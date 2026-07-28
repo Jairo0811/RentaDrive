@@ -12,6 +12,26 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DB_CONNECTION: sqlsrv
+      DB_HOST: 127.0.0.1
+      DB_PORT: 1433
+      DB_DATABASE: RentaDriveTest
+      DB_USERNAME: sa
+      DB_PASSWORD: CI_RentaDrive_2026!
+      DB_ENCRYPT: 'no'
+      DB_TRUST_SERVER_CERTIFICATE: 'true'
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: CI_RentaDrive_2026!
+        ports:
+          - 1433:1433
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -20,7 +40,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: dom, fileinfo, mbstring, pdo_sqlite, xml, zip
+          extensions: dom, fileinfo, mbstring, pdo_sqlsrv, sqlsrv, xml, zip
           coverage: none
 
       - name: Node.js
@@ -36,6 +56,38 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
+
+      - name: Prepare SQL Server
+        run: |
+          php <<'PHP'
+          <?php
+
+          $deadline = time() + 90;
+
+          do {
+              try {
+                  $connection = new PDO(
+                      'sqlsrv:Server=127.0.0.1,1433;Database=master;Encrypt=no;TrustServerCertificate=yes',
+                      getenv('DB_USERNAME'),
+                      getenv('DB_PASSWORD'),
+                      [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
+                  );
+
+                  $connection->exec(
+                      "IF DB_ID(N'RentaDriveTest') IS NULL CREATE DATABASE [RentaDriveTest]"
+                  );
+
+                  exit(0);
+              } catch (Throwable $exception) {
+                  if (time() >= $deadline) {
+                      fwrite(STDERR, $exception->getMessage().PHP_EOL);
+                      exit(1);
+                  }
+
+                  sleep(3);
+              }
+          } while (true);
+          PHP
 
       - name: Validate code style
         run: ./vendor/bin/pint --test
