@@ -14,7 +14,8 @@ Establecer una base Laravel instalable, segura y extensible antes de implementar
 | Spatie Laravel Permission | Roles y permisos mantenibles, compatibles con Policies y Gates |
 | Registro público deshabilitado | El sistema es administrativo; las cuentas deben ser controladas |
 | Seeder de administrador solo local/testing | Evita credenciales conocidas en producción |
-| MySQL para la aplicación y SQLite en memoria para pruebas | Entorno productivo realista y suite rápida/aislada |
+| SQL Server para la aplicación y SQLite en memoria para pruebas locales | Alinea la persistencia con el ecosistema Microsoft y conserva una suite local rápida |
+| SQL Server 2022 en integración continua | Verifica migraciones y pruebas contra el motor real del proyecto |
 | Módulos futuros visibles como deshabilitados | Comunica la hoja de ruta sin simular funciones inexistentes |
 
 ## Árbol inicial
@@ -60,7 +61,7 @@ flowchart TD
 | Elemento | Estado | Evidencia |
 |---|---|---|
 | Proyecto Laravel | Completado | `composer.json`, `artisan`, estructura base |
-| Configuración MySQL | Completado | `.env.example` |
+| Configuración SQL Server | Completado | `.env.example`, `config/database.php` |
 | Breeze Blade | Completado | controladores, requests, vistas y rutas de autenticación |
 | Roles y permisos | Completado | enums, migración y seeders |
 | Policies y middleware | Completado | `UserPolicy`, aliases y rutas protegidas |
@@ -73,6 +74,7 @@ flowchart TD
 ## Criterios de aceptación
 
 - `composer install` resuelve dependencias compatibles con Laravel 13.
+- La CI crea `RentaDriveTest` en SQL Server 2022 y ejecuta la suite completa.
 - `php artisan migrate --seed` crea tablas, permisos, roles y el administrador local.
 - Un visitante es redirigido al login.
 - Un usuario inactivo no inicia sesión.
