@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       DB_CONNECTION: sqlsrv
@@ -35,6 +35,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Microsoft ODBC Driver 18
+        run: |
+          curl -sSL -o /tmp/packages-microsoft-prod.deb \
+            https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
       - name: PHP 8.3
         uses: shivammathur/setup-php@v2
