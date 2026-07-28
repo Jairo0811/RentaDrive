@@ -31,28 +31,73 @@ El proyecto se desarrolla como un monolito modular: conserva la sencillez operat
 
 Los módulos operativos todavía no están implementados. El dashboard los muestra como próximos para no presentar funciones simuladas como terminadas.
 
-## Tecnologías
+## Stack tecnológico
+
+### Backend
 
 <p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.3+" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" title="Laravel 13" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" title="Composer" width="42" height="42">
 </p>
 
-| Área | Tecnología |
-|---|---|
-| Backend | PHP 8.3+, Laravel 13 |
-| Interfaz | Blade, Tailwind CSS 3, Alpine.js |
-| Datos | Microsoft SQL Server 2017+ |
-| Seguridad | Laravel Breeze, Policies, Gates, Spatie Laravel Permission |
-| Gráficos | Chart.js |
-| Documentos | DomPDF, Laravel Excel |
-| Build | Vite 8 |
-| Pruebas | PHPUnit 12 |
+- **PHP 8.3+** como lenguaje del servidor.
+- **Laravel 13** como framework principal y base del monolito modular.
+- **Composer** para la administración de dependencias del backend.
+
+### Frontend
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="Blade y HTML5" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS 3" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" title="JavaScript" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" title="Alpine.js 3" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chartjs/chartjs-original.svg" alt="Chart.js" title="Chart.js 4" width="42" height="42">
+</p>
+
+- **Blade** para las vistas renderizadas por Laravel.
+- **Tailwind CSS 3** para estilos, diseño responsive y modo oscuro.
+- **Alpine.js 3** para la interactividad ligera de la interfaz.
+- **Chart.js 4** para gráficos y visualizaciones del dashboard.
+
+### Base de datos y persistencia
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" title="Microsoft SQL Server" width="42" height="42">
+</p>
+
+- **Microsoft SQL Server 2017+** como motor de base de datos; se recomienda SQL Server 2022.
+- **Eloquent ORM**, migraciones y seeders para el acceso y administración de los datos.
+- **SQLite en memoria** exclusivamente para pruebas locales rápidas.
+
+### Seguridad y control de acceso
+
+- **Laravel Breeze** para la autenticación.
+- **Spatie Laravel Permission** para roles y permisos.
+- **Policies, Gates y middleware** para la autorización del lado del servidor.
+- Protección **CSRF**, regeneración de sesiones y limitación de intentos de inicio de sesión.
+
+### Reportes y documentos
+
+- **DomPDF** para generar documentos PDF.
+- **Laravel Excel** para importar y exportar archivos de Excel.
+- **Chart.js** para presentar indicadores y reportes visuales.
+
+### Herramientas, pruebas e integración continua
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" title="Node.js 20+" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" title="npm 10+" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" title="Vite 8" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" title="Git" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" alt="GitHub Actions" title="GitHub Actions" width="42" height="42">
+</p>
+
+- **Vite 8**, **Node.js 20+** y **npm 10+** para compilar los recursos del frontend.
+- **PHPUnit 12** para pruebas automatizadas.
+- **Laravel Pint** para verificar el estilo del código PHP.
+- **Git y GitHub** para control de versiones.
+- **GitHub Actions** para validar el build, el estilo y las pruebas sobre SQL Server 2022.
 
 ## Requisitos
 
