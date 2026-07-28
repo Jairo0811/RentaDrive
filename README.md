@@ -215,6 +215,18 @@ Consulta [el alcance técnico de la Fase 1](docs/analysis/phase-1.md) para ver d
 - `APP_DEBUG` debe permanecer en `false` en producción.
 - El usuario de demostración está limitado a entornos locales y de prueba.
 
+## 📌 Información académica
+
+| Información | Detalle |
+|-------------|---------|
+| 👨‍🎓 Estudiante | Francis Jairo Matías Rosario |
+| 🆔 Matrícula | 2015-2984 |
+| 📖 Asignatura | Análisis y Diseño de Sistemas (SOF-007) |
+| 👨‍🏫 Profesor | Huáscar Frías Vilorio |
+| 🏫 Institución | Instituto Tecnológico de Las Américas (ITLA) |
+| 📅 Período académico | 2017-C1 |
+| 🎯 Tipo de proyecto | Proyecto final |
+
 ## Capturas
 
 Las capturas definitivas se agregarán cuando los primeros recorridos operativos estén disponibles.
