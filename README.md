@@ -4,12 +4,14 @@
   <img src="public/images/rentadrive-logo-transparent.png" alt="RentaDrive" width="420">
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
-</p>
+
 
 <p align="center">
   <strong>Gestiona tu flota. Impulsa tu negocio.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
 </p>
 
 <p align="center">
