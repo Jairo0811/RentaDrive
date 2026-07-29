@@ -21,6 +21,8 @@ final class RolePermissionSeeder extends Seeder
             Permission::findOrCreate($permission->value, 'web');
         }
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         $this->syncRole(RoleName::ADMINISTRATOR, PermissionName::cases());
         $this->syncRole(RoleName::MANAGER, [
             PermissionName::VIEW_DASHBOARD,

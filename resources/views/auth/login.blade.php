@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-8">
-        <p class="text-sm font-bold uppercase tracking-[.22em] text-blue-600 dark:text-blue-400">Acceso seguro</p>
+        <p class="text-sm font-bold uppercase tracking-[.22em] text-[#0568f5] dark:text-[#22a3ff]">Acceso seguro</p>
         <h1 class="mt-3 text-3xl font-black tracking-tight text-slate-950 dark:text-white">Bienvenido a RentaDrive</h1>
         <p class="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
             Ingresa tus credenciales para acceder al panel de gestión.
@@ -32,7 +32,7 @@
             <div class="flex items-center justify-between">
                 <x-input-label for="password" value="Contraseña" />
                 @if (Route::has('password.request'))
-                    <a class="focus-ring rounded text-xs font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400" href="{{ route('password.request') }}">
+                    <a class="focus-ring rounded text-xs font-semibold text-[#0568f5] hover:text-[#004fc7] dark:text-[#22a3ff]" href="{{ route('password.request') }}">
                         ¿Olvidaste tu contraseña?
                     </a>
                 @endif
@@ -51,7 +51,7 @@
         </div>
 
         <label for="remember_me" class="flex cursor-pointer items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-            <input id="remember_me" type="checkbox" class="rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950" name="remember">
+            <input id="remember_me" type="checkbox" class="rounded border-slate-300 text-[#0568f5] shadow-sm focus:ring-[#168ce8] dark:border-slate-700 dark:bg-slate-950" name="remember">
             Mantener mi sesión iniciada
         </label>
 
