@@ -4,47 +4,47 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="theme-color" content="#0f172a">
+        <meta name="theme-color" content="#071a38">
 
         <title>Acceso | {{ config('app.name', 'RentaDrive') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('images/rentadrive-mark.png') }}">
 
         @include('layouts.partials.theme-script')
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="h-full antialiased">
-        <div class="grid min-h-full bg-slate-100 dark:bg-slate-950 lg:grid-cols-[1.05fr_.95fr]">
-            <section class="relative hidden overflow-hidden bg-slate-950 lg:flex lg:flex-col lg:justify-between lg:p-12">
-                <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(37,99,235,.38),transparent_35%),radial-gradient(circle_at_80%_70%,rgba(14,165,233,.18),transparent_35%)]"></div>
-                <div class="absolute -right-24 top-0 h-full w-72 rotate-12 bg-blue-500/10"></div>
-                <div class="absolute -right-2 top-0 h-full w-px rotate-12 bg-blue-300/30"></div>
+        <div class="grid min-h-full bg-slate-100 dark:bg-[#030914] lg:grid-cols-[1.08fr_.92fr]">
+            <section class="login-brand-panel relative hidden overflow-hidden bg-[#030914] lg:flex lg:flex-col lg:justify-between lg:p-12">
+                <img
+                    src="{{ asset('images/rentadrive-racing.jpeg') }}"
+                    alt=""
+                    class="absolute inset-0 h-full w-full object-cover"
+                >
+                <div class="absolute inset-0 bg-gradient-to-b from-[#030914]/55 via-[#04152c]/55 to-[#030914]/95"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-[#030914]/20 via-transparent to-[#030914]/65"></div>
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0568f5] via-[#25a7ff] to-[#e2232e]"></div>
 
-                <a href="{{ route('home') }}" class="relative z-10 flex items-center gap-3 text-white">
-                    <x-application-logo class="h-12 w-12 text-blue-400" />
-                    <span>
-                        <span class="block text-xl font-black tracking-tight">RentaDrive</span>
-                        <span class="block text-xs font-medium uppercase tracking-[.22em] text-slate-400">Fleet management</span>
-                    </span>
+                <a href="{{ route('home') }}" class="relative z-10 inline-flex rounded-xl">
+                    <img src="{{ asset('images/rentadrive-logo-dark.png') }}" alt="RentaDrive" class="h-20 w-64 object-contain object-left">
                 </a>
 
                 <div class="relative z-10 max-w-xl">
-                    <p class="mb-4 text-sm font-bold uppercase tracking-[.3em] text-blue-400">Control operativo</p>
-                    <h1 class="text-5xl font-black leading-tight text-white xl:text-6xl">
-                        Gestiona tu flota.<br>
-                        <span class="text-blue-400">Impulsa tu negocio.</span>
-                    </h1>
-                    <p class="mt-6 max-w-lg text-lg leading-relaxed text-slate-400">
-                        Una plataforma centralizada para reservas, alquileres, inspecciones, facturación y control de vehículos.
+                    <div class="brand-lockup">
+                        <img src="{{ asset('images/rentadrive-logo-dark.png') }}" alt="RentaDrive">
+                    </div>
+                    <p class="mt-5 max-w-lg text-base leading-relaxed text-slate-200">
+                        Reservas, alquileres, inspecciones, facturación y vehículos en una sola plataforma.
                     </p>
                 </div>
 
-                <p class="relative z-10 text-sm text-slate-500">RentaDrive · Versión 1.0 en desarrollo</p>
+                <p class="relative z-10 text-sm text-slate-300">RentaDrive · Gestiona tu flota. Impulsa tu negocio.</p>
             </section>
 
-            <section class="relative flex min-h-full items-center justify-center px-5 py-12 sm:px-8">
+            <section class="login-form-panel relative flex min-h-full items-center justify-center px-5 py-12 sm:px-8">
                 <button
                     type="button"
-                    class="focus-ring absolute right-5 top-5 rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                    class="focus-ring absolute right-5 top-5 rounded-xl border border-[#cbd9eb] bg-white p-2.5 text-[#0b2a52] shadow-sm dark:border-[#17355f] dark:bg-[#081a35] dark:text-[#8ed2ff]"
                     @click="$store.theme.toggle()"
                     :aria-label="$store.theme.dark ? 'Activar modo claro' : 'Activar modo oscuro'"
                 >
@@ -57,12 +57,9 @@
                 </button>
 
                 <div class="w-full max-w-md">
-                    <div class="mb-8 flex items-center gap-3 lg:hidden">
-                        <x-application-logo class="h-11 w-11 text-blue-600 dark:text-blue-400" />
-                        <div>
-                            <p class="text-xl font-black text-slate-950 dark:text-white">RentaDrive</p>
-                            <p class="text-xs uppercase tracking-[.18em] text-slate-500">Gestión de flotas</p>
-                        </div>
+                    <div class="mb-8 lg:hidden">
+                        <img src="{{ asset('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive" class="h-20 w-64 object-contain object-left dark:hidden">
+                        <img src="{{ asset('images/rentadrive-logo-dark.png') }}" alt="RentaDrive" class="hidden h-20 w-64 object-contain object-left dark:block">
                     </div>
 
                     {{ $slot }}

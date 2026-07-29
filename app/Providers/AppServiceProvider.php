@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Events\ConnectionEstablished;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(
+            ConnectionEstablished::class,
+            static function (ConnectionEstablished $event): void {
+                if ($event->connection->getDriverName() === 'sqlsrv') {
+                    $event->connection->unprepared('SET DATEFORMAT ymd');
+                }
+            }
+        );
     }
 }

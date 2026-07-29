@@ -27,8 +27,6 @@ app/
 │       ├── Enums/
 │       │   ├── PermissionName.php
 │       │   └── RoleName.php
-│       └── Services/
-│           └── FoundationSummaryService.php
 ├── Http/
 │   ├── Controllers/
 │   │   ├── Auth/

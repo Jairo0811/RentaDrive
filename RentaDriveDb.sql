@@ -1,5 +1,0 @@
-IF DB_ID(N'RentaDriveDb') IS NULL
-BEGIN
-    CREATE DATABASE [RentaDriveDb];
-END;
-GO

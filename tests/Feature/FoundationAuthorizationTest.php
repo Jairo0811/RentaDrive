@@ -36,7 +36,7 @@ final class FoundationAuthorizationTest extends TestCase
             $this->actingAs($user)
                 ->get('/dashboard')
                 ->assertOk()
-                ->assertSee('La base de RentaDrive está preparada.');
+                ->assertSee('Gestiona tu flota. Impulsa tu negocio.');
         }
     }
 

@@ -7,6 +7,7 @@
         <meta name="theme-color" content="#0f172a">
 
         <title>{{ config('app.name', 'RentaDrive') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('images/rentadrive-mark.png') }}">
 
         @include('layouts.partials.theme-script')
 
@@ -38,6 +39,17 @@
                         @if (session('status'))
                             <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300">
                                 {{ session('status') }}
+                            </div>
+                        @endif
+
+                        @if ($errors->any())
+                            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300">
+                                <p class="font-bold">Revisa la información indicada:</p>
+                                <ul class="mt-1 list-disc space-y-1 pl-5">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         @endif
 

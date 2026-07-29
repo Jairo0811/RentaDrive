@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models\Concerns;
+
+use App\Models\AuditLog;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Arr;
+
+trait Auditable
+{
+    public static function bootAuditable(): void
+    {
+        foreach (['created', 'updated', 'deleted'] as $event) {
+            static::$event(function (Model $model) use ($event): void {
+                if (! Schema::hasTable('audit_logs')) {
+                    return;
+                }
+
+                $hidden = $model->getHidden();
+                $oldValues = match ($event) {
+                    'updated' => Arr::except($model->getOriginal(), $hidden),
+                    'deleted' => Arr::except($model->getAttributes(), $hidden),
+                    default => null,
+                };
+                $newValues = $event === 'deleted'
+                    ? null
+                    : Arr::except($model->getAttributes(), $hidden);
+
+                AuditLog::query()->create([
+                    'user_id' => Auth::id(),
+                    'event' => $event,
+                    'auditable_type' => $model::class,
+                    'auditable_id' => $model->getKey(),
+                    'old_values' => $oldValues,
+                    'new_values' => $newValues,
+                    'ip_address' => request()?->ip(),
+                    'user_agent' => request()?->userAgent(),
+                ]);
+            });
+        }
+    }
+}
