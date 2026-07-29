@@ -2,115 +2,99 @@
 
 > **Gestiona tu flota. Impulsa tu negocio.**
 
-RentaDrive es un sistema web de gestión de alquiler de vehículos construido como evolución profesional de un proyecto académico del ITLA. Centralizará clientes, flota, reservas, alquileres, contratos, inspecciones, devoluciones, facturación, pagos y reportes.
+RentaDrive es un sistema web para administrar empresas de alquiler de vehículos. Integra clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes y auditoría en un flujo operativo completo.
 
-El proyecto se desarrolla como un monolito modular: conserva la sencillez operativa de Laravel y separa la lógica por dominios para facilitar su mantenimiento y una futura API REST.
+El proyecto nació como trabajo final de Análisis y Diseño de Sistemas en el ITLA y fue reconstruido como una aplicación profesional con Laravel, SQL Server y una arquitectura monolítica modular.
 
-![Estado](https://img.shields.io/badge/estado-fase%201-blue)
-![Laravel](https://img.shields.io/badge/Laravel-13.8-FF2D20?logo=laravel&logoColor=white)
+![Estado](https://img.shields.io/badge/estado-versión%201.0-16a34a)
+![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.3+-777BB4?logo=php&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-2017+-CC2927?logo=microsoftsqlserver&logoColor=white)
-![Licencia](https://img.shields.io/badge/licencia-MIT-green)
+![Licencia](https://img.shields.io/badge/licencia-MIT-16a34a)
 
-## Estado actual
+## Funcionalidades
 
-**Fase 1 — Fundación técnica**
+### Operaciones
 
-- Autenticación con Laravel Breeze y registro público deshabilitado.
-- Protección CSRF, regeneración de sesión y limitación de intentos de acceso.
-- Usuarios activos/inactivos.
-- Roles y permisos con Spatie Laravel Permission.
-- Roles iniciales: Administrador, Gerente, Agente de alquiler e Inspector.
-- Policies y middleware de autorización.
-- Seeder local idempotente para el administrador.
-- Layout responsive con sidebar, navbar y navegación móvil.
-- Modo oscuro persistente.
-- Dashboard inicial con datos reales de la fundación.
-- Pruebas de autenticación y autorización.
-- Integración continua para backend y frontend.
+- Expedientes de clientes con documentos, contacto y licencia.
+- Marcas, modelos, categorías, tarifas, depósitos y vehículos.
+- Estados de flota: disponible, reservado, alquilado, mantenimiento e inactivo.
+- Historial y programación de mantenimiento.
+- Reservas con validación de solapamiento por vehículo.
+- Conversión de una reserva en alquiler.
+- Alquileres con kilometraje, combustible, tarifa, depósito y cargos.
+- Cálculo automático de días, impuestos y total.
+- Contrato imprimible por alquiler.
+- Inspecciones de entrega y devolución con fotografías.
+- Cierre del alquiler y actualización automática de la unidad.
 
-Los módulos operativos todavía no están implementados. El dashboard los muestra como próximos para no presentar funciones simuladas como terminadas.
+### Finanzas
 
-## Stack tecnológico
+- Factura automática al abrir un alquiler.
+- Recalculo de factura al devolver el vehículo.
+- Descuentos, fecha de vencimiento y notas.
+- Pagos parciales o totales.
+- Recibos con método y referencia.
+- Anulación de pagos y recálculo del balance.
+- Facturas descargables en PDF.
+- Exportación de operaciones a CSV.
 
-### Backend
+### Administración
 
-<p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.3+" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" title="Laravel 13" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" title="Composer" width="42" height="42">
-</p>
+- Dashboard con indicadores reales.
+- Roles: Administrador, Gerente, Agente de alquiler e Inspector.
+- Permisos por módulo y operación.
+- Gestión de usuarios activos e inactivos.
+- Configuración del negocio, moneda, ITBIS y ubicación.
+- Auditoría automática de creaciones, cambios y eliminaciones.
+- Registro público deshabilitado.
+- Modo claro/oscuro y diseño responsive.
 
-- **PHP 8.3+** como lenguaje del servidor.
-- **Laravel 13** como framework principal y base del monolito modular.
-- **Composer** para la administración de dependencias del backend.
+## Flujo principal
 
-### Frontend
+```mermaid
+flowchart TD
+    A["Cliente"] --> B["Reserva"]
+    B --> C["Alquiler"]
+    C --> D["Inspección de entrega"]
+    C --> E["Factura"]
+    E --> F["Pago"]
+    C --> G["Inspección de devolución"]
+    G --> H["Cierre y disponibilidad"]
+```
 
-<p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="Blade y HTML5" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS 3" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" title="JavaScript" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" title="Alpine.js 3" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chartjs/chartjs-original.svg" alt="Chart.js" title="Chart.js 4" width="42" height="42">
-</p>
-
-- **Blade** para las vistas renderizadas por Laravel.
-- **Tailwind CSS 3** para estilos, diseño responsive y modo oscuro.
-- **Alpine.js 3** para la interactividad ligera de la interfaz.
-- **Chart.js 4** para gráficos y visualizaciones del dashboard.
-
-### Base de datos y persistencia
-
-<p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" title="Microsoft SQL Server" width="42" height="42">
-</p>
-
-- **Microsoft SQL Server 2017+** como motor de base de datos; se recomienda SQL Server 2022.
-- **Eloquent ORM**, migraciones y seeders para el acceso y administración de los datos.
-- **SQLite en memoria** exclusivamente para pruebas locales rápidas.
-
-### Seguridad y control de acceso
-
-- **Laravel Breeze** para la autenticación.
-- **Spatie Laravel Permission** para roles y permisos.
-- **Policies, Gates y middleware** para la autorización del lado del servidor.
-- Protección **CSRF**, regeneración de sesiones y limitación de intentos de inicio de sesión.
-
-### Reportes y documentos
-
-- **DomPDF** para generar documentos PDF.
-- **Laravel Excel** para importar y exportar archivos de Excel.
-- **Chart.js** para presentar indicadores y reportes visuales.
-
-### Herramientas, pruebas e integración continua
+## Tecnologías
 
 <p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" title="Node.js 20+" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" title="npm 10+" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" title="Vite 8" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" title="Git" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" alt="GitHub Actions" title="GitHub Actions" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" width="42" height="42">
 </p>
 
-- **Vite 8**, **Node.js 20+** y **npm 10+** para compilar los recursos del frontend.
-- **PHPUnit 12** para pruebas automatizadas.
-- **Laravel Pint** para verificar el estilo del código PHP.
-- **Git y GitHub** para control de versiones.
-- **GitHub Actions** para validar el build, el estilo y las pruebas sobre SQL Server 2022.
+| Área | Tecnología |
+|---|---|
+| Backend | PHP 8.3+, Laravel 13 |
+| Interfaz | Blade, Tailwind CSS 3, Alpine.js |
+| Datos | Microsoft SQL Server 2017+ |
+| Seguridad | Laravel Breeze, Policies, Spatie Laravel Permission |
+| Documentos | DomPDF |
+| Exportaciones | CSV y Laravel Excel disponible |
+| Build | Vite 8 |
+| Pruebas | PHPUnit 12 |
 
 ## Requisitos
 
 - PHP 8.3 o superior.
 - Composer 2.7 o superior.
-- Microsoft SQL Server 2017 o superior; se recomienda SQL Server 2022.
+- Microsoft SQL Server 2017 o superior.
 - Microsoft ODBC Driver 18 for SQL Server.
-- Node.js 20 o superior.
+- Extensiones PHP `sqlsrv` y `pdo_sqlsrv`.
+- Node.js 22 o superior.
 - npm 10 o superior.
-
-Extensiones PHP principales: `ctype`, `curl`, `dom`, `fileinfo`, `filter`, `hash`, `mbstring`, `openssl`, `pdo`, `pdo_sqlsrv`, `session`, `sqlsrv`, `tokenizer` y `xml`.
-
-Laravel requiere las extensiones `sqlsrv` y `pdo_sqlsrv` junto con el controlador ODBC de Microsoft. Consulta la [configuración oficial de SQL Server en Laravel](https://laravel.com/docs/13.x/database#microsoft-sql-server-configuration) y la [instalación oficial de los controladores PHP](https://learn.microsoft.com/sql/connect/php/download-drivers-php-sql-server).
 
 ## Instalación
 
@@ -123,161 +107,138 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Crea una base de datos SQL Server vacía desde SQL Server Management Studio o Azure Data Studio:
-
-```sql
-IF DB_ID(N'RentaDriveDb') IS NULL
-BEGIN
-    CREATE DATABASE [RentaDriveDb];
-END;
-GO
-```
-
-Usa un login dedicado con permisos sobre `RentaDriveDb`; evita utilizar `sa` en producción.
-
-Ajusta estas variables en `.env`:
+Crea `RentaDriveDb` en SQL Server y configura `.env`. Para autenticación de Windows local:
 
 ```dotenv
 DB_CONNECTION=sqlsrv
-DB_HOST=127.0.0.1
-DB_PORT=1433
+DB_HOST=localhost
+DB_PORT=null
 DB_DATABASE=RentaDriveDb
-DB_USERNAME=rentadrive_app
-DB_PASSWORD=
-DB_ENCRYPT=no
+DB_USERNAME=null
+DB_PASSWORD=null
+DB_ENCRYPT=yes
 DB_TRUST_SERVER_CERTIFICATE=true
 ```
 
-La configuración anterior facilita el desarrollo local con un certificado autofirmado. En producción utiliza `DB_ENCRYPT=yes`, `DB_TRUST_SERVER_CERTIFICATE=false` y un certificado válido.
-
-Finaliza la preparación:
+Luego ejecuta:
 
 ```bash
-php artisan storage:link
+php artisan optimize:clear
 php artisan migrate --seed
+php artisan storage:link
 npm run build
+php artisan test
 php artisan serve
 ```
 
-Para ejecutar servidor, cola, logs y Vite en desarrollo:
+Abre `http://127.0.0.1:8000`.
+
+### Actualización desde la fase 1
+
+Si ya tienes autenticación, roles y el administrador funcionando, no borres la base. Reemplaza los archivos y ejecuta:
 
 ```bash
-composer run dev
+php artisan optimize:clear
+php artisan migrate
+php artisan db:seed
+php artisan storage:link
+npm run build
+php artisan test
 ```
+
+La migración operativa agrega las tablas nuevas sin eliminar usuarios, permisos ni información existente.
 
 ## Credenciales locales
 
-El seeder crea este usuario **únicamente en los entornos `local` y `testing`**:
+El seeder crea este usuario únicamente en `local` y `testing`:
 
 ```text
 Correo: admin@rentadrive.test
 Contraseña: password
 ```
 
-Puedes reemplazarlo antes de ejecutar los seeders:
+Puedes cambiarlo antes de sembrar:
 
 ```dotenv
 RENTADRIVE_ADMIN_EMAIL=admin@rentadrive.test
 RENTADRIVE_ADMIN_PASSWORD=una-clave-local-segura
 ```
 
-El usuario de demostración no se crea en producción.
+## Roles
 
-## Roles iniciales
-
-| Rol | Alcance preparado |
+| Rol | Alcance |
 |---|---|
-| Administrador | Control completo y administración |
+| Administrador | Acceso completo, configuración, usuarios y auditoría |
 | Gerente | Consultas operativas, financieras y reportes |
-| Agente de alquiler | Clientes, reservas, alquileres, contratos, entregas y devoluciones |
-| Inspector | Vehículos, alquileres e inspecciones |
+| Agente de alquiler | Clientes, reservas, alquileres, contratos y devoluciones |
+| Inspector | Flota, alquileres e inspecciones |
 
-Los permisos están definidos como enums y asignados de forma idempotente por `RolePermissionSeeder`.
-
-## Estructura inicial
+## Estructura
 
 ```text
-RentaDrive/
-├── app/
-│   ├── Domain/
-│   │   └── Security/
-│   │       ├── Enums/
-│   │       └── Services/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   └── Requests/
-│   ├── Models/
-│   ├── Policies/
-│   └── View/Components/
-├── config/
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-├── docs/analysis/
-├── resources/
-│   ├── css/
-│   ├── js/
-│   └── views/
-├── routes/
-└── tests/
-    ├── Feature/
-    └── Unit/
+app/
+├── Domain/
+│   ├── Operations/Services/
+│   └── Security/
+├── Http/
+│   ├── Controllers/
+│   └── Requests/
+├── Models/
+│   └── Concerns/Auditable.php
+├── Policies/
+└── Providers/
+database/
+├── migrations/
+└── seeders/
+resources/
+├── css/
+├── js/
+└── views/
+    ├── customers/
+    ├── vehicles/
+    ├── reservations/
+    ├── rentals/
+    ├── inspections/
+    ├── invoices/
+    ├── payments/
+    ├── reports/
+    └── administration/
 ```
 
-Cada dominio nuevo se incorporará bajo `app/Domain` sin duplicar la estructura base de Laravel.
-
-## Pruebas
-
-Las pruebas locales usan SQLite en memoria y no modifican `RentaDriveDb`:
+## Pruebas y calidad
 
 ```bash
-composer test
-```
-
-La integración continua ejecuta la misma suite contra una instancia efímera de SQL Server 2022 para validar las migraciones y el comportamiento real del motor elegido.
-
-Verificación de estilo:
-
-```bash
+php artisan test
 ./vendor/bin/pint --test
-```
-
-Compilación del frontend:
-
-```bash
 npm run build
 ```
 
-## Hoja de ruta
+Las pruebas usan SQLite en memoria. La integración continua repite migraciones y pruebas contra SQL Server 2022.
 
-1. ✅ Fundación técnica.
-2. ⏳ Catálogos y flota.
-3. ⏳ Clientes.
-4. ⏳ Reservas y disponibilidad.
-5. ⏳ Alquileres y contratos.
-6. ⏳ Inspecciones y devoluciones.
-7. ⏳ Facturación y pagos.
-8. ⏳ Dashboard y reportes.
-9. ⏳ Auditoría y hardening.
-10. ⏳ Pruebas integrales y documentación final.
+Cobertura funcional incluida:
 
-Consulta [el alcance técnico de la Fase 1](docs/analysis/phase-1.md) para ver decisiones y criterios de aceptación.
+- autenticación y usuario inactivo;
+- registro público deshabilitado;
+- roles, permisos y Policy de usuarios;
+- acceso a módulos por rol;
+- disponibilidad y solapamiento de reservas;
+- apertura de alquiler, cambio de estado y factura automática.
 
 ## Seguridad
 
-- No se versiona `.env` ni ningún secreto.
+- No se versionan secretos ni `.env`.
 - El registro público está deshabilitado.
-- Las contraseñas se almacenan con el hasher configurado por Laravel.
-- Los usuarios inactivos no pueden autenticarse.
-- Los permisos se verifican en backend; ocultar opciones de la interfaz no sustituye la autorización.
-- `APP_DEBUG` debe permanecer en `false` en producción.
-- El usuario de demostración está limitado a entornos locales y de prueba.
+- Los permisos se validan en backend.
+- La auditoría excluye contraseña y token de sesión.
+- El usuario de demostración no se crea en producción.
+- Los importes de pagos se validan contra el balance pendiente.
+- Reservas y alquileres usan transacciones para evitar estados parciales.
+- `APP_DEBUG` debe estar en `false` en producción.
 
-## 📌 Información académica
+## Información académica
 
 | Información | Detalle |
-|-------------|---------|
+|---|---|
 | 👨‍🎓 Estudiante | Francis Jairo Matías Rosario |
 | 🆔 Matrícula | 2015-2984 |
 | 📖 Asignatura | Análisis y Diseño de Sistemas (SOF-007) |
@@ -286,9 +247,10 @@ Consulta [el alcance técnico de la Fase 1](docs/analysis/phase-1.md) para ver d
 | 📅 Período académico | 2017-C1 |
 | 🎯 Tipo de proyecto | Proyecto final |
 
-## Capturas
+## Documentación
 
-Las capturas definitivas se agregarán cuando los primeros recorridos operativos estén disponibles.
+- [Fase 1 — Fundación técnica](docs/analysis/phase-1.md)
+- [Versión 1.0 — Alcance, fases y criterios](docs/analysis/version-1.md)
 
 ## Licencia
 
