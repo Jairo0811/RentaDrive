@@ -1,7 +1,7 @@
 # 🚘 RentaDrive
 
 <p align="center">
-  <img src="public/images/rentadrive-logo-transparent.png" alt="RentaDrive" width="420">
+  <img src="public/images/rentadrive-racing.jpeg" alt="RentaDrive" width="420">
 </p>
 
 
