@@ -1,6 +1,12 @@
 USE [master];
 GO
 
+IF DB_ID(N'RentaDriveDb') IS NULL
+BEGIN
+    CREATE DATABASE [RentaDriveDb];
+END;
+GO
+
 IF NOT EXISTS (
     SELECT 1
     FROM sys.server_principals
@@ -18,12 +24,6 @@ BEGIN
     WITH PASSWORD = 'RentaDrive_Local_2026!';
 
     ALTER LOGIN [rentadrive_app] ENABLE;
-END;
-GO
-
-IF DB_ID(N'RentaDriveDb') IS NULL
-BEGIN
-    CREATE DATABASE [RentaDriveDb];
 END;
 GO
 
