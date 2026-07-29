@@ -49,18 +49,34 @@ return new class extends Migration
 
         Schema::create('vehicle_models', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('vehicle_brand_id')->constrained()->restrictOnDelete();
+
+            $table->foreignId('vehicle_brand_id')
+                ->constrained('vehicle_brands')
+                ->noActionOnDelete();
+
             $table->string('name', 80);
             $table->unsignedSmallInteger('year');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->unique(['vehicle_brand_id', 'name', 'year']);
+
+            $table->unique([
+                'vehicle_brand_id',
+                'name',
+                'year',
+            ]);
         });
 
         Schema::create('vehicles', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('vehicle_model_id')->constrained()->restrictOnDelete();
-            $table->foreignId('vehicle_category_id')->constrained()->restrictOnDelete();
+
+            $table->foreignId('vehicle_model_id')
+                ->constrained('vehicle_models')
+                ->noActionOnDelete();
+
+            $table->foreignId('vehicle_category_id')
+                ->constrained('vehicle_categories')
+                ->noActionOnDelete();
+
             $table->string('code', 30)->unique();
             $table->string('plate', 20)->unique();
             $table->string('vin', 50)->nullable();
@@ -79,7 +95,11 @@ return new class extends Migration
 
         Schema::create('vehicle_maintenances', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('vehicle_id')->constrained()->cascadeOnDelete();
+
+            $table->foreignId('vehicle_id')
+                ->constrained('vehicles')
+                ->cascadeOnDelete();
+
             $table->string('maintenance_type', 60);
             $table->dateTime('scheduled_at');
             $table->dateTime('completed_at')->nullable();
@@ -94,9 +114,20 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table): void {
             $table->id();
             $table->string('code', 40)->unique();
-            $table->foreignId('customer_id')->constrained()->restrictOnDelete();
-            $table->foreignId('vehicle_category_id')->constrained()->restrictOnDelete();
-            $table->foreignId('vehicle_id')->nullable()->constrained()->nullOnDelete();
+
+            $table->foreignId('customer_id')
+                ->constrained('customers')
+                ->noActionOnDelete();
+
+            $table->foreignId('vehicle_category_id')
+                ->constrained('vehicle_categories')
+                ->noActionOnDelete();
+
+            $table->foreignId('vehicle_id')
+                ->nullable()
+                ->constrained('vehicles')
+                ->noActionOnDelete();
+
             $table->dateTime('start_at')->index();
             $table->dateTime('end_at')->index();
             $table->string('pickup_location')->default('Oficina principal');
@@ -105,7 +136,12 @@ return new class extends Migration
             $table->decimal('estimated_total', 14, 2);
             $table->string('status', 20)->default('pending')->index();
             $table->text('notes')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users')
+                ->noActionOnDelete();
+
             $table->dateTime('cancelled_at')->nullable();
             $table->timestamps();
         });
@@ -113,9 +149,20 @@ return new class extends Migration
         Schema::create('rentals', function (Blueprint $table): void {
             $table->id();
             $table->string('code', 40)->unique();
-            $table->foreignId('reservation_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('customer_id')->constrained()->restrictOnDelete();
-            $table->foreignId('vehicle_id')->constrained()->restrictOnDelete();
+
+            $table->foreignId('reservation_id')
+                ->nullable()
+                ->constrained('reservations')
+                ->noActionOnDelete();
+
+            $table->foreignId('customer_id')
+                ->constrained('customers')
+                ->noActionOnDelete();
+
+            $table->foreignId('vehicle_id')
+                ->constrained('vehicles')
+                ->noActionOnDelete();
+
             $table->dateTime('start_at');
             $table->dateTime('expected_return_at');
             $table->dateTime('returned_at')->nullable();
@@ -131,15 +178,31 @@ return new class extends Migration
             $table->decimal('total', 14, 2);
             $table->string('status', 20)->default('open')->index();
             $table->text('notes')->nullable();
-            $table->foreignId('opened_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('closed_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->foreignId('opened_by')
+                ->nullable()
+                ->constrained('users')
+                ->noActionOnDelete();
+
+            $table->foreignId('closed_by')
+                ->nullable()
+                ->constrained('users')
+                ->noActionOnDelete();
+
             $table->timestamps();
         });
 
         Schema::create('inspections', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('rental_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('vehicle_id')->constrained()->restrictOnDelete();
+
+            $table->foreignId('rental_id')
+                ->constrained('rentals')
+                ->cascadeOnDelete();
+
+            $table->foreignId('vehicle_id')
+                ->constrained('vehicles')
+                ->noActionOnDelete();
+
             $table->string('type', 20)->index();
             $table->dateTime('inspected_at');
             $table->unsignedInteger('mileage');
@@ -150,16 +213,32 @@ return new class extends Migration
             $table->text('accessories')->nullable();
             $table->text('damages')->nullable();
             $table->text('photos')->nullable();
-            $table->foreignId('inspected_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->foreignId('inspected_by')
+                ->nullable()
+                ->constrained('users')
+                ->noActionOnDelete();
+
             $table->timestamps();
-            $table->unique(['rental_id', 'type']);
+
+            $table->unique([
+                'rental_id',
+                'type',
+            ]);
         });
 
         Schema::create('invoices', function (Blueprint $table): void {
             $table->id();
             $table->string('number', 40)->unique();
-            $table->foreignId('rental_id')->constrained()->restrictOnDelete();
-            $table->foreignId('customer_id')->constrained()->restrictOnDelete();
+
+            $table->foreignId('rental_id')
+                ->constrained('rentals')
+                ->noActionOnDelete();
+
+            $table->foreignId('customer_id')
+                ->constrained('customers')
+                ->noActionOnDelete();
+
             $table->date('issued_at')->index();
             $table->date('due_at')->nullable();
             $table->decimal('subtotal', 14, 2);
@@ -176,13 +255,22 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table): void {
             $table->id();
             $table->string('receipt_number', 40)->unique();
-            $table->foreignId('invoice_id')->constrained()->restrictOnDelete();
+
+            $table->foreignId('invoice_id')
+                ->constrained('invoices')
+                ->noActionOnDelete();
+
             $table->dateTime('paid_at')->index();
             $table->string('method', 20);
             $table->string('reference', 80)->nullable();
             $table->decimal('amount', 14, 2);
             $table->text('notes')->nullable();
-            $table->foreignId('received_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->foreignId('received_by')
+                ->nullable()
+                ->constrained('users')
+                ->noActionOnDelete();
+
             $table->timestamps();
         });
 
@@ -197,7 +285,12 @@ return new class extends Migration
 
         Schema::create('audit_logs', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->noActionOnDelete();
+
             $table->string('event', 30)->index();
             $table->string('auditable_type')->index();
             $table->unsignedBigInteger('auditable_id')->index();
@@ -206,17 +299,43 @@ return new class extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->timestamp('created_at')->useCurrent();
-            $table->index(['auditable_type', 'auditable_id']);
+
+            $table->index([
+                'auditable_type',
+                'auditable_id',
+            ]);
         });
 
         if (DB::connection()->getDriverName() === 'sqlsrv') {
-            DB::statement('CREATE UNIQUE INDEX customers_license_number_unique ON customers (license_number) WHERE license_number IS NOT NULL');
-            DB::statement('CREATE UNIQUE INDEX vehicles_vin_unique ON vehicles (vin) WHERE vin IS NOT NULL');
-            DB::statement('CREATE UNIQUE INDEX rentals_reservation_id_unique ON rentals (reservation_id) WHERE reservation_id IS NOT NULL');
+            DB::statement(
+                'CREATE UNIQUE INDEX customers_license_number_unique
+                 ON customers (license_number)
+                 WHERE license_number IS NOT NULL'
+            );
+
+            DB::statement(
+                'CREATE UNIQUE INDEX vehicles_vin_unique
+                 ON vehicles (vin)
+                 WHERE vin IS NOT NULL'
+            );
+
+            DB::statement(
+                'CREATE UNIQUE INDEX rentals_reservation_id_unique
+                 ON rentals (reservation_id)
+                 WHERE reservation_id IS NOT NULL'
+            );
         } else {
-            Schema::table('customers', fn (Blueprint $table) => $table->unique('license_number'));
-            Schema::table('vehicles', fn (Blueprint $table) => $table->unique('vin'));
-            Schema::table('rentals', fn (Blueprint $table) => $table->unique('reservation_id'));
+            Schema::table('customers', function (Blueprint $table): void {
+                $table->unique('license_number');
+            });
+
+            Schema::table('vehicles', function (Blueprint $table): void {
+                $table->unique('vin');
+            });
+
+            Schema::table('rentals', function (Blueprint $table): void {
+                $table->unique('reservation_id');
+            });
         }
     }
 
