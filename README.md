@@ -1,23 +1,21 @@
-
-
 <p align="center">
   <img src="public/images/rentadrive-racing.jpeg" alt="RentaDrive" width="420">
 </p>
-
-
-
 
 <p align="center">
   <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/estado-versión%201.0-16a34a" alt="Estado">
+  <img src="https://img.shields.io/badge/Estado-Finalizado-success?style=for-the-badge" alt="Estado finalizado">
+  <img src="https://img.shields.io/badge/Versión-1.0-16a34a?style=for-the-badge" alt="Versión 1.0">
   <img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel">
   <img src="https://img.shields.io/badge/PHP-8.3+-777BB4?logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/SQL%20Server-2017+-CC2927?logo=microsoftsqlserver&logoColor=white" alt="SQL Server">
   <img src="https://img.shields.io/badge/licencia-MIT-16a34a" alt="Licencia">
 </p>
+
+> Estado actual: **Proyecto finalizado en su versión 1.0, funcional y preparado para portafolio profesional.**
 
 RentaDrive es un sistema web profesional para administrar empresas de alquiler de vehículos. Integra clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
 
