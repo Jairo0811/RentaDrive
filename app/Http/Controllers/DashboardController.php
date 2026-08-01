@@ -21,7 +21,6 @@ final class DashboardController extends Controller
         $monthEnd = now()->endOfMonth();
 
         $monthlyIncome = collect(range(5, 0))
-            ->reverse()
             ->map(function (int $offset): array {
                 $date = now()->subMonths($offset);
 
