@@ -6,9 +6,9 @@ namespace App\Models\Concerns;
 
 use App\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Arr;
 
 trait Auditable
 {

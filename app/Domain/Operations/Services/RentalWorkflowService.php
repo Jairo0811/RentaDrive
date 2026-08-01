@@ -17,8 +17,7 @@ final class RentalWorkflowService
     public function __construct(
         private readonly ReservationAvailabilityService $availability,
         private readonly ReferenceNumberService $references,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

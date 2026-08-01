@@ -30,7 +30,7 @@ final class InspectionController extends Controller
     public function create(Request $request): View
     {
         return view('inspections.form', [
-            'inspection' => new Inspection(),
+            'inspection' => new Inspection,
             'rentals' => Rental::query()->with(['customer', 'vehicle.model.brand'])->latest()->get(),
             'selectedRental' => $request->integer('rental') ?: null,
         ]);

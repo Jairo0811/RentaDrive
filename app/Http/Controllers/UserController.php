@@ -33,7 +33,7 @@ final class UserController extends Controller
 
     public function create(): View
     {
-        return $this->formView(new User());
+        return $this->formView(new User);
     }
 
     public function store(UserRequest $request): RedirectResponse

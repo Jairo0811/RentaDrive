@@ -45,7 +45,7 @@ final class RentalController extends Controller
             : null;
 
         return view('rentals.form', [
-            'rental' => new Rental(),
+            'rental' => new Rental,
             'reservation' => $reservation,
             'customers' => Customer::query()->where('status', 'active')->orderBy('first_name')->get(),
             'vehicles' => Vehicle::query()->with(['model.brand', 'category'])->whereNotIn('status', ['rented', 'maintenance', 'inactive'])->get(),

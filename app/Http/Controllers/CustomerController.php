@@ -37,7 +37,7 @@ final class CustomerController extends Controller
 
     public function create(): View
     {
-        return view('customers.form', ['customer' => new Customer()]);
+        return view('customers.form', ['customer' => new Customer]);
     }
 
     public function store(CustomerRequest $request): RedirectResponse

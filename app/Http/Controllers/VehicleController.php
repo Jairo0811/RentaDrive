@@ -44,7 +44,7 @@ final class VehicleController extends Controller
 
     public function create(): View
     {
-        return $this->formView(new Vehicle());
+        return $this->formView(new Vehicle);
     }
 
     public function store(VehicleRequest $request): RedirectResponse

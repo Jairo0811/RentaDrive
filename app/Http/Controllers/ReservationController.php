@@ -42,7 +42,7 @@ final class ReservationController extends Controller
 
     public function create(): View
     {
-        return $this->formView(new Reservation());
+        return $this->formView(new Reservation);
     }
 
     public function store(
