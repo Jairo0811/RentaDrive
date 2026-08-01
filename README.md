@@ -1,67 +1,95 @@
 <p align="center">
-  <img src="public/images/rentadrive-racing.jpeg" alt="RentaDrive" width="420">
+  <img src="public/images/rentadrive-racing.jpeg" alt="RentaDrive" width="460">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
+  <img src="https://img.shields.io/badge/Estado-Finalizado-16a34a?style=for-the-badge" alt="Estado finalizado">
+  <img src="https://img.shields.io/badge/Versión-1.0-2563eb?style=for-the-badge" alt="Versión 1.0">
+  <img src="https://img.shields.io/badge/Licencia-MIT-16a34a?style=for-the-badge" alt="Licencia MIT">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Estado-Finalizado-success?style=for-the-badge" alt="Estado finalizado">
-  <img src="https://img.shields.io/badge/Versión-1.0-16a34a?style=for-the-badge" alt="Versión 1.0">
-  <img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel">
-  <img src="https://img.shields.io/badge/PHP-8.3+-777BB4?logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php&logoColor=white" alt="PHP 8.4+">
+  <img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13">
   <img src="https://img.shields.io/badge/SQL%20Server-2017+-CC2927?logo=microsoftsqlserver&logoColor=white" alt="SQL Server">
-  <img src="https://img.shields.io/badge/licencia-MIT-16a34a" alt="Licencia">
+  <img src="https://img.shields.io/badge/Tests-35%20passing-success" alt="35 tests passing">
 </p>
 
-> Estado actual: **Proyecto finalizado en su versión 1.0, funcional y preparado para portafolio profesional.**
+# RentaDrive
 
-RentaDrive es un sistema web profesional para administrar empresas de alquiler de vehículos. Integra clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
+**RentaDrive** es un sistema web profesional para la gestión integral de empresas de alquiler de vehículos. Centraliza clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
 
-El proyecto nació como trabajo final de **Análisis y Diseño de Sistemas** en el Instituto Tecnológico de Las Américas (ITLA) y fue reconstruido como una aplicación funcional con Laravel, Microsoft SQL Server y una arquitectura monolítica modular.
+El proyecto nació como trabajo final de la asignatura **Análisis y Diseño de Sistemas** del Instituto Tecnológico de Las Américas (ITLA) y fue reconstruido como una aplicación funcional con Laravel, Microsoft SQL Server y una arquitectura monolítica modular orientada a mantenibilidad, seguridad y escalabilidad.
 
-## 📌 Funcionalidades principales
+## Estado actual
 
-### Operaciones
+La versión 1.0 se encuentra finalizada y validada para uso académico, portafolio profesional y evolución comercial.
 
-- Gestión completa de clientes, documentos, contacto y licencias.
+- 35 pruebas automatizadas aprobadas.
+- 103 assertions.
+- Laravel Pint en verde.
+- Build de Vite aprobado.
+- Compatibilidad validada con SQL Server y SQLite en memoria para testing.
+- Dashboard operativo con métricas, gráficos y calendario.
+- Aplicación instalable como PWA.
+
+# Funcionalidades
+
+## Operaciones
+
+- Gestión completa de clientes, contacto, documentos y licencias.
+- Validación local de cédulas dominicanas por dígito verificador.
+- Normalización automática de cédulas antes de guardar.
 - Administración de marcas, modelos, categorías, tarifas, depósitos y vehículos.
 - Estados de flota: disponible, reservado, alquilado, mantenimiento e inactivo.
 - Historial y programación de mantenimientos.
-- Reservas con validación de disponibilidad y solapamiento por vehículo.
+- Reservas con validación de disponibilidad y solapamiento.
 - Conversión de reservas en alquileres.
-- Alquileres con fechas, kilometraje, combustible, tarifa, depósito y cargos.
-- Cálculo automático de días, subtotal, impuestos y total.
+- Apertura y cierre de alquileres.
+- Gestión de kilometraje, combustible, depósito, cargos y fechas.
 - Contrato imprimible por alquiler.
-- Inspecciones de entrega y devolución con fotografías.
-- Cierre del alquiler y actualización automática del estado del vehículo.
+- Inspecciones de entrega y devolución.
+- Actualización automática del estado del vehículo.
 
-### Finanzas
+## Finanzas
 
-- Factura automática al abrir un alquiler.
-- Recalculo de factura al devolver el vehículo.
-- Gestión de descuentos, fecha de vencimiento y notas.
-- Pagos parciales o totales.
+- Facturación automática al abrir un alquiler.
+- Recálculo de factura al devolver el vehículo.
+- ITBIS fijo del 18 % protegido desde backend.
+- Gestión de descuentos, vencimientos y notas.
+- Pagos parciales y totales.
 - Recibos con método de pago y referencia.
 - Anulación de pagos y recálculo del balance.
-- Facturas descargables en PDF.
-- Exportación de operaciones a CSV.
+- Facturas y contratos en PDF.
+- Exportaciones CSV y soporte para Laravel Excel.
 
-### Administración y seguridad
+## Dashboard y experiencia de usuario
 
-- Dashboard con indicadores operativos reales.
-- Usuarios activos e inactivos.
-- Roles: Administrador, Gerente, Agente de alquiler e Inspector.
-- Permisos por módulo y operación.
-- Configuración del negocio, moneda, ITBIS y ubicación.
-- Auditoría automática de creaciones, modificaciones y eliminaciones.
-- Registro público deshabilitado.
-- Validaciones de autorización en backend.
+- Indicadores operativos en tiempo real.
+- Gráfico de ingresos de los últimos seis meses.
+- Gráfico de distribución del estado de la flota.
+- Calendario mensual de reservas.
+- Accesos rápidos para nuevas reservas y alquileres.
+- Notificaciones tipo toast.
 - Modo claro y oscuro.
 - Diseño responsive.
+- Páginas personalizadas para errores 404 y 500.
+- Manifest y service worker para instalación como PWA.
 
-## 🔄 Flujo principal
+## Administración y seguridad
+
+- Gestión de usuarios activos e inactivos.
+- Roles: Administrador, Gerente, Agente de alquiler e Inspector.
+- Permisos por módulo y operación.
+- Policies y middleware de autorización.
+- Registro público deshabilitado.
+- Protección CSRF.
+- Validaciones mediante Form Requests.
+- Auditoría automática de creaciones, modificaciones y eliminaciones.
+- Eliminación segura de cuentas con limpieza de referencias relacionadas.
+
+# Flujo principal
 
 ```mermaid
 flowchart TD
@@ -75,101 +103,91 @@ flowchart TD
     H --> I[Vehículo disponible]
 ```
 
-# 🧰 Stack tecnológico
+# Stack tecnológico
 
 ## Backend
 
 <p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.3+" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.4+" width="42" height="42">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" title="Laravel 13" width="42" height="42">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" title="Composer" width="42" height="42">
 </p>
 
-- **PHP 8.3+** como lenguaje principal del servidor.
-- **Laravel 13** como framework web y base del monolito modular.
-- **Composer** para gestionar dependencias PHP y scripts del proyecto.
-- **Eloquent ORM** para consultas, relaciones y persistencia.
-- **Migraciones y seeders** para crear y poblar la base de datos.
+- **PHP 8.4.1 o superior**.
+- **Laravel 13.8**.
+- **Composer** para dependencias y scripts.
+- **Eloquent ORM** para persistencia y relaciones.
+- Migraciones, seeders, factories y servicios de dominio.
+- Arquitectura monolítica modular.
 
 ## Frontend
 
 <p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="Blade y HTML5" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS 3" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="HTML5" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS" width="42" height="42">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" title="JavaScript" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" title="Alpine.js 3" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chartjs/chartjs-original.svg" alt="Chart.js" title="Chart.js 4" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" title="Alpine.js" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chartjs/chartjs-original.svg" alt="Chart.js" title="Chart.js" width="42" height="42">
 </p>
 
-- **Blade** para las vistas renderizadas por Laravel.
-- **HTML5** para la estructura de las interfaces.
-- **Tailwind CSS 3** para estilos, diseño responsive y modo oscuro.
-- **Alpine.js 3** para interacciones ligeras.
-- **JavaScript** para comportamiento del frontend.
-- **Chart.js 4** para indicadores y gráficos del dashboard.
-- **Laravel Vite Plugin** para integrar el build del frontend con Laravel.
+- **Blade** y HTML5.
+- **Tailwind CSS 3.4**.
+- **Alpine.js 3.15**.
+- **JavaScript ES Modules**.
+- **Chart.js 4.5**.
+- **Laravel Vite Plugin 3.1**.
 
-## Base de datos y persistencia
+## Base de datos
 
 <p>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" title="Microsoft SQL Server" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" alt="SQLite" title="SQLite para testing" width="42" height="42">
 </p>
 
-- **Microsoft SQL Server 2017+** como motor de base de datos principal.
-- **Microsoft ODBC Driver 17 o 18** para la conexión desde PHP.
-- Extensiones PHP **`sqlsrv`** y **`pdo_sqlsrv`**.
-- **SQLite en memoria** exclusivamente para pruebas automatizadas locales.
+- **Microsoft SQL Server 2017 o superior** como motor principal.
+- **ODBC Driver 17 o 18**.
+- Extensiones PHP `sqlsrv` y `pdo_sqlsrv`.
+- **SQLite en memoria** para pruebas automatizadas.
 
-## Autenticación, autorización y seguridad
+## Seguridad y autorización
 
-- **Laravel Breeze** para la base de autenticación.
-- **Spatie Laravel Permission** para roles y permisos.
-- **Policies y middleware** para autorización del lado del servidor.
-- Protección **CSRF**.
-- Regeneración de sesión al autenticar.
-- Validación mediante **Form Requests**.
+- Laravel Breeze.
+- Spatie Laravel Permission 8.3.
+- Policies, middleware y permisos por módulo.
+- CSRF, sesiones seguras y validación de entradas.
 - Auditoría de operaciones sensibles.
-- Registro público deshabilitado.
 
 ## Documentos y exportaciones
 
-- **DomPDF** para contratos y facturas en PDF.
-- **Laravel Excel** disponible para exportaciones estructuradas.
-- **CSV** para exportación de operaciones.
+- DomPDF 3.1 para contratos y facturas.
+- Laravel Excel 3.1.
+- Exportación CSV.
 
-## Build y herramientas de desarrollo
+## Calidad, build y CI
 
 <p>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" title="Node.js 22+" width="42" height="42">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" title="npm 10+" width="42" height="42">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" title="npm" width="42" height="42">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" title="Vite 8" width="42" height="42">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" title="Git" width="42" height="42">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" alt="GitHub Actions" title="GitHub Actions" width="42" height="42">
 </p>
 
-- **Node.js 22+** y **npm 10+** para dependencias del frontend.
-- **Vite 8** para compilar CSS y JavaScript.
-- **PostCSS** y **Autoprefixer** para procesamiento CSS.
-- **Concurrently** para ejecutar servidor, cola, logs y Vite en desarrollo.
-- **Git y GitHub** para control de versiones.
-- **GitHub Actions** para integración continua.
+- Node.js 22 o superior.
+- npm 10 o superior.
+- Vite 8.
+- PHPUnit 12.5.
+- Laravel Pint 1.27.
+- Mockery y Faker.
+- GitHub Actions para integración continua.
 
-## Pruebas y calidad
+# Requisitos
 
-- **PHPUnit 12** para pruebas unitarias y funcionales.
-- **Laravel Pint** para estilo y formato del código PHP.
-- **Mockery** para dobles de prueba.
-- **Faker** para datos de testing.
-
-# ✅ Requisitos
-
-Antes de instalar RentaDrive, asegúrate de tener:
-
-- PHP 8.3 o superior.
+- PHP 8.4.1 o superior.
 - Composer 2.7 o superior.
 - Microsoft SQL Server 2017 o superior.
-- Microsoft ODBC Driver 17 o 18 for SQL Server.
-- Extensiones PHP `sqlsrv` y `pdo_sqlsrv`.
+- Microsoft ODBC Driver 17 o 18.
+- Extensiones `sqlsrv` y `pdo_sqlsrv`.
 - Node.js 22 o superior.
 - npm 10 o superior.
 - Git.
@@ -194,7 +212,7 @@ xml
 zip
 ```
 
-# 📥 Instalación desde GitHub
+# Instalación
 
 ## 1. Clonar el repositorio
 
@@ -203,41 +221,36 @@ git clone https://github.com/Jairo0811/RentaDrive.git
 cd RentaDrive
 ```
 
-## 2. Instalar dependencias PHP
+## 2. Instalar dependencias
 
 ```bash
 composer install
-```
-
-## 3. Instalar dependencias frontend
-
-```bash
 npm install
 ```
 
-## 4. Crear el archivo de entorno
+## 3. Crear el archivo de entorno
 
-En Linux o macOS:
+Linux o macOS:
 
 ```bash
 cp .env.example .env
 ```
 
-En Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-## 5. Generar la clave de Laravel
+## 4. Generar la clave de Laravel
 
 ```bash
 php artisan key:generate
 ```
 
-## 6. Crear la base de datos
+## 5. Crear la base de datos
 
-Desde SQL Server Management Studio o Azure Data Studio:
+Ejecuta en SQL Server Management Studio o Azure Data Studio:
 
 ```sql
 IF DB_ID(N'RentaDriveDb') IS NULL
@@ -247,9 +260,7 @@ END;
 GO
 ```
 
-## 7. Crear el usuario de aplicación en SQL Server
-
-Ejecuta con una cuenta administrativa:
+## 6. Crear el login de aplicación
 
 ```sql
 USE [master];
@@ -295,11 +306,9 @@ ALTER ROLE [db_ddladmin] ADD MEMBER [rentadrive_app];
 GO
 ```
 
-> La contraseña anterior es solo un ejemplo para desarrollo local. Debe reemplazarse en entornos compartidos o productivos.
+> La contraseña anterior es únicamente un ejemplo para desarrollo local. Debe sustituirse en cualquier entorno compartido o productivo.
 
-## 8. Configurar `.env`
-
-Configura como mínimo:
+## 7. Configurar `.env`
 
 ```dotenv
 APP_NAME=RentaDrive
@@ -324,6 +333,9 @@ DB_TRUST_SERVER_CERTIFICATE=true
 SESSION_DRIVER=file
 CACHE_STORE=file
 QUEUE_CONNECTION=sync
+
+RENTADRIVE_ADMIN_EMAIL=admin@rentadrive.com.do
+RENTADRIVE_ADMIN_PASSWORD=RentaDrive123..
 ```
 
 Para producción:
@@ -335,16 +347,16 @@ DB_ENCRYPT=yes
 DB_TRUST_SERVER_CERTIFICATE=false
 ```
 
-## 9. Limpiar configuración y crear las tablas
+## 8. Crear las tablas y datos iniciales
 
-Para una instalación nueva:
+Instalación nueva:
 
 ```bash
 php artisan optimize:clear
 php artisan migrate:fresh --seed
 ```
 
-Si la base ya contiene información y solo deseas actualizarla:
+Base existente:
 
 ```bash
 php artisan optimize:clear
@@ -352,32 +364,34 @@ php artisan migrate
 php artisan db:seed
 ```
 
-## 10. Crear el enlace de almacenamiento
+## 9. Crear el enlace de almacenamiento
 
 ```bash
 php artisan storage:link
 ```
 
-## 11. Compilar el frontend
+## 10. Compilar frontend
 
 ```bash
 npm run build
 ```
 
-## 12. Ejecutar las pruebas
+## 11. Ejecutar validaciones
 
 ```bash
+vendor/bin/pint --test
 php artisan test
+npm run build
 ```
 
-Resultado validado en la versión 1.0:
+Resultado validado:
 
 ```text
-33 pruebas aprobadas
-101 assertions
+35 pruebas aprobadas
+103 assertions
 ```
 
-## 13. Iniciar la aplicación
+## 12. Iniciar la aplicación
 
 ```bash
 php artisan serve
@@ -389,15 +403,15 @@ Abre:
 http://127.0.0.1:8000
 ```
 
-# 🚀 Desarrollo local
+# Desarrollo local
 
-Para ejecutar Laravel, la cola, los logs y Vite al mismo tiempo:
+Ejecutar todos los procesos:
 
 ```bash
 composer run dev
 ```
 
-También puedes ejecutar cada proceso por separado:
+O por separado:
 
 ```bash
 php artisan serve
@@ -406,23 +420,18 @@ php artisan pail
 npm run dev
 ```
 
-# 🔐 Credenciales locales
+# Credenciales locales
 
-El seeder crea este usuario únicamente en los entornos `local` y `testing`:
+El seeder crea el usuario administrador únicamente en los entornos `local` y `testing`:
 
 ```text
-Correo: admin@rentadrive.test
-Contraseña: password
+Correo: admin@rentadrive.com.do
+Contraseña: RentaDrive123..
 ```
 
-Puedes cambiarlo antes de ejecutar los seeders:
+> Estas credenciales son exclusivas para desarrollo. Deben cambiarse antes de publicar la aplicación.
 
-```dotenv
-RENTADRIVE_ADMIN_EMAIL=admin@rentadrive.test
-RENTADRIVE_ADMIN_PASSWORD=una-clave-local-segura
-```
-
-# 👥 Roles
+# Roles
 
 | Rol | Alcance |
 |---|---|
@@ -431,7 +440,7 @@ RENTADRIVE_ADMIN_PASSWORD=una-clave-local-segura
 | Agente de alquiler | Clientes, reservas, alquileres, contratos y devoluciones |
 | Inspector | Flota, alquileres e inspecciones |
 
-# 🗂️ Estructura principal
+# Estructura principal
 
 ```text
 app/
@@ -443,6 +452,8 @@ app/
 │   └── Requests/
 ├── Models/
 │   └── Concerns/Auditable.php
+├── Rules/
+│   └── DominicanCedula.php
 ├── Policies/
 └── Providers/
 
@@ -465,6 +476,7 @@ resources/
     ├── reports/
     ├── settings/
     ├── users/
+    ├── errors/
     └── audit/
 
 tests/
@@ -472,60 +484,27 @@ tests/
 └── Unit/
 ```
 
-# 🧪 Pruebas y calidad
+# Comandos útiles
 
 ```bash
+php artisan optimize:clear
+php artisan migrate:status
 php artisan test
-./vendor/bin/pint --test
+vendor/bin/pint
 npm run build
+php artisan serve
 ```
 
-Cobertura funcional incluida:
+# Solución de problemas
 
-- autenticación;
-- bloqueo de usuarios inactivos;
-- registro público deshabilitado;
-- roles, permisos y Policy de usuarios;
-- acceso a módulos según rol;
-- disponibilidad y solapamiento de reservas;
-- apertura de alquiler;
-- actualización del estado del vehículo;
-- creación automática de factura.
+## `Login failed for user 'rentadrive_app'`
 
-# 🛡️ Seguridad
+- Verifica que SQL Server use autenticación mixta.
+- Confirma usuario y contraseña en `.env`.
+- Reinicia el servicio SQL Server después de cambiar el modo de autenticación.
+- Ejecuta `php artisan config:clear`.
 
-- No se versionan secretos ni archivos `.env`.
-- El registro público está deshabilitado.
-- Los permisos se validan en backend.
-- La auditoría excluye contraseñas y tokens de sesión.
-- El usuario de demostración no se crea en producción.
-- Los pagos se validan contra el balance pendiente.
-- Reservas y alquileres utilizan transacciones.
-- `APP_DEBUG` debe permanecer en `false` en producción.
-- Los archivos subidos deben validarse por tipo MIME y tamaño.
-
-# 🧯 Solución de problemas
-
-## Error de inicio de sesión de SQL Server
-
-```text
-Error de inicio de sesión del usuario 'rentadrive_app'
-```
-
-Verifica:
-
-- que el login exista;
-- que la contraseña de `.env` sea correcta;
-- que SQL Server use autenticación mixta;
-- que el usuario tenga acceso a `RentaDriveDb`.
-
-## Tabla inexistente
-
-```text
-El nombre de objeto 'vehicles' no es válido
-```
-
-Ejecuta:
+## `Invalid object name 'vehicles'`
 
 ```bash
 php artisan migrate:status
@@ -533,41 +512,29 @@ php artisan migrate
 php artisan db:seed
 ```
 
-## Error de caché durante `optimize:clear`
+## Error con claves foráneas en SQL Server
 
-Durante la instalación inicial utiliza:
+Las migraciones utilizan `NO ACTION` en las relaciones que podrían producir múltiples rutas en cascada.
 
-```dotenv
-SESSION_DRIVER=file
-CACHE_STORE=file
-QUEUE_CONNECTION=sync
-```
-
-## Recompilar estilos y scripts
+## Vistas o configuración desactualizadas
 
 ```bash
-npm install
-npm run build
 php artisan optimize:clear
+npm run build
 ```
 
-# 🎓 Información académica
+# Información académica
 
-| Información | Detalle |
+| Campo | Información |
 |---|---|
-| 👨‍🎓 Estudiante | Francis Jairo Matías Rosario |
-| 🆔 Matrícula | 2015-2984 |
-| 📖 Asignatura | Análisis y Diseño de Sistemas (SOF-007) |
-| 👨‍🏫 Profesor | Huáscar Frías Vilorio |
-| 🏫 Institución | Instituto Tecnológico de Las Américas (ITLA) |
-| 📅 Período académico | 2017-C1 |
-| 🎯 Tipo de proyecto | Proyecto final |
+| Institución | Instituto Tecnológico de Las Américas (ITLA) |
+| Asignatura | Análisis y Diseño de Sistemas |
+| Código | SOF-007 |
+| Período | 2017-C1 |
+| Profesor | Huascar Frias Vilorio |
+| Estudiante | Francis Jairo Matías Rosario |
+| Matrícula | 2015-2984 |
 
-# 📚 Documentación
+# Licencia
 
-- [Fase 1 — Fundación técnica](docs/analysis/phase-1.md)
-- [Versión 1.0 — Alcance, fases y criterios](docs/analysis/version-1.md)
-
-# 📄 Licencia
-
-Distribuido bajo la licencia [MIT](LICENSE).
+Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo `LICENSE` para más información.
