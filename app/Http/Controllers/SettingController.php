@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 final class SettingController extends Controller
 {
+    private const FIXED_ITBIS_RATE = '18';
+
     public function edit(): View
     {
         return view('settings.edit', [
@@ -28,9 +30,10 @@ final class SettingController extends Controller
             'business_email' => ['nullable', 'email', 'max:255'],
             'business_address' => ['nullable', 'string', 'max:255'],
             'currency' => ['required', 'in:DOP,USD'],
-            'tax_rate' => ['required', 'numeric', 'between:0,100'],
             'default_pickup_location' => ['required', 'string', 'max:255'],
         ]);
+
+        $data['tax_rate'] = self::FIXED_ITBIS_RATE;
 
         $map = [
             'business_name' => ['general', 'business.name'],
@@ -52,6 +55,6 @@ final class SettingController extends Controller
             }
         });
 
-        return back()->with('status', 'Configuración guardada.');
+        return back()->with('status', 'Configuración guardada. El ITBIS permanece fijo en 18%.');
     }
 }
