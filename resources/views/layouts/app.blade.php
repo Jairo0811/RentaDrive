@@ -13,6 +13,13 @@
         <link rel="icon" type="image/png" href="{{ asset('images/rentadrive-mark.png') }}">
         <link rel="apple-touch-icon" href="{{ asset('images/rentadrive-mark.png') }}">
         <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+            integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        >
 
         @include('layouts.partials.theme-script')
 
@@ -29,13 +36,14 @@
             aria-live="polite"
         >
             <div class="flex items-start gap-3">
-                <svg class="mt-0.5 h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path x-show="$store.toast.type !== 'error'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 13 4 4L19 7"/>
-                    <path x-show="$store.toast.type === 'error'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 4.4 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.4a2 2 0 0 0-3.4 0Z"/>
-                </svg>
+                <i
+                    class="mt-0.5 shrink-0 text-base"
+                    :class="$store.toast.type === 'error' ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-circle-check'"
+                    aria-hidden="true"
+                ></i>
                 <p class="min-w-0 flex-1 text-sm font-semibold" x-text="$store.toast.message"></p>
                 <button type="button" class="rounded p-1 opacity-70 transition hover:opacity-100" @click="$store.toast.visible = false" aria-label="Cerrar notificación">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 6 12 12M18 6 6 18"/></svg>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -73,7 +81,10 @@
                         <div class="mx-auto w-full max-w-[1600px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
                             @if ($errors->any())
                                 <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300">
-                                    <p class="font-bold">Revisa la información indicada:</p>
+                                    <p class="flex items-center gap-2 font-bold">
+                                        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                                        Revisa la información indicada:
+                                    </p>
                                     <ul class="mt-1 list-disc space-y-1 pl-5">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
@@ -96,9 +107,13 @@
                                 </div>
 
                                 <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
-                                    <span>Versión 1.0</span>
+                                    <span class="inline-flex items-center gap-2">
+                                        <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
+                                        Versión 1.0
+                                    </span>
                                     <span class="hidden text-slate-300 dark:text-slate-700 sm:inline">•</span>
-                                    <a href="https://github.com/Jairo0811/RentaDrive" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                    <a href="https://github.com/Jairo0811/RentaDrive" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                        <i class="fa-brands fa-github" aria-hidden="true"></i>
                                         GitHub
                                     </a>
                                 </div>
