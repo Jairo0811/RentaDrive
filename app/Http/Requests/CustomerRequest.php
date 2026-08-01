@@ -26,13 +26,15 @@ final class CustomerRequest extends FormRequest
         $documentRules = [
             'required',
             'string',
-            'max:30',
             Rule::unique('customers')->ignore($customer),
         ];
 
-        if ($documentType === 'cedula') {
-            $documentRules[] = new DominicanCedula;
-        }
+        match ($documentType) {
+            'cedula' => array_push($documentRules, 'digits:11', new DominicanCedula),
+            'rnc' => array_push($documentRules, 'digits:9'),
+            'passport' => array_push($documentRules, 'min:6', 'max:20', 'regex:/^[A-Z0-9]+$/i'),
+            default => array_push($documentRules, 'min:3', 'max:30'),
+        };
 
         return [
             'document_type' => ['required', Rule::in(['cedula', 'passport', 'rnc', 'other'])],
@@ -51,14 +53,32 @@ final class CustomerRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'document_number.digits' => 'El número debe contener exactamente :digits dígitos.',
+            'document_number.min' => 'El número debe contener al menos :min caracteres.',
+            'document_number.max' => 'El número no puede superar :max caracteres.',
+            'document_number.regex' => 'El pasaporte solo puede contener letras y números.',
+        ];
+    }
+
     protected function prepareForValidation(): void
     {
-        if ((string) $this->input('document_type') !== 'cedula') {
-            return;
+        $documentType = (string) $this->input('document_type');
+        $documentNumber = trim((string) $this->input('document_number'));
+
+        if (in_array($documentType, ['cedula', 'rnc'], true)) {
+            $documentNumber = preg_replace('/\D+/', '', $documentNumber) ?? '';
+        } elseif ($documentType === 'passport') {
+            $documentNumber = strtoupper(preg_replace('/\s+/', '', $documentNumber) ?? '');
         }
 
         $this->merge([
-            'document_number' => preg_replace('/\D+/', '', (string) $this->input('document_number')),
+            'document_number' => $documentNumber,
         ]);
     }
 }
