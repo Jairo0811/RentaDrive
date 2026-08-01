@@ -1,0 +1,19 @@
+{
+  "name": "RentaDrive",
+  "short_name": "RentaDrive",
+  "description": "Sistema profesional de gestión de alquiler de vehículos.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#030914",
+  "theme_color": "#0f172a",
+  "lang": "es-DO",
+  "icons": [
+    {
+      "src": "/images/rentadrive-mark.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
