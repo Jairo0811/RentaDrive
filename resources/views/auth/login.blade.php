@@ -19,7 +19,7 @@
                 class="mt-2 block w-full"
                 type="email"
                 name="email"
-                :value="old('email')"
+                :value="old('email', 'admin@rentadrive.com.do')"
                 placeholder="nombre@empresa.com"
                 required
                 autofocus
@@ -63,7 +63,7 @@
     @env(['local', 'testing'])
         <div class="mt-7 rounded-xl border border-blue-200 bg-blue-50 p-4 text-xs text-blue-900 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-200">
             <p class="font-bold">Acceso de demostración</p>
-            <p class="mt-1 font-mono">admin@rentadrive.test / password</p>
+            <p class="mt-1 font-mono">admin@rentadrive.com.do / RentaDrive123..</p>
         </div>
     @endenv
 
