@@ -8,7 +8,10 @@
 
     <x-page-header :title="$customer->exists ? 'Editar cliente' : 'Registrar cliente'" subtitle="Completa la identidad, contacto y licencia de conducir.">
         <x-slot name="actions">
-            <a href="{{ $customer->exists ? route('customers.show', $customer) : route('customers.index') }}" class="btn-secondary">Cancelar</a>
+            <a href="{{ $customer->exists ? route('customers.show', $customer) : route('customers.index') }}" class="btn-secondary">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                Cancelar
+            </a>
         </x-slot>
     </x-page-header>
 
@@ -17,7 +20,10 @@
         @if ($customer->exists) @method('PUT') @endif
 
         <section class="panel p-5 sm:p-6">
-            <h2 class="font-black text-slate-950 dark:text-white">Identificación</h2>
+            <h2 class="flex items-center gap-2 font-black text-slate-950 dark:text-white">
+                <i class="fa-solid fa-id-card text-blue-500" aria-hidden="true"></i>
+                Identificación
+            </h2>
             <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                 <div>
                     <label class="form-label" for="document_type">Tipo de documento</label>
@@ -29,7 +35,17 @@
                 </div>
                 <div>
                     <label class="form-label" for="document_number">Número</label>
-                    <input id="document_number" name="document_number" value="{{ old('document_number', $customer->document_number) }}" class="form-input" required>
+                    <input
+                        id="document_number"
+                        name="document_number"
+                        value="{{ old('document_number', $customer->document_number) }}"
+                        class="form-input"
+                        required
+                        autocomplete="off"
+                        aria-describedby="document_number_help"
+                    >
+                    <p id="document_number_help" class="mt-2 text-xs text-slate-500 dark:text-slate-400"></p>
+                    <x-input-error :messages="$errors->get('document_number')" class="mt-2" />
                 </div>
                 <div>
                     <label class="form-label" for="first_name">Nombres</label>
@@ -54,7 +70,10 @@
         </section>
 
         <section class="panel p-5 sm:p-6">
-            <h2 class="font-black text-slate-950 dark:text-white">Contacto y licencia</h2>
+            <h2 class="flex items-center gap-2 font-black text-slate-950 dark:text-white">
+                <i class="fa-solid fa-address-book text-blue-500" aria-hidden="true"></i>
+                Contacto y licencia
+            </h2>
             <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 <div>
                     <label class="form-label" for="phone">Teléfono</label>
@@ -88,7 +107,82 @@
         </section>
 
         <div class="flex justify-end">
-            <button class="btn-primary">{{ $customer->exists ? 'Guardar cambios' : 'Registrar cliente' }}</button>
+            <button class="btn-primary">
+                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                {{ $customer->exists ? 'Guardar cambios' : 'Registrar cliente' }}
+            </button>
         </div>
     </form>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const typeField = document.querySelector('#document_type');
+                const numberField = document.querySelector('#document_number');
+                const helpText = document.querySelector('#document_number_help');
+
+                if (! typeField || ! numberField || ! helpText) {
+                    return;
+                }
+
+                const settings = {
+                    cedula: {
+                        minLength: 11,
+                        maxLength: 11,
+                        inputMode: 'numeric',
+                        pattern: '[0-9]{11}',
+                        placeholder: '00112345678',
+                        help: 'Debe contener exactamente 11 dígitos, sin guiones.',
+                    },
+                    rnc: {
+                        minLength: 9,
+                        maxLength: 9,
+                        inputMode: 'numeric',
+                        pattern: '[0-9]{9}',
+                        placeholder: '101234567',
+                        help: 'Debe contener exactamente 9 dígitos.',
+                    },
+                    passport: {
+                        minLength: 6,
+                        maxLength: 20,
+                        inputMode: 'text',
+                        pattern: '[A-Za-z0-9]{6,20}',
+                        placeholder: 'PA1234567',
+                        help: 'Entre 6 y 20 caracteres alfanuméricos, sin espacios.',
+                    },
+                    other: {
+                        minLength: 3,
+                        maxLength: 30,
+                        inputMode: 'text',
+                        pattern: '.{3,30}',
+                        placeholder: 'Número de documento',
+                        help: 'Entre 3 y 30 caracteres.',
+                    },
+                };
+
+                const applyDocumentRules = () => {
+                    const rule = settings[typeField.value] ?? settings.other;
+
+                    numberField.minLength = rule.minLength;
+                    numberField.maxLength = rule.maxLength;
+                    numberField.inputMode = rule.inputMode;
+                    numberField.pattern = rule.pattern;
+                    numberField.placeholder = rule.placeholder;
+                    helpText.textContent = rule.help;
+
+                    if (['cedula', 'rnc'].includes(typeField.value)) {
+                        numberField.value = numberField.value.replace(/\D/g, '').slice(0, rule.maxLength);
+                    } else if (typeField.value === 'passport') {
+                        numberField.value = numberField.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, rule.maxLength);
+                    } else {
+                        numberField.value = numberField.value.slice(0, rule.maxLength);
+                    }
+                };
+
+                typeField.addEventListener('change', applyDocumentRules);
+                numberField.addEventListener('input', applyDocumentRules);
+                applyDocumentRules();
+            });
+        </script>
+    @endpush
 </x-app-layout>
