@@ -30,8 +30,13 @@ trait Auditable
                     ? null
                     : Arr::except($model->getAttributes(), $hidden);
 
+                $authenticatedUserId = Auth::id();
+                $actorId = $event === 'deleted' && $model->getTable() === 'users' && $model->getKey() === $authenticatedUserId
+                    ? null
+                    : $authenticatedUserId;
+
                 AuditLog::query()->create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $actorId,
                     'event' => $event,
                     'auditable_type' => $model::class,
                     'auditable_id' => $model->getKey(),
