@@ -18,11 +18,11 @@
             <section class="login-brand-panel relative hidden overflow-hidden bg-[#030914] lg:flex lg:flex-col lg:justify-between lg:p-12">
                 <img
                     src="{{ asset('images/rentadrive-racing.jpeg') }}"
-                    alt=""
+                    alt="Escena automotriz de RentaDrive"
                     class="absolute inset-0 h-full w-full object-cover"
                 >
-                <div class="absolute inset-0 bg-gradient-to-b from-[#030914]/55 via-[#04152c]/55 to-[#030914]/95"></div>
-                <div class="absolute inset-0 bg-gradient-to-r from-[#030914]/20 via-transparent to-[#030914]/65"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-[#030914]/35 via-[#04152c]/25 to-[#030914]/90"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-[#030914]/10 via-transparent to-[#030914]/55"></div>
                 <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0568f5] via-[#25a7ff] to-[#e2232e]"></div>
 
                 <a href="{{ route('home') }}" class="relative z-10 inline-flex rounded-xl">
@@ -30,10 +30,7 @@
                 </a>
 
                 <div class="relative z-10 max-w-xl">
-                    <div class="brand-lockup">
-                        <img src="{{ asset('images/rentadrive-logo-dark.png') }}" alt="RentaDrive">
-                    </div>
-                    <p class="mt-5 max-w-lg text-base leading-relaxed text-slate-200">
+                    <p class="max-w-lg text-base leading-relaxed text-slate-100">
                         Reservas, alquileres, inspecciones, facturación y vehículos en una sola plataforma.
                     </p>
                 </div>
