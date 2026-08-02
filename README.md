@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
   <img src="https://img.shields.io/badge/Estado-Finalizado-16a34a?style=for-the-badge" alt="Estado finalizado">
-  <img src="https://img.shields.io/badge/Versión-1.0-2563eb?style=for-the-badge" alt="Versión 1.0">
+  <img src="https://img.shields.io/badge/Versión-1.0.0-2563eb?style=for-the-badge" alt="Versión 1.0.0">
   <img src="https://img.shields.io/badge/Licencia-MIT-16a34a?style=for-the-badge" alt="Licencia MIT">
 </p>
 
@@ -18,21 +18,23 @@
 
 # 🚘 RentaDrive
 
-**RentaDrive** es un sistema web profesional para la gestión integral de empresas de alquiler de vehículos. Centraliza clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
+**RentaDrive** es una plataforma web profesional para la gestión integral de empresas de alquiler de vehículos. Centraliza clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
 
 El proyecto nació como trabajo final de la asignatura **Análisis y Diseño de Sistemas** del Instituto Tecnológico de Las Américas (ITLA) y fue reconstruido como una aplicación funcional con Laravel, Microsoft SQL Server y una arquitectura monolítica modular orientada a mantenibilidad, seguridad y escalabilidad.
 
 ## ✅ Estado actual
 
-La versión 1.0 se encuentra finalizada y validada para uso académico, portafolio profesional y evolución comercial.
+La versión **1.0.0** se considera finalizada y lista para uso académico, portafolio profesional y evolución comercial.
 
 - 🧪 **35 pruebas automatizadas** aprobadas.
 - 🎯 **103 assertions** ejecutadas correctamente.
-- 🎨 Laravel Pint en verde.
+- 🎨 Laravel Pint validado.
 - ⚡ Build de Vite aprobado.
-- 🗄️ Compatibilidad validada con SQL Server y SQLite en memoria para testing.
+- 🗄️ Compatibilidad con SQL Server y SQLite en memoria para testing.
 - 📊 Dashboard operativo con métricas, gráficos y calendario.
 - 📱 Aplicación instalable como PWA.
+- 📄 Facturas, contratos y reportes operativos exportables en PDF.
+- 📤 Exportación de reportes en CSV.
 
 # 🧩 Funcionalidades
 
@@ -41,6 +43,7 @@ La versión 1.0 se encuentra finalizada y validada para uso académico, portafol
 - 👤 Gestión completa de clientes, contacto, documentos y licencias.
 - 🪪 Validación local de cédulas dominicanas por dígito verificador.
 - 🧹 Normalización automática de cédulas antes de guardar.
+- 🔢 Validación de longitud para cédula, RNC y pasaporte.
 - 🚘 Administración de marcas, modelos, categorías, tarifas, depósitos y vehículos.
 - 🚦 Estados de flota: disponible, reservado, alquilado, mantenimiento e inactivo.
 - 🛠️ Historial y programación de mantenimientos.
@@ -62,7 +65,8 @@ La versión 1.0 se encuentra finalizada y validada para uso académico, portafol
 - 🧾 Recibos con método de pago y referencia.
 - ↩️ Anulación de pagos y recálculo del balance.
 - 📄 Facturas y contratos en PDF.
-- 📤 Exportaciones CSV y soporte para Laravel Excel.
+- 📊 Reportes operativos en PDF y CSV.
+- 📗 Soporte para Laravel Excel.
 
 ## 📊 Dashboard y experiencia de usuario
 
@@ -76,6 +80,7 @@ La versión 1.0 se encuentra finalizada y validada para uso académico, portafol
 - 📱 Diseño responsive.
 - 🚫 Páginas personalizadas para errores 404 y 500.
 - 📲 Manifest y service worker para instalación como PWA.
+- 🎯 Navegación enriquecida con iconos de Font Awesome.
 
 ## 🔐 Administración y seguridad
 
@@ -136,6 +141,7 @@ flowchart TD
 - 🟨 **JavaScript ES Modules**.
 - 📊 **Chart.js 4.5**.
 - ⚡ **Laravel Vite Plugin 3.1**.
+- ⭐ **Font Awesome 6.7**.
 
 ## 🗄️ Base de datos
 
@@ -159,7 +165,7 @@ flowchart TD
 
 ## 📄 Documentos y exportaciones
 
-- 📕 DomPDF 3.1 para contratos y facturas.
+- 📕 DomPDF 3.1 para contratos, facturas y reportes.
 - 📗 Laravel Excel 3.1.
 - 📤 Exportación CSV.
 
@@ -415,148 +421,141 @@ O por separado:
 
 ```bash
 php artisan serve
-php artisan queue:listen
-php artisan pail
+php artisan queue:listen --tries=1
 npm run dev
 ```
 
-# 🔐 Credenciales locales
+# 🔑 Credenciales iniciales
 
-El seeder crea el usuario administrador únicamente en los entornos `local` y `testing`:
+Estas credenciales se crean mediante el seeder únicamente para desarrollo local:
 
 ```text
 Correo: admin@rentadrive.com.do
 Contraseña: RentaDrive123..
 ```
 
-> ⚠️ Estas credenciales son exclusivas para desarrollo. Deben cambiarse antes de publicar la aplicación.
+> 🔒 Cambia estas credenciales antes de publicar la aplicación o usarla en un entorno compartido.
 
-# 👥 Roles
+## 👥 Roles incluidos
 
-| Icono | Rol | Alcance |
-|---:|---|---|
-| 👑 | Administrador | Acceso completo, configuración, usuarios y auditoría |
-| 📊 | Gerente | Consultas operativas, financieras y reportes |
-| 🔑 | Agente de alquiler | Clientes, reservas, alquileres, contratos y devoluciones |
-| 🔍 | Inspector | Flota, alquileres e inspecciones |
+- 👑 Administrador.
+- 📊 Gerente.
+- 🚗 Agente de alquiler.
+- 🔍 Inspector.
+
+# 🧪 Testing
+
+Ejecutar toda la suite:
+
+```bash
+php artisan test
+```
+
+Solo pruebas unitarias:
+
+```bash
+php artisan test --testsuite=Unit
+```
+
+Solo pruebas funcionales:
+
+```bash
+php artisan test --testsuite=Feature
+```
+
+Validar formato sin modificar archivos:
+
+```bash
+vendor/bin/pint --test
+```
 
 # 🗂️ Estructura principal
 
 ```text
 app/
 ├── Domain/
-│   ├── Operations/Services/
-│   └── Security/
 ├── Http/
-│   ├── Controllers/
-│   └── Requests/
 ├── Models/
-│   └── Concerns/Auditable.php
-├── Rules/
-│   └── DominicanCedula.php
 ├── Policies/
-└── Providers/
+├── Rules/
+└── Services/
 
 database/
+├── factories/
 ├── migrations/
-├── seeders/
-└── factories/
+└── seeders/
 
 resources/
 ├── css/
 ├── js/
 └── views/
+    ├── auth/
+    ├── components/
     ├── customers/
-    ├── vehicles/
-    ├── reservations/
-    ├── rentals/
-    ├── inspections/
+    ├── documents/
     ├── invoices/
-    ├── payments/
-    ├── reports/
-    ├── settings/
-    ├── users/
-    └── audit/
+    ├── layouts/
+    ├── rentals/
+    └── reports/
 
 tests/
 ├── Feature/
 └── Unit/
 ```
 
-# 🧪 Comandos útiles
-
-```bash
-php artisan optimize:clear
-php artisan migrate:status
-php artisan test
-vendor/bin/pint
-npm run build
-php artisan serve
-```
-
 # 🛠️ Solución de problemas
 
-## ❌ Error de autenticación en SQL Server
+## SQL Server no conecta
 
 Verifica:
 
-- 🔑 El usuario `rentadrive_app` existe.
-- 🔐 La contraseña coincide con `.env`.
-- 🔄 SQL Server usa autenticación mixta.
-- 🌐 El puerto 1433 está habilitado.
-- 🔌 Las extensiones `sqlsrv` y `pdo_sqlsrv` están activas.
+```bash
+php -m | findstr /I "sqlsrv pdo_sqlsrv"
+```
 
-Después ejecuta:
+También confirma que SQL Server esté escuchando en el puerto `1433` y que el usuario configurado tenga acceso a `RentaDriveDb`.
+
+## Cambios visuales no aparecen
 
 ```bash
 php artisan optimize:clear
-php artisan migrate:status
-```
-
-## ❌ Tabla `vehicles` o `settings` no encontrada
-
-```bash
-php artisan migrate
-php artisan db:seed
-```
-
-Para una instalación nueva:
-
-```bash
-php artisan migrate:fresh --seed
-```
-
-## ❌ Error de rutas múltiples en SQL Server
-
-Las claves foráneas del proyecto utilizan `NO ACTION` donde SQL Server no admite múltiples rutas de cascada. No reemplaces esas reglas por `cascadeOnDelete()` o `nullOnDelete()` sin revisar el impacto completo del esquema.
-
-## ❌ Error de formato en CI
-
-```bash
-vendor/bin/pint
-php artisan test
 npm run build
 ```
 
-Luego confirma y publica los cambios.
+## El PDF no muestra imágenes
+
+Confirma que los logos existan dentro de:
+
+```text
+public/images/
+```
+
+Las plantillas de DomPDF utilizan rutas locales mediante `public_path()`.
+
+# 🗺️ Evolución futura
+
+La versión 1.0.0 está cerrada. Posibles líneas de evolución para una versión 2.0:
+
+- 🏢 Multiempresa y multisucursal.
+- ✍️ Firma digital de contratos.
+- 📧 Envío de documentos por correo.
+- 💬 Integración con WhatsApp.
+- 🗓️ Calendario visual avanzado de disponibilidad.
+- 🔌 API REST documentada con OpenAPI/Swagger.
+- 🪪 Integración oficial con servicios de identidad cuando exista acceso autorizado.
 
 # 🎓 Información académica
 
-| Campo | Detalle |
-|---|---|
-| 🏫 Institución | Instituto Tecnológico de Las Américas (ITLA) |
-| 📚 Asignatura | Análisis y Diseño de Sistemas |
-| 📅 Período académico | 2017-C1 |
-| 🧑‍🏫 Profesor | Huascar Frías Vilorio |
-| 👨‍🎓 Estudiante | Francis Jairo Matías Rosario |
-| 🆔 Matrícula | 2015-2984 |
+- **Institución:** Instituto Tecnológico de Las Américas (ITLA).
+- **Asignatura:** Análisis y Diseño de Sistemas.
+- **Período:** 2017-C1.
+- **Repositorio modernizado:** 2026.
 
-# 📜 Licencia
+# 👨‍💻 Autor
 
-Este proyecto se distribuye bajo la licencia **MIT**. Consulta el archivo [`LICENSE`](LICENSE) para más información.
+**Jairo Matías**  
+GitHub: [@Jairo0811](https://github.com/Jairo0811)
 
----
+# 📄 Licencia
 
-<p align="center">
-  🚘 <strong>RentaDrive</strong> · Gestiona tu flota. Impulsa tu negocio.
-</p>
+Este proyecto se distribuye bajo la licencia **MIT**.
