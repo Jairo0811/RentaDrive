@@ -28,7 +28,7 @@
     <div class="header">
         <table style="border-collapse:collapse;width:100%">
             <tr>
-                <td style="padding:0"><img class="brand-mark" src="{{ public_path('images/rentadrive-mark.png') }}" alt="RentaDrive"></td>
+                <td style="padding:0"><img class="brand-mark" src="{{ public_path('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive"></td>
                 <td class="right" style="padding:0">
                     <p class="title">REPORTE OPERATIVO</p>
                     <p style="font-size:13px;font-weight:bold;margin:4px 0 0">{{ $from->format('d/m/Y') }} — {{ $to->format('d/m/Y') }}</p>

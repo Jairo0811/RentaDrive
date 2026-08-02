@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -75,7 +76,7 @@ final class ReportController extends Controller
      *     to: Carbon,
      *     rentals: \Illuminate\Database\Eloquent\Collection<int, Rental>,
      *     metrics: array{rental_count: int, billed: mixed, collected: mixed, outstanding: mixed, utilization: float},
-     *     fleetByStatus: \Illuminate\Support\Collection<string, int>
+     *     fleetByStatus: Collection<string, int>
      * }
      */
     private function reportData(Request $request): array

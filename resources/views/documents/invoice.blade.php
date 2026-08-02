@@ -26,7 +26,7 @@
     <div class="header">
         <table style="margin:0">
             <tr>
-                <td style="border:0;padding:0"><img class="brand-mark" src="{{ public_path('images/rentadrive-mark.png') }}" alt="RentaDrive"></td>
+                <td style="border:0;padding:0"><img class="brand-mark" src="{{ public_path('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive"></td>
                 <td class="right" style="border:0;padding:0">
                     <p class="title">FACTURA</p>
                     <p style="font-size:16px;font-weight:bold;margin:5px 0 0">{{ $invoice->number }}</p>
