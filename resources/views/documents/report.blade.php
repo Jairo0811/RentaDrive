@@ -7,7 +7,7 @@
         @page { margin: 28px 32px; }
         body { color: #0f172a; font-family: DejaVu Sans, sans-serif; font-size: 10px; }
         .header { border-bottom: 3px solid #0568f5; padding-bottom: 14px; }
-        .logo { height: 64px; width: 210px; object-fit: contain; }
+        .brand-mark { display: block; height: 54px; width: 54px; }
         .right { text-align: right; }
         .muted { color: #64748b; }
         .title { color: #0568f5; font-size: 22px; font-weight: 800; margin: 0; }
@@ -28,7 +28,7 @@
     <div class="header">
         <table style="border-collapse:collapse;width:100%">
             <tr>
-                <td style="padding:0"><img class="logo" src="{{ public_path('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive"></td>
+                <td style="padding:0"><img class="brand-mark" src="{{ public_path('images/rentadrive-mark.png') }}" alt="RentaDrive"></td>
                 <td class="right" style="padding:0">
                     <p class="title">REPORTE OPERATIVO</p>
                     <p style="font-size:13px;font-weight:bold;margin:4px 0 0">{{ $from->format('d/m/Y') }} — {{ $to->format('d/m/Y') }}</p>
