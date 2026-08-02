@@ -94,6 +94,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/export', [ReportController::class, 'export'])
         ->middleware('permission:'.PermissionName::VIEW_REPORTS->value)
         ->name('reports.export');
+    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])
+        ->middleware('permission:'.PermissionName::VIEW_REPORTS->value)
+        ->name('reports.export.pdf');
 
     Route::resource('users', UserController::class)->except(['show'])
         ->middleware('permission:'.PermissionName::MANAGE_USERS->value);
