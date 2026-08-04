@@ -4,12 +4,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
-</p>
-
-<p align="center">
-
   <img src="https://img.shields.io/badge/Estado-Finalizado-16a34a?style=for-the-badge" alt="Estado finalizado">
   <img src="https://img.shields.io/badge/Versión-1.0.0-2563eb?style=for-the-badge" alt="Versión 1.0.0">
+  <img src="https://img.shields.io/badge/Accesibilidad-NORTIC%20B2%20en%20progreso-7c3aed?style=for-the-badge" alt="Accesibilidad NORTIC B2 en progreso">
   <img src="https://img.shields.io/badge/Licencia-MIT-16a34a?style=for-the-badge" alt="Licencia MIT">
 </p>
 
@@ -39,6 +36,7 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - 📱 Aplicación instalable como PWA.
 - 📄 Facturas, contratos y reportes operativos en PDF.
 - 📤 Reportes exportables en CSV.
+- ♿ Primera fase de accesibilidad basada en NORTIC B2:2017 y WCAG 2.0.
 
 # 🧩 Funcionalidades
 
@@ -86,6 +84,45 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - ✅ Validaciones mediante Form Requests.
 - 🧾 Auditoría automática.
 - 🗑️ Eliminación segura de cuentas.
+
+# ♿ Accesibilidad
+
+RentaDrive incorpora una primera fase transversal de accesibilidad inspirada en la **NORTIC B2:2017** y las **WCAG 2.0**, con objetivo técnico de aproximación al nivel **AA**.
+
+## Funcionalidades accesibles implementadas
+
+- ⌨️ Navegación mediante teclado.
+- 🔗 Enlaces para saltar al contenido principal y a la navegación.
+- 🎯 Indicadores de foco visibles.
+- 🧭 Regiones semánticas mediante `header`, `aside`, `main` y `footer`.
+- 🏷️ Nombres accesibles y atributos ARIA en controles interactivos.
+- 🚨 Mensajes de error con `role="alert"` y notificaciones `aria-live`.
+- 🔠 Ajuste persistente del tamaño del texto a 100 %, 125 %, 150 % y 200 %.
+- ◐ Modo de alto contraste.
+- 🧘 Reducción de movimiento.
+- ⚙️ Respeto de la preferencia del sistema `prefers-reduced-motion`.
+- ⎋ Cierre de menús desplegables mediante la tecla `Escape`.
+- 💾 Persistencia local de preferencias de accesibilidad.
+- 🖼️ Textos alternativos para imágenes informativas e imágenes decorativas ignoradas por tecnologías asistivas.
+
+La implementación responde a criterios como contenido no textual, contraste mínimo, cambio de tamaño del texto, teclado, ausencia de trampas de foco, evitar bloques repetidos, orden de foco, encabezados y etiquetas, foco visible, identificación de errores y nombre, función y valor de los componentes.
+
+> **Importante:** el proyecto todavía no declara una certificación formal NORTIC B2. La conformidad completa requiere auditoría por módulo, validación de todos los procesos, pruebas con lectores de pantalla y evaluación mediante herramientas automáticas.
+
+Documentación técnica detallada:
+
+```text
+docs/accessibility.md
+```
+
+Validaciones manuales recomendadas:
+
+- Navegar usando únicamente `Tab`, `Shift + Tab`, `Enter`, `Space` y `Escape`.
+- Probar el escalado de texto hasta 200 % sin pérdida de contenido o funcionalidad.
+- Verificar los modos claro, oscuro y alto contraste.
+- Probar la reducción de movimiento.
+- Revisar login, dashboard, formularios, tablas y menús con NVDA.
+- Ejecutar Lighthouse Accessibility y axe DevTools.
 
 # 🧰 Stack tecnológico
 
@@ -230,6 +267,8 @@ GitHub: [@Jairo0811](https://github.com/Jairo0811)
 
 # 🗺️ Evolución futura
 
+- Completar auditoría de accesibilidad por módulo y proceso.
+- Incorporar pruebas automatizadas de accesibilidad al flujo CI.
 - Multiempresa y multisucursal.
 - Firma digital de contratos.
 - Integración con correo y WhatsApp.
