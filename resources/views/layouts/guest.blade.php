@@ -21,32 +21,40 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="h-full antialiased">
+        <a href="#main-content" class="skip-link">Saltar al formulario de acceso</a>
+
         <div class="grid min-h-full bg-slate-100 dark:bg-[#030914] lg:grid-cols-[1.08fr_.92fr]">
-            <section class="login-brand-panel relative hidden overflow-hidden bg-[#030914] lg:flex lg:flex-col lg:p-12">
+            <section class="login-brand-panel relative hidden overflow-hidden bg-[#030914] lg:flex lg:flex-col lg:p-12" aria-label="Identidad visual de RentaDrive">
                 <img
                     src="{{ asset('images/rentadrive-racing.jpeg') }}"
-                    alt="Escena automotriz de RentaDrive"
+                    alt=""
                     class="absolute inset-0 h-full w-full object-cover"
+                    aria-hidden="true"
                 >
-                <div class="absolute inset-0 bg-gradient-to-b from-[#030914]/35 via-[#04152c]/20 to-[#030914]/55"></div>
-                <div class="absolute inset-0 bg-gradient-to-r from-[#030914]/10 via-transparent to-[#030914]/55"></div>
-                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0568f5] via-[#25a7ff] to-[#e2232e]"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-[#030914]/35 via-[#04152c]/20 to-[#030914]/55" aria-hidden="true"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-[#030914]/10 via-transparent to-[#030914]/55" aria-hidden="true"></div>
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0568f5] via-[#25a7ff] to-[#e2232e]" aria-hidden="true"></div>
 
-                <a href="{{ route('home') }}" class="relative z-10 inline-flex rounded-xl">
+                <a href="{{ route('home') }}" class="focus-ring relative z-10 inline-flex rounded-xl" aria-label="Ir al inicio de RentaDrive">
                     <img src="{{ asset('images/rentadrive-logo-dark.png') }}" alt="RentaDrive" class="h-20 w-64 object-contain object-left">
                 </a>
             </section>
 
-            <section class="login-form-panel relative flex min-h-full items-center justify-center px-5 py-12 sm:px-8">
-                <button
-                    type="button"
-                    class="focus-ring absolute right-5 top-5 rounded-xl border border-[#cbd9eb] bg-white p-2.5 text-[#0b2a52] shadow-sm dark:border-[#17355f] dark:bg-[#081a35] dark:text-[#8ed2ff]"
-                    @click="$store.theme.toggle()"
-                    :aria-label="$store.theme.dark ? 'Activar modo claro' : 'Activar modo oscuro'"
-                >
-                    <i x-show="! $store.theme.dark" class="fa-solid fa-sun h-5 w-5 text-center leading-5" aria-hidden="true"></i>
-                    <i x-cloak x-show="$store.theme.dark" class="fa-solid fa-moon h-5 w-5 text-center leading-5" aria-hidden="true"></i>
-                </button>
+            <main id="main-content" class="login-form-panel relative flex min-h-full items-center justify-center px-5 py-12 sm:px-8" tabindex="-1">
+                <div class="absolute right-5 top-5 flex items-center gap-2">
+                    @include('layouts.partials.accessibility-menu')
+
+                    <button
+                        type="button"
+                        class="focus-ring rounded-xl border border-[#cbd9eb] bg-white p-2.5 text-[#0b2a52] shadow-sm dark:border-[#17355f] dark:bg-[#081a35] dark:text-[#8ed2ff]"
+                        @click="$store.theme.toggle()"
+                        :aria-label="$store.theme.dark ? 'Activar modo claro' : 'Activar modo oscuro'"
+                        :aria-pressed="$store.theme.dark"
+                    >
+                        <i x-show="! $store.theme.dark" class="fa-solid fa-sun h-5 w-5 text-center leading-5" aria-hidden="true"></i>
+                        <i x-cloak x-show="$store.theme.dark" class="fa-solid fa-moon h-5 w-5 text-center leading-5" aria-hidden="true"></i>
+                    </button>
+                </div>
 
                 <div class="w-full max-w-md">
                     <div class="mb-8 lg:hidden">
@@ -56,7 +64,7 @@
 
                     {{ $slot }}
                 </div>
-            </section>
+            </main>
         </div>
     </body>
 </html>

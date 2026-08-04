@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        --rentadrive-font-scale: 100%;
+    }
+
     html {
         @apply scroll-smooth;
+        font-size: var(--rentadrive-font-scale);
     }
 
     body {
@@ -14,9 +19,62 @@
     [x-cloak] {
         display: none !important;
     }
+
+    :focus-visible {
+        outline: 3px solid #facc15;
+        outline-offset: 3px;
+    }
+
+    .reduce-motion *,
+    .reduce-motion *::before,
+    .reduce-motion *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    .high-contrast body {
+        background: #000 !important;
+        color: #fff !important;
+    }
+
+    .high-contrast a:not(.btn-primary):not(.btn-danger) {
+        color: #7dd3fc !important;
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+    }
+
+    .high-contrast input,
+    .high-contrast select,
+    .high-contrast textarea,
+    .high-contrast button,
+    .high-contrast [role='dialog'],
+    .high-contrast .panel {
+        border-color: #fff !important;
+    }
 }
 
 @layer components {
+    .skip-link {
+        @apply fixed left-4 top-4 z-[200] -translate-y-24 rounded-lg bg-yellow-300 px-4 py-3 font-black text-slate-950 shadow-xl transition-transform;
+    }
+
+    .skip-link:focus {
+        @apply translate-y-0;
+    }
+
     .panel {
         @apply rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
     }
@@ -90,7 +148,7 @@
     }
 
     .focus-ring {
-        @apply focus:outline-none focus:ring-2 focus:ring-[#168ce8] focus:ring-offset-2 dark:focus:ring-offset-[#081a35];
+        @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#facc15] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#081a35];
     }
 
     .metric-icon {

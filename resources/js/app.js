@@ -3,15 +3,25 @@ import Chart from 'chart.js/auto';
 
 window.Alpine = Alpine;
 
+const safeStorageGet = (key) => {
+    try {
+        return localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+};
+
+const safeStorageSet = (key, value) => {
+    try {
+        localStorage.setItem(key, value);
+    } catch {
+        // Browser storage can be disabled without breaking the interface.
+    }
+};
+
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-let storedTheme = null;
-
-try {
-    storedTheme = localStorage.getItem('rentadrive-theme');
-} catch {
-    // Browser storage can be disabled without breaking the interface.
-}
-
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const storedTheme = safeStorageGet('rentadrive-theme');
 const startsDark = storedTheme === 'dark' || (storedTheme === null && prefersDark);
 
 Alpine.store('theme', {
@@ -20,14 +30,63 @@ Alpine.store('theme', {
     toggle() {
         this.dark = ! this.dark;
         document.documentElement.classList.toggle('dark', this.dark);
+        safeStorageSet('rentadrive-theme', this.dark ? 'dark' : 'light');
+        window.dispatchEvent(new CustomEvent('rentadrive:theme-changed'));
+    },
+});
 
-        try {
-            localStorage.setItem('rentadrive-theme', this.dark ? 'dark' : 'light');
-        } catch {
-            // Keep the current theme even when the preference cannot be persisted.
+const storedFontScale = Number(safeStorageGet('rentadrive-font-scale'));
+const allowedFontScales = [100, 125, 150, 200];
+const initialFontScale = allowedFontScales.includes(storedFontScale) ? storedFontScale : 100;
+const initialHighContrast = safeStorageGet('rentadrive-high-contrast') === 'true';
+const storedReducedMotion = safeStorageGet('rentadrive-reduced-motion');
+const initialReducedMotion = storedReducedMotion === null
+    ? prefersReducedMotion
+    : storedReducedMotion === 'true';
+
+Alpine.store('accessibility', {
+    fontScale: initialFontScale,
+    highContrast: initialHighContrast,
+    reducedMotion: initialReducedMotion,
+
+    apply() {
+        document.documentElement.style.setProperty('--rentadrive-font-scale', `${this.fontScale}%`);
+        document.documentElement.classList.toggle('high-contrast', this.highContrast);
+        document.documentElement.classList.toggle('reduce-motion', this.reducedMotion);
+    },
+
+    setFontScale(value) {
+        const parsedValue = Number(value);
+
+        if (! allowedFontScales.includes(parsedValue)) {
+            return;
         }
 
-        window.dispatchEvent(new CustomEvent('rentadrive:theme-changed'));
+        this.fontScale = parsedValue;
+        safeStorageSet('rentadrive-font-scale', String(parsedValue));
+        this.apply();
+    },
+
+    toggleHighContrast() {
+        this.highContrast = ! this.highContrast;
+        safeStorageSet('rentadrive-high-contrast', String(this.highContrast));
+        this.apply();
+    },
+
+    toggleReducedMotion() {
+        this.reducedMotion = ! this.reducedMotion;
+        safeStorageSet('rentadrive-reduced-motion', String(this.reducedMotion));
+        this.apply();
+    },
+
+    reset() {
+        this.fontScale = 100;
+        this.highContrast = false;
+        this.reducedMotion = prefersReducedMotion;
+        safeStorageSet('rentadrive-font-scale', '100');
+        safeStorageSet('rentadrive-high-contrast', 'false');
+        safeStorageSet('rentadrive-reduced-motion', String(prefersReducedMotion));
+        this.apply();
     },
 });
 
@@ -49,6 +108,7 @@ Alpine.store('toast', {
 });
 
 document.documentElement.classList.toggle('dark', startsDark);
+Alpine.store('accessibility').apply();
 Alpine.start();
 
 const chartTextColor = () => document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569';
@@ -86,6 +146,7 @@ const buildDashboardCharts = () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: ! Alpine.store('accessibility').reducedMotion,
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -117,6 +178,7 @@ const buildDashboardCharts = () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: ! Alpine.store('accessibility').reducedMotion,
                 cutout: '68%',
                 plugins: {
                     legend: {
