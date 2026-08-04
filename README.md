@@ -128,37 +128,80 @@ Validaciones manuales recomendadas:
 
 ## ⚙️ Backend
 
-- PHP 8.4.1+
-- Laravel 13.8
-- Composer
-- Eloquent ORM
-- Migraciones, seeders, factories y servicios de dominio
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.4+" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" title="Laravel 13" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" title="Composer" width="44" height="44">
+</p>
+
+- 🐘 **PHP 8.4.1 o superior**.
+- 🔺 **Laravel 13.8**.
+- 📦 **Composer** para gestión de dependencias.
+- 🗃️ **Eloquent ORM** para persistencia y relaciones.
+- 🧱 Migraciones, seeders, factories y servicios de dominio.
+- 🧩 Arquitectura monolítica modular.
 
 ## 🎨 Frontend
 
-- Blade
-- HTML5
-- Tailwind CSS 3.4
-- Alpine.js 3.15
-- JavaScript ES Modules
-- Chart.js 4.5
-- Font Awesome 6.7
-- Vite 8
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="HTML5" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS 3.4" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" title="JavaScript ES Modules" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" title="Alpine.js 3.15" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chartjs/chartjs-original.svg" alt="Chart.js" title="Chart.js 4.5" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" title="Vite 8" width="44" height="44">
+</p>
+
+- 🧩 **Blade** y HTML5.
+- 🎨 **Tailwind CSS 3.4**.
+- 🏔️ **Alpine.js 3.15**.
+- 🟨 **JavaScript ES Modules**.
+- 📊 **Chart.js 4.5**.
+- 🎯 **Font Awesome 6.7**.
+- ⚡ **Vite 8**.
 
 ## 🗄️ Base de datos
 
-- Microsoft SQL Server 2017+
-- ODBC Driver 17 o 18
-- Extensiones `sqlsrv` y `pdo_sqlsrv`
-- SQLite en memoria para testing
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" title="Microsoft SQL Server" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" alt="SQLite" title="SQLite para testing" width="44" height="44">
+</p>
 
-## 🧪 Calidad y CI
+- 🪟 **Microsoft SQL Server 2017 o superior**.
+- 🔌 **ODBC Driver 17 o 18**.
+- 🧩 Extensiones PHP `sqlsrv` y `pdo_sqlsrv`.
+- 🧪 **SQLite en memoria** para pruebas automatizadas.
 
-- PHPUnit 12.5
-- Laravel Pint 1.27
-- Mockery
-- Faker
-- GitHub Actions
+## ♿ Accesibilidad
+
+<p>
+  <img src="https://img.shields.io/badge/NORTIC-B2%3A2017-263f88?style=for-the-badge" alt="NORTIC B2:2017">
+  <img src="https://img.shields.io/badge/WCAG-2.0%20AA-005A9C?style=for-the-badge&logo=w3c&logoColor=white" alt="WCAG 2.0 AA">
+  <img src="https://img.shields.io/badge/Teclado-Compatible-16a34a?style=for-the-badge" alt="Navegación por teclado">
+</p>
+
+- ⌨️ Navegación completa mediante teclado.
+- 🎯 Foco visible y orden lógico de navegación.
+- 🔎 Escalado de texto hasta 200 %.
+- ◐ Alto contraste y reducción de movimiento.
+- 🧭 Landmarks semánticos, ARIA y enlaces de salto.
+- 🔈 Mensajes accesibles para lectores de pantalla.
+
+## 🧪 Calidad, build y CI
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" title="Node.js 22+" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" title="npm" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" title="Git" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" alt="GitHub Actions" title="GitHub Actions" width="44" height="44">
+</p>
+
+- 🧪 **PHPUnit 12.5**.
+- 🎨 **Laravel Pint 1.27**.
+- 🎭 **Mockery**.
+- 🧬 **Faker**.
+- 🤖 **GitHub Actions** para integración continua.
+- 🟢 **Node.js 22+** y npm 10+.
 
 # 📥 Instalación
 
