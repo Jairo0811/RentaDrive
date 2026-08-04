@@ -9,7 +9,7 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-        <title>{{ config('app.name', 'RentaDrive') }}</title>
+        <title>{{ isset($title) ? $title.' | ' : '' }}{{ config('app.name', 'RentaDrive') }}</title>
         <link rel="icon" type="image/png" href="{{ asset('images/rentadrive-mark.png') }}">
         <link rel="apple-touch-icon" href="{{ asset('images/rentadrive-mark.png') }}">
         <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
@@ -25,15 +25,19 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="h-full antialiased" x-data="{ sidebarOpen: false }">
+    <body class="h-full antialiased" x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false">
+        <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+        <a href="#primary-navigation" class="skip-link left-56">Saltar a la navegación</a>
+
         <div
             x-cloak
             x-show="$store.toast.visible"
             x-transition.opacity.duration.200ms
             class="toast-shell"
             :class="$store.toast.type === 'error' ? 'toast-error' : 'toast-success'"
-            role="status"
-            aria-live="polite"
+            :role="$store.toast.type === 'error' ? 'alert' : 'status'"
+            :aria-live="$store.toast.type === 'error' ? 'assertive' : 'polite'"
+            aria-atomic="true"
         >
             <div class="flex items-start gap-3">
                 <i
@@ -42,7 +46,7 @@
                     aria-hidden="true"
                 ></i>
                 <p class="min-w-0 flex-1 text-sm font-semibold" x-text="$store.toast.message"></p>
-                <button type="button" class="rounded p-1 opacity-70 transition hover:opacity-100" @click="$store.toast.visible = false" aria-label="Cerrar notificación">
+                <button type="button" class="focus-ring rounded p-1 opacity-70 transition hover:opacity-100" @click="$store.toast.visible = false" aria-label="Cerrar notificación">
                     <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
             </div>
@@ -67,8 +71,10 @@
             ></div>
 
             <aside
+                id="primary-navigation"
                 class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transition-transform duration-300 lg:static lg:translate-x-0"
                 :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': ! sidebarOpen }"
+                aria-label="Navegación principal"
             >
                 @include('layouts.partials.sidebar')
             </aside>
@@ -76,12 +82,12 @@
             <div class="flex min-w-0 flex-1 flex-col">
                 @include('layouts.partials.topbar')
 
-                <main class="min-h-0 flex-1 overflow-y-auto">
+                <main id="main-content" class="min-h-0 flex-1 overflow-y-auto" tabindex="-1">
                     <div class="flex min-h-full flex-col">
                         <div class="mx-auto w-full max-w-[1600px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
                             @if ($errors->any())
-                                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300">
-                                    <p class="flex items-center gap-2 font-bold">
+                                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300" role="alert" aria-labelledby="validation-errors-title">
+                                    <p id="validation-errors-title" class="flex items-center gap-2 font-bold">
                                         <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                                         Revisa la información indicada:
                                     </p>
@@ -99,7 +105,7 @@
                         <footer class="border-t border-slate-200 bg-white/80 px-4 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80 sm:px-6 lg:px-8">
                             <div class="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-3 text-center text-sm text-slate-500 dark:text-slate-400 sm:flex-row sm:text-left">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ asset('images/rentadrive-mark.png') }}" alt="RentaDrive" class="h-8 w-8 rounded-lg object-contain">
+                                    <img src="{{ asset('images/rentadrive-mark.png') }}" alt="" class="h-8 w-8 rounded-lg object-contain" aria-hidden="true">
                                     <div>
                                         <p class="font-semibold text-slate-700 dark:text-slate-200">© {{ now()->year }} RentaDrive</p>
                                         <p class="text-xs">Gestiona tu flota. Impulsa tu negocio.</p>
@@ -111,8 +117,8 @@
                                         <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
                                         Versión 1.0
                                     </span>
-                                    <span class="hidden text-slate-300 dark:text-slate-700 sm:inline">•</span>
-                                    <a href="https://github.com/Jairo0811/RentaDrive" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                    <span class="hidden text-slate-300 dark:text-slate-700 sm:inline" aria-hidden="true">•</span>
+                                    <a href="https://github.com/Jairo0811/RentaDrive" target="_blank" rel="noopener noreferrer" class="focus-ring inline-flex items-center gap-2 rounded font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300" aria-label="Abrir el repositorio de RentaDrive en GitHub en una nueva pestaña">
                                         <i class="fa-brands fa-github" aria-hidden="true"></i>
                                         GitHub
                                     </a>
