@@ -19,6 +19,16 @@ const safeStorageSet = (key, value) => {
     }
 };
 
+const readBoolean = (key, fallback = false) => {
+    const value = safeStorageGet(key);
+
+    if (value === null) {
+        return fallback;
+    }
+
+    return value === 'true';
+};
+
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const storedTheme = safeStorageGet('rentadrive-theme');
@@ -35,58 +45,123 @@ Alpine.store('theme', {
     },
 });
 
-const storedFontScale = Number(safeStorageGet('rentadrive-font-scale'));
 const allowedFontScales = [100, 125, 150, 200];
-const initialFontScale = allowedFontScales.includes(storedFontScale) ? storedFontScale : 100;
-const initialHighContrast = safeStorageGet('rentadrive-high-contrast') === 'true';
+const allowedInterfaceScales = [100, 110, 125];
+const allowedColorFilters = ['none', 'grayscale', 'invert'];
+const storedFontScale = Number(safeStorageGet('rentadrive-font-scale'));
+const storedInterfaceScale = Number(safeStorageGet('rentadrive-interface-scale'));
+const storedColorFilter = safeStorageGet('rentadrive-color-filter');
 const storedReducedMotion = safeStorageGet('rentadrive-reduced-motion');
-const initialReducedMotion = storedReducedMotion === null
-    ? prefersReducedMotion
-    : storedReducedMotion === 'true';
 
 Alpine.store('accessibility', {
-    fontScale: initialFontScale,
-    highContrast: initialHighContrast,
-    reducedMotion: initialReducedMotion,
+    fontScale: allowedFontScales.includes(storedFontScale) ? storedFontScale : 100,
+    interfaceScale: allowedInterfaceScales.includes(storedInterfaceScale) ? storedInterfaceScale : 100,
+    colorFilter: allowedColorFilters.includes(storedColorFilter) ? storedColorFilter : 'none',
+    highContrast: readBoolean('rentadrive-high-contrast'),
+    reducedMotion: storedReducedMotion === null ? prefersReducedMotion : storedReducedMotion === 'true',
+    readableFont: readBoolean('rentadrive-readable-font'),
+    textSpacing: readBoolean('rentadrive-text-spacing'),
+    enhancedFocus: readBoolean('rentadrive-enhanced-focus', true),
+    largeCursor: readBoolean('rentadrive-large-cursor'),
 
     apply() {
-        document.documentElement.style.setProperty('--rentadrive-font-scale', `${this.fontScale}%`);
-        document.documentElement.classList.toggle('high-contrast', this.highContrast);
-        document.documentElement.classList.toggle('reduce-motion', this.reducedMotion);
+        const root = document.documentElement;
+        root.style.setProperty('--rentadrive-font-scale', `${this.fontScale}%`);
+        root.style.setProperty('--rentadrive-interface-scale', String(this.interfaceScale / 100));
+        root.classList.toggle('high-contrast', this.highContrast);
+        root.classList.toggle('reduce-motion', this.reducedMotion);
+        root.classList.toggle('readable-font', this.readableFont);
+        root.classList.toggle('text-spacing', this.textSpacing);
+        root.classList.toggle('enhanced-focus', this.enhancedFocus);
+        root.classList.toggle('large-cursor', this.largeCursor);
+        root.classList.toggle('filter-grayscale', this.colorFilter === 'grayscale');
+        root.classList.toggle('filter-invert', this.colorFilter === 'invert');
+        window.dispatchEvent(new CustomEvent('rentadrive:accessibility-changed'));
+    },
+
+    persist() {
+        safeStorageSet('rentadrive-font-scale', String(this.fontScale));
+        safeStorageSet('rentadrive-interface-scale', String(this.interfaceScale));
+        safeStorageSet('rentadrive-color-filter', this.colorFilter);
+        safeStorageSet('rentadrive-high-contrast', String(this.highContrast));
+        safeStorageSet('rentadrive-reduced-motion', String(this.reducedMotion));
+        safeStorageSet('rentadrive-readable-font', String(this.readableFont));
+        safeStorageSet('rentadrive-text-spacing', String(this.textSpacing));
+        safeStorageSet('rentadrive-enhanced-focus', String(this.enhancedFocus));
+        safeStorageSet('rentadrive-large-cursor', String(this.largeCursor));
+    },
+
+    update() {
+        this.persist();
+        this.apply();
     },
 
     setFontScale(value) {
         const parsedValue = Number(value);
-
-        if (! allowedFontScales.includes(parsedValue)) {
-            return;
-        }
-
+        if (! allowedFontScales.includes(parsedValue)) return;
         this.fontScale = parsedValue;
-        safeStorageSet('rentadrive-font-scale', String(parsedValue));
-        this.apply();
+        this.update();
     },
 
-    toggleHighContrast() {
-        this.highContrast = ! this.highContrast;
-        safeStorageSet('rentadrive-high-contrast', String(this.highContrast));
-        this.apply();
+    setInterfaceScale(value) {
+        const parsedValue = Number(value);
+        if (! allowedInterfaceScales.includes(parsedValue)) return;
+        this.interfaceScale = parsedValue;
+        this.update();
     },
 
-    toggleReducedMotion() {
-        this.reducedMotion = ! this.reducedMotion;
-        safeStorageSet('rentadrive-reduced-motion', String(this.reducedMotion));
-        this.apply();
+    setColorFilter(value) {
+        if (! allowedColorFilters.includes(value)) return;
+        this.colorFilter = value;
+        this.update();
+    },
+
+    toggleHighContrast() { this.highContrast = ! this.highContrast; this.update(); },
+    toggleReducedMotion() { this.reducedMotion = ! this.reducedMotion; this.update(); },
+    toggleReadableFont() { this.readableFont = ! this.readableFont; this.update(); },
+    toggleTextSpacing() { this.textSpacing = ! this.textSpacing; this.update(); },
+    toggleEnhancedFocus() { this.enhancedFocus = ! this.enhancedFocus; this.update(); },
+    toggleLargeCursor() { this.largeCursor = ! this.largeCursor; this.update(); },
+
+    applyProfile(profile) {
+        const profiles = {
+            lowVision: { fontScale: 150, interfaceScale: 110, highContrast: true, enhancedFocus: true, largeCursor: true, readableFont: false, textSpacing: false, reducedMotion: false, colorFilter: 'none' },
+            reading: { fontScale: 125, interfaceScale: 100, highContrast: false, enhancedFocus: true, largeCursor: false, readableFont: true, textSpacing: true, reducedMotion: true, colorFilter: 'none' },
+            motor: { fontScale: 125, interfaceScale: 125, highContrast: false, enhancedFocus: true, largeCursor: true, readableFont: false, textSpacing: false, reducedMotion: true, colorFilter: 'none' },
+            senior: { fontScale: 150, interfaceScale: 110, highContrast: true, enhancedFocus: true, largeCursor: true, readableFont: true, textSpacing: true, reducedMotion: true, colorFilter: 'none' },
+        };
+        if (! profiles[profile]) return;
+        Object.assign(this, profiles[profile]);
+        this.update();
+        Alpine.store('toast')?.show('Perfil de accesibilidad aplicado.');
+    },
+
+    announceSummary() {
+        const active = [
+            `texto ${this.fontScale}%`,
+            `interfaz ${this.interfaceScale}%`,
+            this.highContrast ? 'alto contraste' : null,
+            this.readableFont ? 'fuente legible' : null,
+            this.textSpacing ? 'espaciado amplio' : null,
+            this.largeCursor ? 'cursor grande' : null,
+            this.reducedMotion ? 'movimiento reducido' : null,
+            this.colorFilter !== 'none' ? `filtro ${this.colorFilter}` : null,
+        ].filter(Boolean).join(', ');
+        Alpine.store('toast')?.show(`Preferencias activas: ${active}.`);
     },
 
     reset() {
         this.fontScale = 100;
+        this.interfaceScale = 100;
+        this.colorFilter = 'none';
         this.highContrast = false;
         this.reducedMotion = prefersReducedMotion;
-        safeStorageSet('rentadrive-font-scale', '100');
-        safeStorageSet('rentadrive-high-contrast', 'false');
-        safeStorageSet('rentadrive-reduced-motion', String(prefersReducedMotion));
-        this.apply();
+        this.readableFont = false;
+        this.textSpacing = false;
+        this.enhancedFocus = true;
+        this.largeCursor = false;
+        this.update();
+        Alpine.store('toast')?.show('Preferencias de accesibilidad restablecidas.');
     },
 });
 
@@ -191,8 +266,10 @@ const buildDashboardCharts = () => {
     }
 };
 
-const refreshChartTheme = () => {
+const refreshCharts = () => {
     charts.forEach((chart) => {
+        chart.options.animation = ! Alpine.store('accessibility').reducedMotion;
+
         if (chart.options.scales?.x) {
             chart.options.scales.x.ticks.color = chartTextColor();
             chart.options.scales.y.ticks.color = chartTextColor();
@@ -210,36 +287,19 @@ const refreshChartTheme = () => {
 const populateReservationRate = () => {
     const category = document.querySelector('#vehicle_category_id');
     const rate = document.querySelector('#daily_rate');
-
-    if (! category || ! rate) {
-        return;
-    }
-
+    if (! category || ! rate) return;
     const option = category.options[category.selectedIndex];
-
-    if (option?.dataset.rate && ! rate.value) {
-        rate.value = option.dataset.rate;
-    }
+    if (option?.dataset.rate && ! rate.value) rate.value = option.dataset.rate;
 };
 
 const populateReservationVehicle = () => {
     const vehicle = document.querySelector('#vehicle_id');
     const category = document.querySelector('#vehicle_category_id');
     const rate = document.querySelector('#daily_rate');
-
-    if (! vehicle || ! category || ! rate) {
-        return;
-    }
-
+    if (! vehicle || ! category || ! rate) return;
     const option = vehicle.options[vehicle.selectedIndex];
-
-    if (option?.dataset.category) {
-        category.value = option.dataset.category;
-    }
-
-    if (option?.dataset.rate) {
-        rate.value = option.dataset.rate;
-    }
+    if (option?.dataset.category) category.value = option.dataset.category;
+    if (option?.dataset.rate) rate.value = option.dataset.rate;
 };
 
 const populateRentalVehicle = () => {
@@ -247,24 +307,11 @@ const populateRentalVehicle = () => {
     const mileage = document.querySelector('#opening_mileage');
     const rate = document.querySelector('#daily_rate');
     const deposit = document.querySelector('#deposit_amount');
-
-    if (! vehicle || ! mileage || ! rate || ! deposit) {
-        return;
-    }
-
+    if (! vehicle || ! mileage || ! rate || ! deposit) return;
     const option = vehicle.options[vehicle.selectedIndex];
-
-    if (option?.dataset.mileage && ! mileage.value) {
-        mileage.value = option.dataset.mileage;
-    }
-
-    if (option?.dataset.rate && ! rate.value) {
-        rate.value = option.dataset.rate;
-    }
-
-    if (option?.dataset.deposit && ! deposit.value) {
-        deposit.value = option.dataset.deposit;
-    }
+    if (option?.dataset.mileage && ! mileage.value) mileage.value = option.dataset.mileage;
+    if (option?.dataset.rate && ! rate.value) rate.value = option.dataset.rate;
+    if (option?.dataset.deposit && ! deposit.value) deposit.value = option.dataset.deposit;
 };
 
 document.querySelector('#vehicle_category_id')?.addEventListener('change', populateReservationRate);
@@ -273,7 +320,8 @@ document.querySelector('#vehicle_id')?.addEventListener('change', () => {
     populateRentalVehicle();
 });
 
-window.addEventListener('rentadrive:theme-changed', refreshChartTheme);
+window.addEventListener('rentadrive:theme-changed', refreshCharts);
+window.addEventListener('rentadrive:accessibility-changed', refreshCharts);
 window.addEventListener('DOMContentLoaded', buildDashboardCharts);
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
