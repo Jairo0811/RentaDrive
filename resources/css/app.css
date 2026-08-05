@@ -5,6 +5,7 @@
 @layer base {
     :root {
         --rentadrive-font-scale: 100%;
+        --rentadrive-interface-scale: 1;
     }
 
     html {
@@ -16,6 +17,11 @@
         @apply bg-slate-100 text-slate-900 dark:bg-[#030914] dark:text-slate-100;
     }
 
+    body > div.flex,
+    body > div.grid {
+        zoom: var(--rentadrive-interface-scale);
+    }
+
     [x-cloak] {
         display: none !important;
     }
@@ -23,6 +29,12 @@
     :focus-visible {
         outline: 3px solid #facc15;
         outline-offset: 3px;
+    }
+
+    .enhanced-focus :focus-visible {
+        outline: 5px solid #facc15 !important;
+        outline-offset: 4px !important;
+        box-shadow: 0 0 0 3px #0f172a, 0 0 0 7px #facc15 !important;
     }
 
     .reduce-motion *,
@@ -45,9 +57,63 @@
         }
     }
 
+    .readable-font body,
+    .readable-font button,
+    .readable-font input,
+    .readable-font select,
+    .readable-font textarea {
+        font-family: Verdana, Tahoma, Arial, sans-serif !important;
+    }
+
+    .text-spacing body {
+        letter-spacing: 0.06em;
+        line-height: 1.75;
+        word-spacing: 0.12em;
+    }
+
+    .text-spacing p,
+    .text-spacing li,
+    .text-spacing label,
+    .text-spacing td,
+    .text-spacing th {
+        line-height: 1.75 !important;
+    }
+
+    .large-cursor,
+    .large-cursor * {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath fill='%23fff' stroke='%23000' stroke-width='2' d='M4 2l19 17-9 1 5 9-5 2-5-9-6 7z'/%3E%3C/svg%3E") 4 2, auto !important;
+    }
+
+    .filter-grayscale body {
+        filter: grayscale(1);
+    }
+
+    .filter-invert body {
+        filter: invert(1) hue-rotate(180deg);
+    }
+
+    .filter-invert img,
+    .filter-invert video,
+    .filter-invert canvas {
+        filter: invert(1) hue-rotate(180deg);
+    }
+
     .high-contrast body {
         background: #000 !important;
         color: #fff !important;
+    }
+
+    .high-contrast header,
+    .high-contrast aside,
+    .high-contrast footer,
+    .high-contrast main,
+    .high-contrast section,
+    .high-contrast article,
+    .high-contrast .panel,
+    .high-contrast [role='dialog'] {
+        background-color: #000 !important;
+        color: #fff !important;
+        border-color: #fff !important;
     }
 
     .high-contrast a:not(.btn-primary):not(.btn-danger) {
@@ -64,6 +130,20 @@
     .high-contrast .panel {
         border-color: #fff !important;
     }
+
+    .high-contrast input,
+    .high-contrast select,
+    .high-contrast textarea {
+        background: #000 !important;
+        color: #fff !important;
+    }
+
+    .high-contrast .text-slate-400,
+    .high-contrast .text-slate-500,
+    .high-contrast .text-slate-600,
+    .high-contrast .dark\:text-slate-400 {
+        color: #fff !important;
+    }
 }
 
 @layer components {
@@ -73,6 +153,34 @@
 
     .skip-link:focus {
         @apply translate-y-0;
+    }
+
+    .accessibility-choice {
+        @apply focus-ring rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800;
+    }
+
+    .accessibility-choice-active {
+        @apply border-blue-600 bg-blue-600 text-white hover:bg-blue-700 dark:border-blue-400 dark:bg-blue-600 dark:text-white;
+    }
+
+    .accessibility-profile {
+        @apply focus-ring flex min-h-16 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-left text-xs font-bold text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-950/40;
+    }
+
+    .accessibility-profile i {
+        @apply text-base text-blue-600 dark:text-blue-400;
+    }
+
+    .accessibility-toggle {
+        @apply flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-slate-200 p-3 dark:border-slate-700;
+    }
+
+    .accessibility-toggle-title {
+        @apply block text-sm font-bold text-slate-800 dark:text-slate-200;
+    }
+
+    .accessibility-toggle-help {
+        @apply mt-0.5 block text-xs leading-5 text-slate-500 dark:text-slate-400;
     }
 
     .panel {
