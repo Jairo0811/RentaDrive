@@ -21,7 +21,6 @@
   <img src="https://img.shields.io/badge/Tests-35%20passing-success" alt="35 tests passing">
 </p>
 
-# 🚘 RentaDrive
 
 **RentaDrive** es una plataforma web profesional para la gestión integral de empresas de alquiler de vehículos. Centraliza clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
 
