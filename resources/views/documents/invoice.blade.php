@@ -7,7 +7,7 @@
         @page { margin: 34px; }
         body { color: #0f172a; font-family: DejaVu Sans, sans-serif; font-size: 12px; }
         .header { border-bottom: 3px solid #0568f5; padding-bottom: 18px; }
-        .logo { height: 86px; width: 250px; object-fit: contain; }
+        .brand-mark { display: block; height: 64px; width: 64px; }
         .right { text-align: right; }
         .muted { color: #64748b; }
         .title { color: #0568f5; font-size: 25px; font-weight: 800; margin: 0; }
@@ -26,7 +26,7 @@
     <div class="header">
         <table style="margin:0">
             <tr>
-                <td style="border:0;padding:0"><img class="logo" src="{{ public_path('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive"></td>
+                <td style="border:0;padding:0"><img class="brand-mark" src="{{ public_path('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive"></td>
                 <td class="right" style="border:0;padding:0">
                     <p class="title">FACTURA</p>
                     <p style="font-size:16px;font-weight:bold;margin:5px 0 0">{{ $invoice->number }}</p>
