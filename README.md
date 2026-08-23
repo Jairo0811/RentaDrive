@@ -21,7 +21,6 @@
   <img src="https://img.shields.io/badge/Tests-35%20passing-success" alt="35 tests passing">
 </p>
 
-
 **RentaDrive** es una plataforma web profesional para la gestión integral de empresas de alquiler de vehículos. Centraliza clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
 
 El proyecto nació como trabajo final de la asignatura **Análisis y Diseño de Sistemas (SOF-007)** del Instituto Tecnológico de Las Américas (ITLA) y fue modernizado en 2026 como una aplicación funcional con Laravel, Microsoft SQL Server y una arquitectura monolítica modular.
@@ -274,6 +273,8 @@ npm run build
 
 ## 9. Iniciar la aplicación
 
+Para uso exclusivo en la PC:
+
 ```bash
 php artisan serve
 ```
@@ -283,6 +284,28 @@ Abrir:
 ```text
 http://127.0.0.1:8000
 ```
+
+### 📱 Probar RentaDrive desde un móvil en la misma red
+
+Para levantar Laravel y Vite preparados para acceso LAN:
+
+```bash
+composer dev:lan
+```
+
+Luego obtén la IPv4 de la PC con `ipconfig` y abre desde el móvil:
+
+```text
+http://<IP-DE-LA-PC>:8000
+```
+
+Ejemplo:
+
+```text
+http://192.168.1.50:8000
+```
+
+La PC y el móvil deben estar conectados a la misma red. Si Windows solicita permiso de firewall para PHP o Node.js, permite únicamente redes privadas.
 
 # 🔑 Credenciales locales
 
