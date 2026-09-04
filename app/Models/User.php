@@ -30,6 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function casts(): array
     {
         return [
+            'company_id' => 'integer',
+            'branch_id' => 'integer',
             'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
             'password' => 'hashed',
