@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Support\Tenancy\TenantValidation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,9 +21,9 @@ final class ReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['required', 'exists:customers,id'],
-            'vehicle_category_id' => ['required', 'exists:vehicle_categories,id'],
-            'vehicle_id' => ['nullable', 'exists:vehicles,id'],
+            'customer_id' => ['required', TenantValidation::exists('customers')],
+            'vehicle_category_id' => ['required', TenantValidation::exists('vehicle_categories')],
+            'vehicle_id' => ['nullable', TenantValidation::exists('vehicles')],
             'start_at' => ['required', 'date'],
             'end_at' => ['required', 'date', 'after:start_at'],
             'pickup_location' => ['required', 'string', 'max:255'],
