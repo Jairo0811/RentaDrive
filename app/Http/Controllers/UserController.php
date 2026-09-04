@@ -17,6 +17,7 @@ final class UserController extends Controller
     public function index(Request $request): View
     {
         $users = User::query()
+            ->where('company_id', $request->user()?->company_id)
             ->with('roles')
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
                 $search = '%'.$request->string('q')->value().'%';
@@ -42,6 +43,9 @@ final class UserController extends Controller
         $role = $data['role'];
         unset($data['role'], $data['password_confirmation']);
 
+        $data['company_id'] = $request->user()?->company_id;
+        $data['branch_id'] = $request->user()?->branch_id;
+
         $user = User::query()->create($data);
         $user->syncRoles([$role]);
 
@@ -50,11 +54,15 @@ final class UserController extends Controller
 
     public function edit(User $user): View
     {
+        $this->ensureSameCompany($user);
+
         return $this->formView($user);
     }
 
     public function update(UserRequest $request, User $user): RedirectResponse
     {
+        $this->ensureSameCompany($user);
+
         $data = $request->validated();
         $role = $data['role'];
         unset($data['role'], $data['password_confirmation']);
@@ -71,6 +79,7 @@ final class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
+        $this->ensureSameCompany($user);
         Gate::authorize('delete', $user);
         $user->delete();
 
@@ -83,5 +92,13 @@ final class UserController extends Controller
             'user' => $user,
             'roles' => Role::query()->orderBy('name')->get(),
         ]);
+    }
+
+    private function ensureSameCompany(User $user): void
+    {
+        abort_unless(
+            auth()->user() instanceof User && auth()->user()->company_id === $user->company_id,
+            404,
+        );
     }
 }
