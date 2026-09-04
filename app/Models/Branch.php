@@ -28,6 +28,7 @@ final class Branch extends Model
     protected function casts(): array
     {
         return [
+            'company_id' => 'integer',
             'is_primary' => 'boolean',
             'is_active' => 'boolean',
         ];
