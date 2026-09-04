@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Branch;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -24,7 +26,31 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $company = Company::query()->firstOrCreate(
+            ['slug' => 'rentadrive-testing'],
+            [
+                'name' => 'RentaDrive Testing',
+                'currency' => 'DOP',
+                'timezone' => 'America/Santo_Domingo',
+                'status' => 'active',
+            ],
+        );
+
+        $branch = Branch::query()->firstOrCreate(
+            [
+                'company_id' => $company->getKey(),
+                'code' => 'TEST',
+            ],
+            [
+                'name' => 'Sucursal Testing',
+                'is_primary' => true,
+                'is_active' => true,
+            ],
+        );
+
         return [
+            'company_id' => $company->getKey(),
+            'branch_id' => $branch->getKey(),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
