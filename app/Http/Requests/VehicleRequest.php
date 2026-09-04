@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Support\Tenancy\TenantValidation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,11 +23,11 @@ final class VehicleRequest extends FormRequest
         $vehicle = $this->route('vehicle');
 
         return [
-            'vehicle_model_id' => ['required', 'exists:vehicle_models,id'],
-            'vehicle_category_id' => ['required', 'exists:vehicle_categories,id'],
-            'code' => ['required', 'string', 'max:30', Rule::unique('vehicles')->ignore($vehicle)],
-            'plate' => ['required', 'string', 'max:20', Rule::unique('vehicles')->ignore($vehicle)],
-            'vin' => ['nullable', 'string', 'max:50', Rule::unique('vehicles')->ignore($vehicle)],
+            'vehicle_model_id' => ['required', TenantValidation::exists('vehicle_models')],
+            'vehicle_category_id' => ['required', TenantValidation::exists('vehicle_categories')],
+            'code' => ['required', 'string', 'max:30', TenantValidation::unique('vehicles', 'code')->ignore($vehicle)],
+            'plate' => ['required', 'string', 'max:20', TenantValidation::unique('vehicles', 'plate')->ignore($vehicle)],
+            'vin' => ['nullable', 'string', 'max:50', TenantValidation::unique('vehicles', 'vin')->ignore($vehicle)],
             'color' => ['required', 'string', 'max:40'],
             'transmission' => ['required', Rule::in(['automatic', 'manual'])],
             'fuel_type' => ['required', Rule::in(['gasoline', 'diesel', 'hybrid', 'electric'])],

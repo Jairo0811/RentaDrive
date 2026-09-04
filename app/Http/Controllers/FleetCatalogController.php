@@ -7,10 +7,10 @@ namespace App\Http\Controllers;
 use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
+use App\Support\Tenancy\TenantValidation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 final class FleetCatalogController extends Controller
@@ -27,7 +27,7 @@ final class FleetCatalogController extends Controller
     public function storeBrand(Request $request): RedirectResponse
     {
         VehicleBrand::query()->create($request->validate([
-            'name' => ['required', 'string', 'max:80', 'unique:vehicle_brands,name'],
+            'name' => ['required', 'string', 'max:80', TenantValidation::unique('vehicle_brands', 'name')],
             'is_active' => ['nullable', 'boolean'],
         ]) + ['is_active' => $request->boolean('is_active', true)]);
 
@@ -37,7 +37,7 @@ final class FleetCatalogController extends Controller
     public function updateBrand(Request $request, VehicleBrand $brand): RedirectResponse
     {
         $brand->update($request->validate([
-            'name' => ['required', 'string', 'max:80', Rule::unique('vehicle_brands', 'name')->ignore($brand)],
+            'name' => ['required', 'string', 'max:80', TenantValidation::unique('vehicle_brands', 'name')->ignore($brand)],
             'is_active' => ['required', 'boolean'],
         ]));
 
@@ -58,8 +58,8 @@ final class FleetCatalogController extends Controller
     public function storeCategory(Request $request): RedirectResponse
     {
         VehicleCategory::query()->create($request->validate([
-            'code' => ['required', 'string', 'max:20', 'unique:vehicle_categories,code'],
-            'name' => ['required', 'string', 'max:80', 'unique:vehicle_categories,name'],
+            'code' => ['required', 'string', 'max:20', TenantValidation::unique('vehicle_categories', 'code')],
+            'name' => ['required', 'string', 'max:80', TenantValidation::unique('vehicle_categories', 'name')],
             'daily_rate' => ['required', 'numeric', 'min:0'],
             'deposit_amount' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -71,8 +71,8 @@ final class FleetCatalogController extends Controller
     public function updateCategory(Request $request, VehicleCategory $category): RedirectResponse
     {
         $category->update($request->validate([
-            'code' => ['required', 'string', 'max:20', Rule::unique('vehicle_categories', 'code')->ignore($category)],
-            'name' => ['required', 'string', 'max:80', Rule::unique('vehicle_categories', 'name')->ignore($category)],
+            'code' => ['required', 'string', 'max:20', TenantValidation::unique('vehicle_categories', 'code')->ignore($category)],
+            'name' => ['required', 'string', 'max:80', TenantValidation::unique('vehicle_categories', 'name')->ignore($category)],
             'daily_rate' => ['required', 'numeric', 'min:0'],
             'deposit_amount' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -95,9 +95,19 @@ final class FleetCatalogController extends Controller
 
     public function storeModel(Request $request): RedirectResponse
     {
+        $brandId = (int) $request->input('vehicle_brand_id');
+        $year = (int) $request->input('year');
+
         VehicleModel::query()->create($request->validate([
-            'vehicle_brand_id' => ['required', 'exists:vehicle_brands,id'],
-            'name' => ['required', 'string', 'max:80'],
+            'vehicle_brand_id' => ['required', TenantValidation::exists('vehicle_brands')],
+            'name' => [
+                'required',
+                'string',
+                'max:80',
+                TenantValidation::unique('vehicle_models', 'name')
+                    ->where('vehicle_brand_id', $brandId)
+                    ->where('year', $year),
+            ],
             'year' => ['required', 'integer', 'between:1950,'.(now()->year + 2)],
         ]) + ['is_active' => true]);
 
@@ -106,9 +116,20 @@ final class FleetCatalogController extends Controller
 
     public function updateModel(Request $request, VehicleModel $model): RedirectResponse
     {
+        $brandId = (int) $request->input('vehicle_brand_id');
+        $year = (int) $request->input('year');
+
         $model->update($request->validate([
-            'vehicle_brand_id' => ['required', 'exists:vehicle_brands,id'],
-            'name' => ['required', 'string', 'max:80'],
+            'vehicle_brand_id' => ['required', TenantValidation::exists('vehicle_brands')],
+            'name' => [
+                'required',
+                'string',
+                'max:80',
+                TenantValidation::unique('vehicle_models', 'name')
+                    ->where('vehicle_brand_id', $brandId)
+                    ->where('year', $year)
+                    ->ignore($model),
+            ],
             'year' => ['required', 'integer', 'between:1950,'.(now()->year + 2)],
             'is_active' => ['required', 'boolean'],
         ]));
