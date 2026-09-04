@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Support\Tenancy\TenantValidation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,7 +21,7 @@ final class VehicleMaintenanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicle_id' => ['required', 'exists:vehicles,id'],
+            'vehicle_id' => ['required', TenantValidation::exists('vehicles')],
             'maintenance_type' => ['required', 'string', 'max:60'],
             'scheduled_at' => ['required', 'date'],
             'completed_at' => ['nullable', 'date', 'after_or_equal:scheduled_at'],
