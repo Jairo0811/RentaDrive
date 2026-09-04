@@ -17,11 +17,12 @@ use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleMaintenance;
 use App\Models\VehicleModel;
+use Illuminate\Database\Eloquent\Model;
 
 final class TenantModelRegistry
 {
     /**
-     * @return list<class-string<\Illuminate\Database\Eloquent\Model>>
+     * @return list<class-string<Model>>
      */
     public static function models(): array
     {
@@ -43,7 +44,7 @@ final class TenantModelRegistry
     }
 
     /**
-     * @return list<class-string<\Illuminate\Database\Eloquent\Model>>
+     * @return list<class-string<Model>>
      */
     public static function branchModels(): array
     {
