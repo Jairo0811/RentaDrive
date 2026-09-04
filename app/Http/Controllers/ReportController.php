@@ -8,47 +8,19 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Rental;
 use App\Models\Vehicle;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ReportController extends Controller
 {
     public function index(Request $request): View
     {
-        [$from, $to] = $this->dateRange($request);
-
-        $rentals = Rental::query()
-            ->with(['customer', 'vehicle.model.brand'])
-            ->whereBetween('start_at', [$from->startOfDay(), $to->endOfDay()])
-            ->latest('start_at')
-            ->get();
-
-        $payments = Payment::query()
-            ->whereBetween('paid_at', [$from->startOfDay(), $to->endOfDay()])
-            ->get();
-
-        $invoices = Invoice::query()
-            ->whereBetween('issued_at', [$from->toDateString(), $to->toDateString()])
-            ->get();
-
-        return view('reports.index', [
-            'from' => $from,
-            'to' => $to,
-            'rentals' => $rentals,
-            'metrics' => [
-                'rental_count' => $rentals->count(),
-                'billed' => $invoices->sum('total'),
-                'collected' => $payments->sum('amount'),
-                'outstanding' => Invoice::query()->where('balance', '>', 0)->sum('balance'),
-                'utilization' => $this->utilizationRate(),
-            ],
-            'fleetByStatus' => Vehicle::query()
-                ->selectRaw('status, COUNT(*) as total')
-                ->groupBy('status')
-                ->pluck('total', 'status'),
-        ]);
+        return view('reports.index', $this->reportData($request));
     }
 
     public function export(Request $request): StreamedResponse
@@ -56,7 +28,7 @@ final class ReportController extends Controller
         [$from, $to] = $this->dateRange($request);
         $rentals = Rental::query()
             ->with(['customer', 'vehicle.model.brand'])
-            ->whereBetween('start_at', [$from->startOfDay(), $to->endOfDay()])
+            ->whereBetween('start_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
             ->orderBy('start_at')
             ->cursor();
 
@@ -86,6 +58,61 @@ final class ReportController extends Controller
         }, 'rentadrive-operaciones-'.$from->format('Ymd').'-'.$to->format('Ymd').'.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    public function exportPdf(Request $request): Response
+    {
+        $data = $this->reportData($request);
+        $filename = 'rentadrive-reporte-'.$data['from']->format('Ymd').'-'.$data['to']->format('Ymd').'.pdf';
+
+        return Pdf::loadView('documents.report', $data)
+            ->setPaper('letter', 'landscape')
+            ->download($filename);
+    }
+
+    /**
+     * @return array{
+     *     from: Carbon,
+     *     to: Carbon,
+     *     rentals: \Illuminate\Database\Eloquent\Collection<int, Rental>,
+     *     metrics: array{rental_count: int, billed: mixed, collected: mixed, outstanding: mixed, utilization: float},
+     *     fleetByStatus: Collection<string, int>
+     * }
+     */
+    private function reportData(Request $request): array
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        $rentals = Rental::query()
+            ->with(['customer', 'vehicle.model.brand'])
+            ->whereBetween('start_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
+            ->latest('start_at')
+            ->get();
+
+        $payments = Payment::query()
+            ->whereBetween('paid_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
+            ->get();
+
+        $invoices = Invoice::query()
+            ->whereBetween('issued_at', [$from->toDateString(), $to->toDateString()])
+            ->get();
+
+        return [
+            'from' => $from,
+            'to' => $to,
+            'rentals' => $rentals,
+            'metrics' => [
+                'rental_count' => $rentals->count(),
+                'billed' => $invoices->sum('total'),
+                'collected' => $payments->sum('amount'),
+                'outstanding' => Invoice::query()->where('balance', '>', 0)->sum('balance'),
+                'utilization' => $this->utilizationRate(),
+            ],
+            'fleetByStatus' => Vehicle::query()
+                ->selectRaw('status, COUNT(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status'),
+        ];
     }
 
     /**
