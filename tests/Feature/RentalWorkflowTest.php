@@ -26,9 +26,10 @@ final class RentalWorkflowTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
         $administrator = User::factory()->create();
         $administrator->assignRole(RoleName::ADMINISTRATOR->value);
+        $this->actingAs($administrator);
         [$customer, $vehicle] = $this->fixtures();
 
-        $response = $this->actingAs($administrator)->post('/rentals', [
+        $response = $this->post('/rentals', [
             'customer_id' => $customer->id,
             'vehicle_id' => $vehicle->id,
             'start_at' => now()->format('Y-m-d H:i:s'),
