@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified', 'platform_admin'])
         Route::get('/companies/{company}/branches/{branch}/edit', [PlatformBranchController::class, 'edit'])->name('companies.branches.edit');
         Route::put('/companies/{company}/branches/{branch}', [PlatformBranchController::class, 'update'])->name('companies.branches.update');
         Route::patch('/companies/{company}/branches/{branch}/status', [PlatformBranchController::class, 'toggleStatus'])->name('companies.branches.status');
+        Route::delete('/companies/{company}/branches/{branch}', [PlatformBranchController::class, 'destroy'])->name('companies.branches.destroy');
     });
 
 Route::get('/dashboard', DashboardController::class)
