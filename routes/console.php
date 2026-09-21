@@ -3,9 +3,9 @@
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Symfony\Component\Console\Command\Command;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -32,7 +32,7 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
             $this->error($error);
         }
 
-        return self::FAILURE;
+        return Command::FAILURE;
     }
 
     $user = User::query()->where('email', $email)->first();
@@ -40,7 +40,7 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
     if ($user !== null && ! $user->isPlatformAdmin() && $user->company_id !== null) {
         $this->error('Ese correo ya pertenece a un usuario tenant y no puede elevarse a SuperAdmin.');
 
-        return self::FAILURE;
+        return Command::FAILURE;
     }
 
     $user ??= new User;
@@ -51,7 +51,7 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
         'name' => $name,
         'email' => $email,
         'email_verified_at' => now(),
-        'password' => Hash::make($password),
+        'password' => $password,
         'is_active' => true,
         'is_platform_admin' => true,
     ])->save();
@@ -60,5 +60,5 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
 
     $this->info('SuperAdmin de plataforma provisionado correctamente.');
 
-    return self::SUCCESS;
+    return Command::SUCCESS;
 })->purpose('Provisiona o actualiza un SuperAdmin de RentaDrive sin exponer la contraseña.');
