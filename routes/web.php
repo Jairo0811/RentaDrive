@@ -5,9 +5,13 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FleetCatalogController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Platform\PlatformBranchController;
+use App\Http\Controllers\Platform\PlatformCompanyController;
+use App\Http\Controllers\Platform\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
@@ -18,7 +22,35 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard')->name('home');
+Route::get('/', HomeController::class)->name('home');
+
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth', 'verified', 'platform_admin'])
+    ->prefix('platform')
+    ->name('platform.')
+    ->group(function (): void {
+        Route::get('/', PlatformDashboardController::class)->name('dashboard');
+
+        Route::get('/companies', [PlatformCompanyController::class, 'index'])->name('companies.index');
+        Route::get('/companies/create', [PlatformCompanyController::class, 'create'])->name('companies.create');
+        Route::post('/companies', [PlatformCompanyController::class, 'store'])->name('companies.store');
+        Route::get('/companies/{company}/edit', [PlatformCompanyController::class, 'edit'])->name('companies.edit');
+        Route::put('/companies/{company}', [PlatformCompanyController::class, 'update'])->name('companies.update');
+        Route::patch('/companies/{company}/suspend', [PlatformCompanyController::class, 'suspend'])->name('companies.suspend');
+        Route::patch('/companies/{company}/activate', [PlatformCompanyController::class, 'activate'])->name('companies.activate');
+
+        Route::get('/companies/{company}/branches', [PlatformBranchController::class, 'index'])->name('companies.branches.index');
+        Route::get('/companies/{company}/branches/create', [PlatformBranchController::class, 'create'])->name('companies.branches.create');
+        Route::post('/companies/{company}/branches', [PlatformBranchController::class, 'store'])->name('companies.branches.store');
+        Route::get('/companies/{company}/branches/{branch}/edit', [PlatformBranchController::class, 'edit'])->name('companies.branches.edit');
+        Route::put('/companies/{company}/branches/{branch}', [PlatformBranchController::class, 'update'])->name('companies.branches.update');
+        Route::patch('/companies/{company}/branches/{branch}/status', [PlatformBranchController::class, 'toggleStatus'])->name('companies.branches.status');
+    });
 
 Route::get('/dashboard', DashboardController::class)
     ->middleware([
@@ -29,11 +61,7 @@ Route::get('/dashboard', DashboardController::class)
     ])
     ->name('dashboard');
 
-Route::middleware(['auth', 'tenant'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
+Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::resource('customers', CustomerController::class)
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_CUSTOMERS->value)
         ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:'.PermissionName::MANAGE_CUSTOMERS->value);
