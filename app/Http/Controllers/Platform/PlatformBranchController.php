@@ -11,6 +11,8 @@ use App\Models\Company;
 use App\Support\Commercial\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 final class PlatformBranchController extends Controller
 {
@@ -80,6 +82,34 @@ final class PlatformBranchController extends Controller
         $branch->update(['is_active' => ! $branch->is_active]);
 
         return back()->with('status', $branch->is_active ? 'Sucursal activada.' : 'Sucursal desactivada.');
+    }
+
+    public function destroy(Company $company, Branch $branch): RedirectResponse
+    {
+        $this->ensureBelongsToCompany($company, $branch);
+
+        if ($branch->is_primary) {
+            throw ValidationException::withMessages([
+                'branch' => 'La sucursal principal no puede eliminarse.',
+            ]);
+        }
+
+        $hasRelations = $branch->users()->exists()
+            || DB::table('vehicles')->where('branch_id', $branch->getKey())->exists()
+            || DB::table('reservations')->where('branch_id', $branch->getKey())->exists()
+            || DB::table('rentals')->where('branch_id', $branch->getKey())->exists();
+
+        if ($hasRelations) {
+            throw ValidationException::withMessages([
+                'branch' => 'La sucursal tiene información relacionada. Desactívala en lugar de eliminarla.',
+            ]);
+        }
+
+        $branch->delete();
+
+        return redirect()
+            ->route('platform.companies.branches.index', $company)
+            ->with('status', 'Sucursal eliminada.');
     }
 
     private function ensureBelongsToCompany(Company $company, Branch $branch): void
