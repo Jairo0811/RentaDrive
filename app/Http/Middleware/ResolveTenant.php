@@ -17,7 +17,9 @@ final class ResolveTenant
     {
         $user = $request->user();
 
-        abort_unless($user !== null && $user->company_id !== null, 403, 'Tu usuario no tiene una empresa asignada.');
+        abort_unless($user !== null, 403);
+        abort_if($user->isPlatformAdmin(), 403, 'El SuperAdmin de plataforma no opera dentro de un tenant.');
+        abort_unless($user->company_id !== null, 403, 'Tu usuario no tiene una empresa asignada.');
 
         $user->loadMissing(['company', 'branch']);
 
