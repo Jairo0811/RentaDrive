@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Domain\Operations\Services\ReservationAvailabilityService;
 use App\Models\Customer;
 use App\Models\Reservation;
+use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
@@ -20,6 +21,7 @@ final class ReservationAvailabilityTest extends TestCase
 
     public function test_overlapping_reservation_blocks_the_same_vehicle(): void
     {
+        $this->actingAs(User::factory()->create());
         [$customer, $vehicle, $category] = $this->fixtures();
         $service = app(ReservationAvailabilityService::class);
 

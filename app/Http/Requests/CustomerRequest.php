@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Rules\DominicanCedula;
+use App\Support\Tenancy\TenantValidation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,7 +27,7 @@ final class CustomerRequest extends FormRequest
         $documentRules = [
             'required',
             'string',
-            Rule::unique('customers')->ignore($customer),
+            TenantValidation::unique('customers', 'document_number')->ignore($customer),
         ];
 
         match ($documentType) {
@@ -44,7 +45,7 @@ final class CustomerRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
             'birth_date' => ['nullable', 'date', 'before:today'],
-            'license_number' => ['nullable', 'string', 'max:50', Rule::unique('customers')->ignore($customer)],
+            'license_number' => ['nullable', 'string', 'max:50', TenantValidation::unique('customers', 'license_number')->ignore($customer)],
             'license_expiry' => ['nullable', 'date'],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:80'],

@@ -63,6 +63,9 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+
       - name: Build frontend
         run: npm run build
 
@@ -107,4 +110,14 @@ jobs:
         run: ./vendor/bin/pint --test
 
       - name: Run tests
-        run: php artisan test
+        run: |
+          set -o pipefail
+          php artisan test 2>&1 | tee test-output.txt
+
+      - name: Upload test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-diagnostics
+          path: test-output.txt
+          retention-days: 3

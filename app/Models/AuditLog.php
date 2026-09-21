@@ -16,6 +16,7 @@ class AuditLog extends Model
     public const UPDATED_AT = null;
 
     protected $fillable = [
+        'company_id',
         'user_id',
         'event',
         'auditable_type',
@@ -29,6 +30,7 @@ class AuditLog extends Model
     protected function casts(): array
     {
         return [
+            'company_id' => 'integer',
             'old_values' => 'array',
             'new_values' => 'array',
             'created_at' => 'datetime',

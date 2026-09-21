@@ -56,7 +56,11 @@ trait Auditable
                     $userId = null;
                 }
 
+                $companyId = $model->getAttribute('company_id')
+                    ?? (Auth::user() instanceof User ? Auth::user()->company_id : null);
+
                 AuditLog::withoutEvents(function () use (
+                    $companyId,
                     $userId,
                     $event,
                     $model,
@@ -65,6 +69,7 @@ trait Auditable
                 ): void {
 
                     AuditLog::query()->create([
+                        'company_id' => $companyId,
                         'user_id' => $userId,
                         'event' => $event,
                         'auditable_type' => $model::class,
