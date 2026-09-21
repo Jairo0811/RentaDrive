@@ -121,6 +121,34 @@ final class PlatformAdministrationTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_activating_trial_company_clears_trial_expiration(): void
+    {
+        $platformAdmin = $this->platformAdmin();
+        $tenantAdmin = User::factory()->create();
+        $company = $tenantAdmin->company;
+        $company->update([
+            'status' => 'trial',
+            'plan_code' => 'business',
+            'trial_ends_at' => now()->addDays(7),
+        ]);
+
+        $this->actingAs($platformAdmin)
+            ->put(route('platform.companies.update', $company), [
+                'name' => $company->name,
+                'slug' => $company->slug,
+                'currency' => $company->currency,
+                'timezone' => $company->timezone,
+                'plan_code' => 'business',
+                'status' => 'active',
+            ])
+            ->assertRedirect(route('platform.companies.edit', $company));
+
+        $company->refresh();
+
+        $this->assertSame('active', $company->status);
+        $this->assertNull($company->trial_ends_at);
+    }
+
     public function test_branch_creation_respects_commercial_plan_limit(): void
     {
         config(['rentadrive.plans.starter.max_branches' => 1]);
