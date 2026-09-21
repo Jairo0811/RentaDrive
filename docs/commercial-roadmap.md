@@ -61,6 +61,8 @@ Convertir RentaDrive en una plataforma multiempresa capaz de operar de forma seg
 
 Los límites se validan en backend. Los estados `suspended` y `cancelled` bloquean el tenant; `trial` requiere una fecha de vencimiento futura. La eliminación de sucursales es conservadora: una sucursal con relaciones operativas debe desactivarse en lugar de borrarse.
 
+**Criterio de cierre de 1C:** npm audit sin vulnerabilidades high/critical, build de producción, Pint y PHPUnit deben pasar contra SQL Server 2022.
+
 ## Fase 2 — Booking Engine
 
 - Sitio público por empresa.
