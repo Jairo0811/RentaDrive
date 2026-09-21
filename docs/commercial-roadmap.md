@@ -31,25 +31,25 @@ Convertir RentaDrive en una plataforma multiempresa capaz de operar de forma seg
 
 ### 1B. Aislamiento de datos operativos
 
-- [ ] Incorporar `company_id` en clientes.
-- [ ] Incorporar `company_id` y `branch_id` en flota.
-- [ ] Aislar categorías y tarifas por empresa.
-- [ ] Aislar reservas y alquileres.
-- [ ] Aislar inspecciones y mantenimientos.
-- [ ] Aislar facturas y pagos.
-- [ ] Aislar configuración y auditoría.
-- [ ] Sustituir índices únicos globales por índices únicos por tenant cuando corresponda.
-- [ ] Aplicar scopes automáticos de tenant.
-- [ ] Pruebas negativas de acceso cruzado en todos los módulos.
+- [x] Incorporar `company_id` en clientes.
+- [x] Incorporar `company_id` y `branch_id` en flota.
+- [x] Aislar categorías y tarifas por empresa.
+- [x] Aislar reservas y alquileres.
+- [x] Aislar inspecciones y mantenimientos.
+- [x] Aislar facturas y pagos.
+- [x] Aislar configuración y auditoría.
+- [x] Sustituir índices únicos globales por índices únicos por tenant cuando corresponda.
+- [x] Aplicar scopes automáticos de tenant.
+- [x] Pruebas negativas de acceso cruzado en todos los módulos.
 
 ### 1C. Administración comercial
 
-- [ ] Perfil de empresa.
-- [ ] CRUD de sucursales.
-- [ ] Selección/asignación de sucursal por usuario.
-- [ ] SuperAdmin de plataforma separado de los administradores de tenant.
-- [ ] Estados de empresa: trial, active, suspended, cancelled.
-- [ ] Límites comerciales por plan.
+- [x] Perfil de empresa.
+- [x] CRUD seguro de sucursales (eliminación solo sin relaciones; desactivación para historial existente).
+- [x] Selección/asignación de sucursal por usuario.
+- [x] SuperAdmin de plataforma separado de los administradores de tenant.
+- [x] Estados de empresa: trial, active, suspended, cancelled.
+- [x] Límites comerciales por plan para usuarios, sucursales y vehículos.
 
 ## Fase 2 — Booking Engine
 
