@@ -51,7 +51,7 @@ final class PlatformAdministrationTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_platform_admin_can_onboard_company_with_primary_branch_and_administrator(): void
+    public function test_platform_admin_can_onboard_trial_company_with_primary_branch_and_administrator(): void
     {
         $platformAdmin = $this->platformAdmin();
 
@@ -65,6 +65,8 @@ final class PlatformAdministrationTest extends TestCase
                 'phone' => '809-555-0101',
                 'currency' => 'DOP',
                 'timezone' => 'America/Santo_Domingo',
+                'plan_code' => 'starter',
+                'status' => 'trial',
                 'branch_name' => 'Sucursal Principal',
                 'branch_code' => 'PRINCIPAL',
                 'branch_city' => 'Santo Domingo',
@@ -79,7 +81,9 @@ final class PlatformAdministrationTest extends TestCase
         $branch = Branch::query()->where('company_id', $company->getKey())->where('is_primary', true)->firstOrFail();
         $administrator = User::query()->where('email', 'admin@quisqueya.test')->firstOrFail();
 
-        $this->assertSame('active', $company->status);
+        $this->assertSame('trial', $company->status);
+        $this->assertSame('starter', $company->plan_code);
+        $this->assertTrue($company->trial_ends_at?->isFuture() ?? false);
         $this->assertSame($company->getKey(), $branch->company_id);
         $this->assertSame($company->getKey(), $administrator->company_id);
         $this->assertSame($branch->getKey(), $administrator->branch_id);
@@ -103,6 +107,72 @@ final class PlatformAdministrationTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_expired_trial_blocks_tenant_access(): void
+    {
+        $tenantAdmin = User::factory()->create();
+        $tenantAdmin->assignRole(RoleName::ADMINISTRATOR->value);
+        $tenantAdmin->company()->update([
+            'status' => 'trial',
+            'trial_ends_at' => now()->subMinute(),
+        ]);
+
+        $this->actingAs($tenantAdmin->fresh())
+            ->get(route('dashboard'))
+            ->assertForbidden();
+    }
+
+    public function test_branch_creation_respects_commercial_plan_limit(): void
+    {
+        config(['rentadrive.plans.starter.max_branches' => 1]);
+
+        $platformAdmin = $this->platformAdmin();
+        $tenantAdmin = User::factory()->create();
+        $company = $tenantAdmin->company;
+        $company->update(['plan_code' => 'starter']);
+
+        $this->actingAs($platformAdmin)
+            ->post(route('platform.companies.branches.store', $company), [
+                'name' => 'Sucursal Extra',
+                'code' => 'EXTRA',
+                'city' => 'Santo Domingo',
+            ])
+            ->assertSessionHasErrors('branches');
+
+        $this->assertDatabaseMissing('branches', [
+            'company_id' => $company->getKey(),
+            'code' => 'EXTRA',
+        ]);
+    }
+
+    public function test_unused_secondary_branch_can_be_deleted_but_primary_cannot(): void
+    {
+        $platformAdmin = $this->platformAdmin();
+        $tenantAdmin = User::factory()->create();
+        $company = $tenantAdmin->company;
+
+        $secondary = Branch::query()->create([
+            'company_id' => $company->getKey(),
+            'name' => 'Temporal',
+            'code' => 'TEMP',
+            'is_primary' => false,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($platformAdmin)
+            ->delete(route('platform.companies.branches.destroy', [$company, $secondary]))
+            ->assertRedirect(route('platform.companies.branches.index', $company));
+
+        $this->assertDatabaseMissing('branches', ['id' => $secondary->getKey()]);
+
+        $primary = $tenantAdmin->branch;
+
+        $this->actingAs($platformAdmin)
+            ->delete(route('platform.companies.branches.destroy', [$company, $primary]))
+            ->assertSessionHasErrors('branch');
+
+        $this->assertDatabaseHas('branches', ['id' => $primary->getKey()]);
+    }
+
     public function test_platform_admin_login_redirects_to_platform_dashboard(): void
     {
         $platformAdmin = $this->platformAdmin();
@@ -110,7 +180,7 @@ final class PlatformAdministrationTest extends TestCase
         $this->post(route('login'), [
             'email' => $platformAdmin->email,
             'password' => 'password',
-        ])->assertRedirect(route('platform.dashboard', absolute: false));
+        ])->assertRedirect(route('platform.dashboard'));
     }
 
     private function platformAdmin(): User
