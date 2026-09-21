@@ -51,6 +51,16 @@ Convertir RentaDrive en una plataforma multiempresa capaz de operar de forma seg
 - [x] Estados de empresa: trial, active, suspended, cancelled.
 - [x] Límites comerciales por plan para usuarios, sucursales y vehículos.
 
+#### Planes base de 1C
+
+| Plan | Usuarios | Sucursales | Vehículos |
+| --- | ---: | ---: | ---: |
+| Starter | 5 | 2 | 25 |
+| Professional | 15 | 5 | 100 |
+| Business | 50 | 20 | 500 |
+
+Los límites se validan en backend. Los estados `suspended` y `cancelled` bloquean el tenant; `trial` requiere una fecha de vencimiento futura. La eliminación de sucursales es conservadora: una sucursal con relaciones operativas debe desactivarse en lugar de borrarse.
+
 ## Fase 2 — Booking Engine
 
 - Sitio público por empresa.
