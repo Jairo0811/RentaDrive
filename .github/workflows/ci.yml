@@ -64,17 +64,7 @@ jobs:
         run: npm ci
 
       - name: Audit frontend dependencies
-        run: npm audit --json || true
-
-      - name: Generate frontend audit fix
-        run: npm audit fix --package-lock-only
-
-      - name: Upload repaired lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: package-lock-audit-fix
-          path: package-lock.json
-          retention-days: 1
+        run: npm audit --audit-level=high
 
       - name: Build frontend
         run: npm run build
