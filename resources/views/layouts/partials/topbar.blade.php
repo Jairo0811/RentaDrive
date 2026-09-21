@@ -39,7 +39,7 @@
                 </span>
                 <span class="hidden min-w-0 text-left sm:block">
                     <span class="block max-w-40 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{{ Auth::user()->name }}</span>
-                    <span class="block max-w-40 truncate text-xs text-slate-500">{{ Auth::user()->getRoleNames()->first() ?? 'Sin rol' }}</span>
+                    <span class="block max-w-40 truncate text-xs text-slate-500">{{ Auth::user()->isPlatformAdmin() ? 'SuperAdmin de plataforma' : (Auth::user()->getRoleNames()->first() ?? 'Sin rol') }}</span>
                 </span>
                 <svg class="hidden h-4 w-4 text-slate-400 sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/>
