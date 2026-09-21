@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\BranchRequest;
 use App\Models\Branch;
 use App\Models\Company;
+use App\Support\Commercial\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
 final class PlatformBranchController extends Controller
 {
+    public function __construct(private readonly PlanLimits $planLimits) {}
+
     public function index(Company $company): View
     {
         $branches = $company->branches()
@@ -34,6 +37,8 @@ final class PlatformBranchController extends Controller
 
     public function store(BranchRequest $request, Company $company): RedirectResponse
     {
+        $this->planLimits->ensureCanAdd($company, 'branches', $company->branches()->count());
+
         $company->branches()->create([
             ...$request->validated(),
             'is_primary' => false,
