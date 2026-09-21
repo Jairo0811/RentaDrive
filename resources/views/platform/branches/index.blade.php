@@ -27,6 +27,12 @@
                                     <form method="POST" action="{{ route('platform.companies.branches.status', [$company, $branch]) }}">@csrf @method('PATCH')
                                         <button class="font-bold {{ $branch->is_active ? 'text-amber-600' : 'text-emerald-600' }}">{{ $branch->is_active ? 'Desactivar' : 'Activar' }}</button>
                                     </form>
+                                    @unless ($branch->is_primary)
+                                        <form method="POST" action="{{ route('platform.companies.branches.destroy', [$company, $branch]) }}" onsubmit="return confirm('¿Eliminar esta sucursal? Solo es posible si no tiene información relacionada.')">
+                                            @csrf @method('DELETE')
+                                            <button class="font-bold text-red-600">Eliminar</button>
+                                        </form>
+                                    @endunless
                                 </div>
                             </td>
                         </tr>
