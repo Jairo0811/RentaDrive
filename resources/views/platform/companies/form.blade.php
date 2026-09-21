@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $company->exists ? 'Editar empresa' : 'Nueva empresa' }}</p><p class="text-xs text-slate-500">{{ $company->exists ? 'Configuración del tenant' : 'Onboarding comercial' }}</p></div></x-slot>
 
-    <x-page-header :title="$company->exists ? 'Editar empresa' : 'Crear empresa'" :subtitle="$company->exists ? 'Actualiza la información comercial del tenant.' : 'Provisiona empresa, sucursal principal y administrador en una sola operación.'">
+    <x-page-header :title="$company->exists ? 'Editar empresa' : 'Crear empresa'" :subtitle="$company->exists ? 'Actualiza perfil, plan y ciclo de vida del tenant.' : 'Provisiona empresa, sucursal principal y administrador en una sola operación.'">
         <x-slot name="actions">
             @if ($company->exists)
                 <a href="{{ route('platform.companies.branches.index', $company) }}" class="btn-secondary">Sucursales</a>
@@ -17,7 +17,7 @@
         <section class="panel p-5 sm:p-6">
             <div class="mb-5">
                 <h2 class="font-black text-slate-950 dark:text-white">Empresa</h2>
-                <p class="mt-1 text-sm text-slate-500">Identidad y configuración base.</p>
+                <p class="mt-1 text-sm text-slate-500">Identidad, plan comercial y configuración base.</p>
             </div>
             <div class="grid gap-5 md:grid-cols-2">
                 <div><label class="form-label" for="name">Nombre comercial</label><input id="name" name="name" value="{{ old('name', $company->name) }}" class="form-input" required></div>
@@ -28,6 +28,38 @@
                 <div><label class="form-label" for="phone">Teléfono</label><input id="phone" name="phone" value="{{ old('phone', $company->phone) }}" class="form-input"></div>
                 <div><label class="form-label" for="currency">Moneda</label><input id="currency" name="currency" value="{{ old('currency', $company->currency ?: 'DOP') }}" class="form-input" maxlength="3" required></div>
                 <div><label class="form-label" for="timezone">Zona horaria</label><input id="timezone" name="timezone" value="{{ old('timezone', $company->timezone ?: 'America/Santo_Domingo') }}" class="form-input" required></div>
+
+                <div>
+                    <label class="form-label" for="plan_code">Plan</label>
+                    <select id="plan_code" name="plan_code" class="form-input" required>
+                        @foreach (config('rentadrive.plans') as $code => $plan)
+                            <option value="{{ $code }}" @selected(old('plan_code', $company->plan_code ?: 'starter') === $code)>
+                                {{ $plan['name'] }} · {{ $plan['max_vehicles'] }} vehículos · {{ $plan['max_users'] }} usuarios · {{ $plan['max_branches'] }} sucursales
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="status">Estado comercial</label>
+                    <select id="status" name="status" class="form-input" required>
+                        @if (! $company->exists)
+                            <option value="trial" @selected(old('status', 'trial') === 'trial')>Prueba</option>
+                            <option value="active" @selected(old('status') === 'active')>Activa</option>
+                        @else
+                            @foreach (['trial' => 'Prueba', 'active' => 'Activa', 'suspended' => 'Suspendida', 'cancelled' => 'Cancelada'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('status', $company->status) === $value)>{{ $label }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+
+                @if ($company->exists)
+                    <div class="md:col-span-2">
+                        <label class="form-label" for="trial_ends_at">Vencimiento de prueba</label>
+                        <input id="trial_ends_at" type="datetime-local" name="trial_ends_at" value="{{ old('trial_ends_at', $company->trial_ends_at?->format('Y-m-d\TH:i')) }}" class="form-input">
+                        <p class="mt-1 text-xs text-slate-500">Obligatorio cuando el estado sea Prueba.</p>
+                    </div>
+                @endif
             </div>
         </section>
 
