@@ -6,6 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException as MigrationRuntimeException;
 
 return new class extends Migration
 {
@@ -58,7 +59,7 @@ return new class extends Migration
             ->value('id');
 
         if ($companyId === null) {
-            throw new \RuntimeException('No se encontró la empresa legacy necesaria para migrar los datos de RentaDrive v1.');
+            throw new MigrationRuntimeException('No se encontró la empresa legacy necesaria para migrar los datos de RentaDrive v1.');
         }
 
         $branchId = DB::table('branches')
