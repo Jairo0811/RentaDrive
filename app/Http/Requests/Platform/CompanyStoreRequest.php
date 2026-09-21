@@ -22,6 +22,8 @@ final class CompanyStoreRequest extends FormRequest
             'slug' => Str::slug((string) ($this->input('slug') ?: $this->input('name'))),
             'currency' => Str::upper((string) $this->input('currency', 'DOP')),
             'branch_code' => Str::upper((string) $this->input('branch_code', 'PRINCIPAL')),
+            'plan_code' => $this->input('plan_code', 'starter'),
+            'status' => $this->input('status', 'trial'),
         ]);
     }
 
@@ -39,6 +41,8 @@ final class CompanyStoreRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:30'],
             'currency' => ['required', 'string', 'size:3'],
             'timezone' => ['required', 'string', 'max:80'],
+            'plan_code' => ['required', Rule::in(array_keys((array) config('rentadrive.plans')))],
+            'status' => ['required', Rule::in(['trial', 'active'])],
             'branch_name' => ['required', 'string', 'max:120'],
             'branch_code' => ['required', 'string', 'max:30', 'alpha_dash'],
             'branch_address' => ['nullable', 'string', 'max:255'],
