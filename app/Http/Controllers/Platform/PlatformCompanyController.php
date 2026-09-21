@@ -112,7 +112,13 @@ final class PlatformCompanyController extends Controller
 
     public function update(CompanyUpdateRequest $request, Company $company): RedirectResponse
     {
-        $company->update($request->validated());
+        $data = $request->validated();
+
+        if ($data['status'] !== 'trial') {
+            $data['trial_ends_at'] = null;
+        }
+
+        $company->update($data);
 
         return redirect()
             ->route('platform.companies.edit', $company)
