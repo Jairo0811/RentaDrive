@@ -22,12 +22,15 @@ final class Company extends Model
         'currency',
         'timezone',
         'status',
+        'plan_code',
+        'trial_ends_at',
         'settings',
     ];
 
     protected function casts(): array
     {
         return [
+            'trial_ends_at' => 'datetime',
             'settings' => 'array',
         ];
     }

@@ -77,10 +77,18 @@ final class TenantFoundationTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_created_user_inherits_administrator_tenant(): void
+    public function test_created_user_can_be_assigned_to_an_active_branch_from_same_company(): void
     {
         $administrator = User::factory()->create();
         $administrator->assignRole(RoleName::ADMINISTRATOR->value);
+
+        $secondaryBranch = Branch::query()->create([
+            'company_id' => $administrator->company_id,
+            'name' => 'Aeropuerto',
+            'code' => 'AEROPUERTO',
+            'is_primary' => false,
+            'is_active' => true,
+        ]);
 
         $this->actingAs($administrator)
             ->post(route('users.store'), [
@@ -89,6 +97,7 @@ final class TenantFoundationTest extends TestCase
                 'password' => 'Password123!',
                 'password_confirmation' => 'Password123!',
                 'role' => RoleName::RENTAL_AGENT->value,
+                'branch_id' => $secondaryBranch->getKey(),
                 'is_active' => true,
             ])
             ->assertRedirect(route('users.index'));
@@ -96,6 +105,65 @@ final class TenantFoundationTest extends TestCase
         $created = User::query()->where('email', 'agente@rentadrive.test')->firstOrFail();
 
         $this->assertSame($administrator->company_id, $created->company_id);
-        $this->assertSame($administrator->branch_id, $created->branch_id);
+        $this->assertSame($secondaryBranch->getKey(), $created->branch_id);
+    }
+
+    public function test_user_cannot_be_assigned_to_branch_from_another_company(): void
+    {
+        $administrator = User::factory()->create();
+        $administrator->assignRole(RoleName::ADMINISTRATOR->value);
+
+        $otherCompany = Company::query()->create([
+            'name' => 'Tenant Ajeno',
+            'slug' => 'tenant-ajeno',
+            'currency' => 'DOP',
+            'timezone' => 'America/Santo_Domingo',
+            'status' => 'active',
+        ]);
+
+        $otherBranch = Branch::query()->create([
+            'company_id' => $otherCompany->getKey(),
+            'name' => 'Ajena',
+            'code' => 'AJENA',
+            'is_primary' => true,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($administrator)
+            ->post(route('users.store'), [
+                'name' => 'Usuario Cruzado',
+                'email' => 'cruzado@rentadrive.test',
+                'password' => 'Password123!',
+                'password_confirmation' => 'Password123!',
+                'role' => RoleName::RENTAL_AGENT->value,
+                'branch_id' => $otherBranch->getKey(),
+                'is_active' => true,
+            ])
+            ->assertSessionHasErrors('branch_id');
+
+        $this->assertDatabaseMissing('users', ['email' => 'cruzado@rentadrive.test']);
+    }
+
+    public function test_user_creation_respects_commercial_plan_limit(): void
+    {
+        config(['rentadrive.plans.starter.max_users' => 1]);
+
+        $administrator = User::factory()->create();
+        $administrator->assignRole(RoleName::ADMINISTRATOR->value);
+        $administrator->company()->update(['plan_code' => 'starter']);
+
+        $this->actingAs($administrator)
+            ->post(route('users.store'), [
+                'name' => 'Usuario Excedente',
+                'email' => 'limite@rentadrive.test',
+                'password' => 'Password123!',
+                'password_confirmation' => 'Password123!',
+                'role' => RoleName::RENTAL_AGENT->value,
+                'branch_id' => $administrator->branch_id,
+                'is_active' => true,
+            ])
+            ->assertSessionHasErrors('users');
+
+        $this->assertDatabaseMissing('users', ['email' => 'limite@rentadrive.test']);
     }
 }

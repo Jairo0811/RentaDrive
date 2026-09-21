@@ -8,6 +8,7 @@ use App\Http\Requests\VehicleRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
+use App\Support\Commercial\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 final class VehicleController extends Controller
 {
+    public function __construct(private readonly PlanLimits $planLimits) {}
+
     public function index(Request $request): View
     {
         $vehicles = Vehicle::query()
@@ -49,6 +52,11 @@ final class VehicleController extends Controller
 
     public function store(VehicleRequest $request): RedirectResponse
     {
+        $company = $request->user()?->company;
+        abort_unless($company !== null, 403);
+
+        $this->planLimits->ensureCanAdd($company, 'vehicles', Vehicle::query()->count());
+
         $vehicle = Vehicle::query()->create($request->validated());
 
         return redirect()->route('vehicles.show', $vehicle)->with('status', 'Vehículo registrado.');
