@@ -20,6 +20,8 @@ final class PlatformCompanyController extends Controller
 {
     public function index(Request $request): View
     {
+        $statuses = ['trial', 'active', 'suspended', 'cancelled'];
+
         $companies = Company::query()
             ->withCount(['branches', 'users'])
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
@@ -31,7 +33,7 @@ final class PlatformCompanyController extends Controller
                     ->orWhere('slug', 'like', $search));
             })
             ->when(
-                in_array($request->string('status')->value(), ['active', 'suspended'], true),
+                in_array($request->string('status')->value(), $statuses, true),
                 fn ($query) => $query->where('status', $request->string('status')->value()),
             )
             ->latest()
@@ -51,6 +53,11 @@ final class PlatformCompanyController extends Controller
         $data = $request->validated();
 
         $company = DB::transaction(function () use ($data): Company {
+            $status = $data['status'];
+            $trialEndsAt = $status === 'trial'
+                ? now()->addDays((int) config('rentadrive.trial_days', 14))
+                : null;
+
             $company = Company::query()->create([
                 'name' => $data['name'],
                 'legal_name' => $data['legal_name'] ?? null,
@@ -60,7 +67,9 @@ final class PlatformCompanyController extends Controller
                 'phone' => $data['phone'] ?? null,
                 'currency' => $data['currency'],
                 'timezone' => $data['timezone'],
-                'status' => 'active',
+                'status' => $status,
+                'plan_code' => $data['plan_code'],
+                'trial_ends_at' => $trialEndsAt,
             ]);
 
             $branch = Branch::query()->create([
@@ -119,7 +128,10 @@ final class PlatformCompanyController extends Controller
 
     public function activate(Company $company): RedirectResponse
     {
-        $company->update(['status' => 'active']);
+        $company->update([
+            'status' => 'active',
+            'trial_ends_at' => null,
+        ]);
 
         return back()->with('status', 'Empresa reactivada.');
     }
