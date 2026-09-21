@@ -16,8 +16,9 @@ final class PlatformDashboardController extends Controller
     {
         $metrics = [
             'companies' => Company::query()->count(),
+            'trial_companies' => Company::query()->where('status', 'trial')->count(),
             'active_companies' => Company::query()->where('status', 'active')->count(),
-            'suspended_companies' => Company::query()->where('status', 'suspended')->count(),
+            'blocked_companies' => Company::query()->whereIn('status', ['suspended', 'cancelled'])->count(),
             'active_branches' => Branch::query()->where('is_active', true)->count(),
             'tenant_users' => User::query()
                 ->where('is_platform_admin', false)
