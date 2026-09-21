@@ -41,6 +41,9 @@ final class CompanyUpdateRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:30'],
             'currency' => ['required', 'string', 'size:3'],
             'timezone' => ['required', 'string', 'max:80'],
+            'plan_code' => ['required', Rule::in(array_keys((array) config('rentadrive.plans')))],
+            'status' => ['required', Rule::in(['trial', 'active', 'suspended', 'cancelled'])],
+            'trial_ends_at' => ['nullable', 'date', 'required_if:status,trial'],
         ];
     }
 }
