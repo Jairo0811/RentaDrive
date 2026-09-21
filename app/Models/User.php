@@ -15,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['company_id', 'branch_id', 'name', 'email', 'password', 'is_active'])]
+#[Fillable(['company_id', 'branch_id', 'name', 'email', 'password', 'is_active', 'is_platform_admin'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -23,8 +23,6 @@ class User extends Authenticatable implements MustVerifyEmail
     use Auditable, HasFactory, HasRoles, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array
@@ -34,8 +32,14 @@ class User extends Authenticatable implements MustVerifyEmail
             'branch_id' => 'integer',
             'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
+            'is_platform_admin' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function isPlatformAdmin(): bool
+    {
+        return $this->is_platform_admin === true;
     }
 
     public function company(): BelongsTo
