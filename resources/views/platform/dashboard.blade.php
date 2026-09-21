@@ -6,7 +6,7 @@
         </div>
     </x-slot>
 
-    <x-page-header title="Panel de plataforma" subtitle="Control global de empresas, sucursales y cuentas tenant.">
+    <x-page-header title="Panel de plataforma" subtitle="Control global de empresas, sucursales, planes y cuentas tenant.">
         <x-slot name="actions">
             <a href="{{ route('platform.companies.create') }}" class="btn-primary">
                 <i class="fa-solid fa-plus" aria-hidden="true"></i>
@@ -15,11 +15,12 @@
         </x-slot>
     </x-page-header>
 
-    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Métricas de plataforma">
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6" aria-label="Métricas de plataforma">
         @foreach ([
             ['label' => 'Empresas', 'value' => $metrics['companies'], 'icon' => 'fa-building'],
+            ['label' => 'En prueba', 'value' => $metrics['trial_companies'], 'icon' => 'fa-hourglass-half'],
             ['label' => 'Activas', 'value' => $metrics['active_companies'], 'icon' => 'fa-circle-check'],
-            ['label' => 'Suspendidas', 'value' => $metrics['suspended_companies'], 'icon' => 'fa-circle-pause'],
+            ['label' => 'Bloqueadas', 'value' => $metrics['blocked_companies'], 'icon' => 'fa-ban'],
             ['label' => 'Sucursales activas', 'value' => $metrics['active_branches'], 'icon' => 'fa-location-dot'],
             ['label' => 'Usuarios tenant', 'value' => $metrics['tenant_users'], 'icon' => 'fa-users'],
         ] as $card)
@@ -52,6 +53,7 @@
                     <tr>
                         <th>Empresa</th>
                         <th>Estado</th>
+                        <th>Plan</th>
                         <th>Sucursales</th>
                         <th>Usuarios</th>
                         <th></th>
@@ -59,18 +61,36 @@
                 </thead>
                 <tbody>
                     @forelse ($latestCompanies as $company)
+                        @php
+                            $statusLabel = match ($company->status) {
+                                'trial' => 'Prueba',
+                                'active' => 'Activa',
+                                'suspended' => 'Suspendida',
+                                'cancelled' => 'Cancelada',
+                                default => $company->status,
+                            };
+                            $statusClass = match ($company->status) {
+                                'trial' => 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
+                                'active' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300',
+                                'suspended' => 'bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300',
+                                'cancelled' => 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-300',
+                                default => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+                            };
+                            $plan = config('rentadrive.plans.'.$company->plan_code);
+                        @endphp
                         <tr>
                             <td>
                                 <p class="font-bold text-slate-900 dark:text-white">{{ $company->name }}</p>
                                 <p class="mt-1 text-xs text-slate-500">{{ $company->slug }}</p>
                             </td>
-                            <td><x-status-badge :status="$company->status === 'active' ? 'active' : 'inactive'" /></td>
+                            <td><span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $statusLabel }}</span></td>
+                            <td>{{ $plan['name'] ?? $company->plan_code }}</td>
                             <td>{{ $company->branches_count }}</td>
                             <td>{{ $company->users_count }}</td>
                             <td><a href="{{ route('platform.companies.edit', $company) }}" class="font-bold text-blue-600">Administrar</a></td>
                         </tr>
                     @empty
-                        <tr><td colspan="5"><x-empty-state title="Sin empresas" message="Crea el primer tenant comercial de RentaDrive." /></td></tr>
+                        <tr><td colspan="6"><x-empty-state title="Sin empresas" message="Crea el primer tenant comercial de RentaDrive." /></td></tr>
                     @endforelse
                 </tbody>
             </table>
