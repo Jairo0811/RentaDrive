@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/ITLA-2017--C1-0057B8?style=for-the-badge" alt="ITLA 2017-C1">
+  <img src="https://img.shields.io/badge/ITLA-SOF--007-0057B8?style=for-the-badge" alt="ITLA SOF-007">
 </p>
 
 <p align="center">
@@ -12,6 +12,10 @@
   <img src="https://img.shields.io/badge/Versión-1.0.0-2563eb?style=for-the-badge" alt="Versión 1.0.0">
   <img src="https://img.shields.io/badge/Accesibilidad-NORTIC%20B2%20en%20progreso-7c3aed?style=for-the-badge" alt="Accesibilidad NORTIC B2 en progreso">
   <img src="https://img.shields.io/badge/Licencia-MIT-16a34a?style=for-the-badge" alt="Licencia MIT">
+</p>
+
+<p align="center">
+  <a href="https://github.com/Jairo0811/RentaDrive/actions/workflows/ci.yml"><img src="https://github.com/Jairo0811/RentaDrive/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </p>
 
 <p align="center">
@@ -40,9 +44,9 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - 📤 Reportes exportables en CSV.
 - ♿ Primera fase de accesibilidad basada en NORTIC B2:2017 y WCAG 2.0.
 
-# 🧩 Funcionalidades
+## 🧩 Funcionalidades
 
-## 🚗 Operaciones
+### 🚗 Operaciones
 
 - 👤 Gestión de clientes, documentos, contacto y licencias.
 - 🪪 Validación local de cédulas dominicanas por dígito verificador.
@@ -56,7 +60,7 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - ⛽ Gestión de kilometraje, combustible, depósitos, cargos y fechas.
 - 📸 Inspecciones de entrega y devolución.
 
-## 💰 Finanzas
+### 💰 Finanzas
 
 - 🧾 Facturación automática.
 - 🇩🇴 ITBIS fijo del 18 % protegido desde backend.
@@ -65,7 +69,7 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - 📄 Facturas, contratos y reportes en PDF.
 - 📊 Reportes operativos en PDF y CSV.
 
-## 📊 Experiencia de usuario
+### 📊 Experiencia de usuario
 
 - 📈 Indicadores operativos en tiempo real.
 - 💹 Gráfico de ingresos.
@@ -77,7 +81,7 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - 🎯 Navegación con Font Awesome.
 - 🚫 Páginas personalizadas 404 y 500.
 
-## 🔐 Administración y seguridad
+### 🔐 Administración y seguridad
 
 - 👥 Gestión de usuarios activos e inactivos.
 - 🛡️ Roles y permisos por módulo.
@@ -87,7 +91,7 @@ La versión **1.0.0** está finalizada y lista para uso académico, portafolio p
 - 🧾 Auditoría automática.
 - 🗑️ Eliminación segura de cuentas.
 
-# ♿ Accesibilidad
+### ♿ Accesibilidad
 
 RentaDrive incorpora una primera fase transversal de accesibilidad inspirada en la **NORTIC B2:2017** y las **WCAG 2.0**, con objetivo técnico de aproximación al nivel **AA**.
 
@@ -126,9 +130,9 @@ Validaciones manuales recomendadas:
 - Revisar login, dashboard, formularios, tablas y menús con NVDA.
 - Ejecutar Lighthouse Accessibility y axe DevTools.
 
-# 🧰 Stack tecnológico
+## 🧱 Stack tecnológico
 
-## ⚙️ Backend
+### ⚙️ Backend
 
 <p>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.4+" width="44" height="44">
@@ -143,7 +147,7 @@ Validaciones manuales recomendadas:
 - 🧱 Migraciones, seeders, factories y servicios de dominio.
 - 🧩 Arquitectura monolítica modular.
 
-## 🎨 Frontend
+### 🎨 Frontend
 
 <p>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="HTML5" width="44" height="44">
@@ -162,7 +166,7 @@ Validaciones manuales recomendadas:
 - 🎯 **Font Awesome 6.7**.
 - ⚡ **Vite 8**.
 
-## 🗄️ Base de datos
+### 🗄️ Base de datos
 
 <p>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" title="Microsoft SQL Server" width="44" height="44">
@@ -174,7 +178,7 @@ Validaciones manuales recomendadas:
 - 🧩 Extensiones PHP `sqlsrv` y `pdo_sqlsrv`.
 - 🧪 **SQLite en memoria** para pruebas automatizadas.
 
-## ♿ Accesibilidad
+### ♿ Accesibilidad
 
 <p>
   <img src="https://img.shields.io/badge/NORTIC-B2%3A2017-263f88?style=for-the-badge" alt="NORTIC B2:2017">
@@ -189,7 +193,7 @@ Validaciones manuales recomendadas:
 - 🧭 Landmarks semánticos, ARIA y enlaces de salto.
 - 🔈 Mensajes accesibles para lectores de pantalla.
 
-## 🧪 Calidad, build y CI
+### 🧪 Calidad, build y CI
 
 <p>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" title="Node.js 22+" width="44" height="44">
@@ -205,35 +209,35 @@ Validaciones manuales recomendadas:
 - 🤖 **GitHub Actions** para integración continua.
 - 🟢 **Node.js 22+** y npm 10+.
 
-# 📥 Instalación
+## 📥 Instalación
 
-## 1. Clonar el repositorio
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/Jairo0811/RentaDrive.git
 cd RentaDrive
 ```
 
-## 2. Instalar dependencias
+### 2. Instalar dependencias
 
 ```bash
 composer install
 npm install
 ```
 
-## 3. Crear el archivo de entorno
+### 3. Crear el archivo de entorno
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-## 4. Generar la clave
+### 4. Generar la clave
 
 ```bash
 php artisan key:generate
 ```
 
-## 5. Configurar SQL Server
+### 5. Configurar SQL Server
 
 ```dotenv
 DB_CONNECTION=sqlsrv
@@ -246,7 +250,7 @@ DB_ENCRYPT=no
 DB_TRUST_SERVER_CERTIFICATE=true
 ```
 
-## 6. Configurar credenciales iniciales
+### 6. Configurar credenciales iniciales
 
 ```dotenv
 RENTADRIVE_ADMIN_EMAIL=admin@rentadrive.com.do
@@ -255,7 +259,7 @@ RENTADRIVE_ADMIN_PASSWORD=RentaDrive123..
 
 > Cambia estas credenciales antes de publicar la aplicación.
 
-## 7. Crear tablas y datos iniciales
+### 7. Crear tablas y datos iniciales
 
 ```bash
 php artisan optimize:clear
@@ -263,7 +267,7 @@ php artisan migrate:fresh --seed
 php artisan storage:link
 ```
 
-## 8. Compilar y validar
+### 8. Compilar y validar
 
 ```bash
 vendor/bin/pint --test
@@ -271,7 +275,7 @@ php artisan test
 npm run build
 ```
 
-## 9. Iniciar la aplicación
+### 9. Iniciar la aplicación
 
 Para uso exclusivo en la PC:
 
@@ -307,14 +311,14 @@ http://192.168.1.50:8000
 
 La PC y el móvil deben estar conectados a la misma red. Si Windows solicita permiso de firewall para PHP o Node.js, permite únicamente redes privadas.
 
-# 🔑 Credenciales locales
+## 🔑 Credenciales locales
 
 ```text
 Correo: admin@rentadrive.com.do
 Contraseña: RentaDrive123..
 ```
 
-# 🎓 Ficha académica
+## 🎓 Información académica
 
 | Campo | Información |
 |---|---|
@@ -328,13 +332,17 @@ Contraseña: RentaDrive123..
 | 🚘 Proyecto | RentaDrive |
 | 🛠️ Modernización | 2026 |
 
-# 👨‍💻 Autor
+## 🧭 Continuidad académica
+
+RentaDrive se documenta como proyecto académico individual de **Análisis y Diseño de Sistemas (SOF-007)**. En los repositorios actualmente preservados del ITLA no se ha verificado una segunda coincidencia inequívoca por profesor o compañero que justifique otra línea de continuidad. No se infieren relaciones adicionales sin evidencia documental.
+
+## 👨‍💻 Autor
 
 **Francis Jairo Matías Rosario**  
 Matrícula: **2015-2984**  
 GitHub: [@Jairo0811](https://github.com/Jairo0811)
 
-# 🗺️ Evolución futura
+## 🗺️ Evolución futura
 
 - Completar auditoría de accesibilidad por módulo y proceso.
 - Incorporar pruebas automatizadas de accesibilidad al flujo CI.
@@ -344,6 +352,6 @@ GitHub: [@Jairo0811](https://github.com/Jairo0811)
 - API REST con OpenAPI/Swagger.
 - Integración oficial con servicios de identidad, cuando exista acceso autorizado.
 
-# 📄 Licencia
+## 📄 Licencia
 
 Este proyecto se distribuye bajo la licencia **MIT**.
