@@ -6,9 +6,12 @@ namespace App\Support\Tenancy;
 
 use App\Models\AuditLog;
 use App\Models\Customer;
+use App\Models\FiscalSequence;
 use App\Models\Inspection;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentIntent;
+use App\Models\PaymentRefund;
 use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\Setting;
@@ -38,6 +41,9 @@ final class TenantModelRegistry
             Inspection::class,
             Invoice::class,
             Payment::class,
+            PaymentIntent::class,
+            PaymentRefund::class,
+            FiscalSequence::class,
             Setting::class,
             AuditLog::class,
         ];
@@ -52,6 +58,7 @@ final class TenantModelRegistry
             Vehicle::class,
             Reservation::class,
             Rental::class,
+            PaymentIntent::class,
         ];
     }
 }
