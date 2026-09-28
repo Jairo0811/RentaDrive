@@ -113,10 +113,15 @@
                         $estimated = round($vehicle->effective_daily_rate * $days, 2);
                     @endphp
                     <article class="panel overflow-hidden">
-                        <div class="relative grid h-48 place-items-center overflow-hidden bg-gradient-to-br from-slate-950 via-[#071a38] to-blue-950 text-white">
-                            <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 20% 20%, #168ce8 0, transparent 34%), radial-gradient(circle at 80% 80%, #e2232e 0, transparent 28%);"></div>
-                            <i class="fa-solid fa-car-side relative text-7xl text-blue-200 drop-shadow-2xl" aria-hidden="true"></i>
-                            <span class="absolute left-4 top-4 rounded-full bg-emerald-400/15 px-3 py-1.5 text-xs font-black text-emerald-200 ring-1 ring-inset ring-emerald-300/20">
+                        <div class="relative grid h-52 place-items-center overflow-hidden bg-gradient-to-br from-slate-950 via-[#071a38] to-blue-950 text-white">
+                            @if ($vehicle->photo_url)
+                                <img src="{{ $vehicle->photo_url }}" alt="{{ $vehicle->model->display_name }}" class="h-full w-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" aria-hidden="true"></div>
+                            @else
+                                <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 20% 20%, #168ce8 0, transparent 34%), radial-gradient(circle at 80% 80%, #e2232e 0, transparent 28%);"></div>
+                                <i class="fa-solid fa-car-side relative text-7xl text-blue-200 drop-shadow-2xl" aria-hidden="true"></i>
+                            @endif
+                            <span class="absolute left-4 top-4 rounded-full bg-emerald-400/80 px-3 py-1.5 text-xs font-black text-emerald-950 shadow-sm backdrop-blur">
                                 Disponible
                             </span>
                         </div>
