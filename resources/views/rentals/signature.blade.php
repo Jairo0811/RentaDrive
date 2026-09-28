@@ -27,6 +27,7 @@
             action="{{ route('rentals.signature.store', $rental) }}"
             class="grid gap-6 lg:grid-cols-[.8fr_1.2fr]"
             x-data="signaturePad()"
+            @submit="capture()"
         >
             @csrf
 
@@ -71,7 +72,7 @@
                 <input type="hidden" name="signature_data" x-ref="signatureData">
                 <x-input-error :messages="$errors->get('signature_data')" class="mt-2" />
 
-                <button type="submit" class="btn-primary mt-6 w-full py-3" @click="capture()">
+                <button type="submit" class="btn-primary mt-6 w-full py-3">
                     Firmar y sellar contrato
                 </button>
             </section>
