@@ -12,6 +12,12 @@ return [
         'backup_disk' => env('RENTADRIVE_BACKUP_DISK', env('RENTADRIVE_PRIVATE_DISK', 'local')),
     ],
 
+    'health' => [
+        'ops_email' => env('RENTADRIVE_OPS_EMAIL'),
+        'max_failed_jobs' => (int) env('RENTADRIVE_MAX_FAILED_JOBS', 25),
+        'max_backup_age_hours' => (int) env('RENTADRIVE_MAX_BACKUP_AGE_HOURS', 30),
+    ],
+
     'backup' => [
         'retention_days' => (int) env('RENTADRIVE_BACKUP_RETENTION_DAYS', 14),
         'require_external_in_production' => (bool) env('RENTADRIVE_BACKUP_REQUIRE_EXTERNAL', true),
