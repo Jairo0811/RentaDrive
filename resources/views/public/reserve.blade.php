@@ -19,8 +19,12 @@
 
         <div class="mt-6 grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
             <aside class="panel h-fit overflow-hidden">
-                <div class="grid h-52 place-items-center bg-gradient-to-br from-slate-950 via-[#071a38] to-blue-950 text-white">
-                    <i class="fa-solid fa-car-side text-8xl text-blue-200" aria-hidden="true"></i>
+                <div class="grid h-56 place-items-center overflow-hidden bg-gradient-to-br from-slate-950 via-[#071a38] to-blue-950 text-white">
+                    @if ($vehicle->photo_url)
+                        <img src="{{ $vehicle->photo_url }}" alt="{{ $vehicle->model->display_name }}" class="h-full w-full object-cover">
+                    @else
+                        <i class="fa-solid fa-car-side text-8xl text-blue-200" aria-hidden="true"></i>
+                    @endif
                 </div>
                 <div class="p-6">
                     <p class="text-xs font-black uppercase tracking-[.16em] text-blue-600 dark:text-blue-400">{{ $vehicle->category->name }}</p>
