@@ -38,7 +38,7 @@ return [
     'whatsapp' => [
         'token' => env('WHATSAPP_ACCESS_TOKEN'),
         'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
-        'graph_version' => env('WHATSAPP_GRAPH_VERSION', 'v23.0'),
+        'graph_version' => env('WHATSAPP_GRAPH_VERSION'),
         'booking_template' => env('WHATSAPP_BOOKING_TEMPLATE'),
         'booking_template_language' => env('WHATSAPP_BOOKING_TEMPLATE_LANGUAGE', 'es'),
     ],
