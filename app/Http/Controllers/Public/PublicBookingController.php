@@ -524,7 +524,6 @@ final class PublicBookingController extends Controller
         );
     }
 
-
     private function depositPaymentUrl(Company $company, Reservation $reservation): ?string
     {
         if (
