@@ -70,9 +70,9 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 - [x] Landing pública de RentaDrive separada del login administrativo.
 - [x] Layout público responsive con modo claro/oscuro y accesibilidad existente.
 - [x] Portal público por empresa usando el `slug` del tenant.
-- [x] Tarjetas visuales de vehículos con datos operativos y tarifa.
-- [ ] Fotografías administrables por vehículo.
-- [ ] Calendario operativo tipo timeline por vehículo.
+- [x] Tarjetas visuales de vehículos con fotografía, sucursal, datos operativos, tarifa y alerta de mantenimiento.
+- [x] Fotografía principal administrable por vehículo, con almacenamiento público controlado.
+- [x] Calendario operativo de 14 días por vehículo, sucursal, reservas, alquileres y mantenimiento.
 - [ ] Personalización white-label de logo, colores y dominio por empresa.
 
 ### 2B. Booking Engine
