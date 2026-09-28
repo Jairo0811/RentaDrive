@@ -46,8 +46,12 @@ final class PaymentLedgerService
                 'refunded_amount' => 0,
             ]);
 
-            $this->recalculateInvoice($payment->invoice_id);
-            $this->recalculateReservation($payment->reservation_id);
+            $this->recalculateInvoice(
+                $payment->invoice_id !== null ? (int) $payment->invoice_id : null,
+            );
+            $this->recalculateReservation(
+                $payment->reservation_id !== null ? (int) $payment->reservation_id : null,
+            );
 
             return $payment;
         });
@@ -89,8 +93,12 @@ final class PaymentLedgerService
                     'status' => $newRefunded >= (float) $payment->amount ? 'refunded' : 'partial_refund',
                 ]);
 
-                $this->recalculateInvoice($payment->invoice_id);
-                $this->recalculateReservation($payment->reservation_id);
+                $this->recalculateInvoice(
+                    $payment->invoice_id !== null ? (int) $payment->invoice_id : null,
+                );
+                $this->recalculateReservation(
+                    $payment->reservation_id !== null ? (int) $payment->reservation_id : null,
+                );
             }
 
             return $refund;
