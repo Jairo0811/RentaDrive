@@ -86,6 +86,16 @@ class Rental extends Model
         return $this->hasMany(Inspection::class);
     }
 
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(RentalSignature::class);
+    }
+
+    public function renterSignature(): HasOne
+    {
+        return $this->hasOne(RentalSignature::class)->where('role', 'renter');
+    }
+
     public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
