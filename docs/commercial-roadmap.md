@@ -147,15 +147,26 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 
 ## Fase 7 — SaaS Production
 
-- Suscripciones y planes.
-- Trial y onboarding.
-- Backups y recuperación.
-- Observabilidad y alertas.
-- Storage externo.
-- Rate limiting y hardening.
-- Pruebas E2E y de seguridad multi-tenant.
-- Pipeline de despliegue reproducible.
+- [x] Ledger de suscripciones por tenant con trial, activo, mora, gracia, suspensión y cancelación.
+- [x] Onboarding comercial guiado y verificable.
+- [x] Backups portátiles cifrados, comprimidos, verificados por SHA-256 y con restore probado.
+- [x] Retención de backups y almacenamiento externo obligatorio en producción por defecto.
+- [x] Health checks de liveness/readiness para SQL Server, cache, storage, colas y backups.
+- [x] Alertas operativas de plataforma con deduplicación.
+- [x] Storage público/privado configurable para volúmenes persistentes compartidos.
+- [x] Rate limiting separado para portal público, tenant, plataforma, webhooks y health.
+- [x] Hardening HTTP con request IDs, headers de seguridad, CSP/HSTS en producción y sesiones cifradas.
+- [x] Auditoría de dependencias Composer y npm integrada al CI.
+- [x] Pruebas SaaS, recuperación y seguridad ejecutadas contra SQL Server 2022.
+- [x] Dockerfile de producción reproducible con PHP 8.4, ODBC 18 y extensiones verificadas.
+- [x] Topología separada para web, workers y scheduler.
+- [x] Workflow de release para publicar imágenes inmutables en GHCR.
+- [x] Runbook de despliegue, rollback, backups y recuperación.
+
+**Criterio de cierre de Fase 7:** Composer/npm audit, Vite, migraciones y caches de producción, Pint, PHPUnit sobre SQL Server 2022 y la construcción de la imagen Docker deben pasar en CI. La recuperación debe estar probada desde un backup cifrado y verificable.
 
 ## Meta de salida comercial
 
-RentaDrive se considerará listo para pilotos pagados cuando tenga completadas las fases 1, 2, 3 y los controles de producción esenciales de la fase 7. La integración fiscal dominicana puede desplegarse de forma incremental según el proveedor y el proceso de certificación elegido.
+Las fases 1–7 del roadmap comercial están completadas. RentaDrive queda técnicamente preparado para **pilotos pagados controlados** una vez desplegado en infraestructura real con secretos, dominio/TLS, almacenamiento persistente, correo/WhatsApp y proveedor de cobro configurados.
+
+La emisión e-CF real continúa dependiendo de autorización, certificado y proveedor/conector fiscal habilitado para el tenant; RentaDrive no simula una autorización externa inexistente.
