@@ -108,7 +108,7 @@ final class InspectionController extends Controller
         $evidence->assertCanDelete($inspection);
 
         foreach ($inspection->photos ?? [] as $path) {
-            Storage::disk('public')->delete($path);
+            Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($path);
         }
 
         $inspection->delete();
@@ -172,7 +172,7 @@ final class InspectionController extends Controller
         foreach ($request->file('photos', []) as $photo) {
             $paths[] = $photo->store(
                 'inspections/'.$rental->company_id.'/'.$rental->code,
-                'public',
+                (string) config('rentadrive.storage.public_disk', 'public'),
             );
         }
 
