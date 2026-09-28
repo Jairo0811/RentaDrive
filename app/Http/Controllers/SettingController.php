@@ -149,20 +149,20 @@ final class SettingController extends Controller
             $oldLogoPath = Arr::get($companySettings, 'branding.logo_path');
 
             if ($request->boolean('remove_brand_logo') && is_string($oldLogoPath) && $oldLogoPath !== '') {
-                Storage::disk('public')->delete($oldLogoPath);
+                Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($oldLogoPath);
                 Arr::forget($companySettings, 'branding.logo_path');
                 $oldLogoPath = null;
             }
 
             if ($request->hasFile('brand_logo')) {
                 if (is_string($oldLogoPath) && $oldLogoPath !== '') {
-                    Storage::disk('public')->delete($oldLogoPath);
+                    Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($oldLogoPath);
                 }
 
                 Arr::set(
                     $companySettings,
                     'branding.logo_path',
-                    $request->file('brand_logo')->store('branding/'.$company->getKey(), 'public'),
+                    $request->file('brand_logo')->store('branding/'.$company->getKey(), (string) config('rentadrive.storage.public_disk', 'public')),
                 );
             }
 
