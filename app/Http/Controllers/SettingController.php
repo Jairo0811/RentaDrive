@@ -80,6 +80,12 @@ final class SettingController extends Controller
             'fiscal_rnc' => ['nullable', 'digits:9'],
             'fiscal_address' => ['nullable', 'string', 'max:255'],
             'fiscal_sequences' => ['nullable', 'string', 'max:10000'],
+            'automation_email_enabled' => ['nullable', 'boolean'],
+            'automation_whatsapp_enabled' => ['nullable', 'boolean'],
+            'reservation_reminder_hours' => ['required', 'integer', 'between:1,168'],
+            'return_reminder_hours' => ['required', 'integer', 'between:1,72'],
+            'maintenance_reminder_days' => ['required', 'integer', 'between:1,90'],
+            'document_reminder_days' => ['required', 'integer', 'between:1,180'],
         ]);
 
         $data['tax_rate'] = self::FIXED_ITBIS_RATE;
@@ -133,6 +139,13 @@ final class SettingController extends Controller
             Arr::set($companySettings, 'fiscal.rnc', $data['fiscal_rnc'] ?? '');
             Arr::set($companySettings, 'fiscal.address', $data['fiscal_address'] ?? '');
 
+            Arr::set($companySettings, 'automation.email_enabled', $request->boolean('automation_email_enabled'));
+            Arr::set($companySettings, 'automation.whatsapp_enabled', $request->boolean('automation_whatsapp_enabled'));
+            Arr::set($companySettings, 'automation.reservation_reminder_hours', (int) $data['reservation_reminder_hours']);
+            Arr::set($companySettings, 'automation.return_reminder_hours', (int) $data['return_reminder_hours']);
+            Arr::set($companySettings, 'automation.maintenance_reminder_days', (int) $data['maintenance_reminder_days']);
+            Arr::set($companySettings, 'automation.document_reminder_days', (int) $data['document_reminder_days']);
+
             $oldLogoPath = Arr::get($companySettings, 'branding.logo_path');
 
             if ($request->boolean('remove_brand_logo') && is_string($oldLogoPath) && $oldLogoPath !== '') {
@@ -166,6 +179,6 @@ final class SettingController extends Controller
             $fiscalSequences->syncFromText($company, (string) ($data['fiscal_sequences'] ?? ''));
         });
 
-        return back()->with('status', 'Configuración comercial, de pagos y fiscal guardada.');
+        return back()->with('status', 'Configuración comercial, fiscal y de automatizaciones guardada.');
     }
 }
