@@ -151,6 +151,16 @@
                             <input id="next_maintenance_at" type="number" name="next_maintenance_at" value="{{ old('next_maintenance_at', $vehicle->next_maintenance_at) }}" class="form-input">
                         </div>
 
+                        <div>
+                            <label class="form-label" for="insurance_expires_at">Vencimiento seguro</label>
+                            <input id="insurance_expires_at" type="date" name="insurance_expires_at" value="{{ old('insurance_expires_at', $vehicle->insurance_expires_at?->format('Y-m-d')) }}" class="form-input">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="registration_expires_at">Vencimiento matrícula/documento</label>
+                            <input id="registration_expires_at" type="date" name="registration_expires_at" value="{{ old('registration_expires_at', $vehicle->registration_expires_at?->format('Y-m-d')) }}" class="form-input">
+                        </div>
+
                         <div class="md:col-span-2 xl:col-span-4">
                             <label class="form-label" for="notes">Notas</label>
                             <textarea id="notes" name="notes" rows="3" class="form-input">{{ old('notes', $vehicle->notes) }}</textarea>
