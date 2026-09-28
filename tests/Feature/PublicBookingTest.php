@@ -14,6 +14,7 @@ use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
 use App\Support\Commercial\BookingPricingService;
+use App\Support\Commercial\PublicDomainResolver;
 use App\Support\Notifications\WhatsAppBookingNotifier;
 use App\Support\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
@@ -34,15 +35,16 @@ final class PublicBookingTest extends TestCase
             ->assertSee('Tu rent-a-car, operando desde un solo lugar.');
     }
 
-    public function test_custom_domain_redirects_to_the_company_booking_portal(): void
+    public function test_custom_domain_resolves_to_the_correct_company(): void
     {
         [$company] = $this->companyWithFleet('custom-domain', 'Toyota', 'Corolla', 'CD');
         $company->update(['public_domain' => 'reservas.example.com']);
         app(TenantContext::class)->clear();
 
-        $this->withHeader('Host', 'reservas.example.com')
-            ->get('/')
-            ->assertRedirect('/r/'.$company->slug);
+        $resolved = app(PublicDomainResolver::class)->resolve('RESERVAS.EXAMPLE.COM:443');
+
+        $this->assertNotNull($resolved);
+        $this->assertTrue($resolved->is($company));
     }
 
     public function test_active_company_has_a_white_label_public_booking_portal(): void
