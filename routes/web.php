@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FleetCatalogController;
 use App\Http\Controllers\FleetScheduleController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\InvoiceController;
@@ -28,28 +29,36 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', HomeController::class)->name('home');
+Route::get('/health/live', [HealthController::class, 'live'])
+    ->middleware('throttle:health')
+    ->name('health.live');
+Route::get('/health/ready', [HealthController::class, 'ready'])
+    ->middleware('throttle:health')
+    ->name('health.ready');
+
+Route::get('/', HomeController::class)->middleware('throttle:public-read')->name('home');
 
 Route::prefix('r/{company:slug}')
     ->name('public.booking.')
+    ->middleware('throttle:public-read')
     ->group(function (): void {
         Route::get('/', [PublicBookingController::class, 'show'])->name('show');
         Route::get('/search', [PublicBookingController::class, 'search'])->name('search');
         Route::get('/reserve', [PublicBookingController::class, 'create'])->name('create');
         Route::post('/reserve', [PublicBookingController::class, 'store'])
-            ->middleware('throttle:5,1')
+            ->middleware('throttle:public-write')
             ->name('store');
         Route::get('/reservation/{code}/deposit', [PublicPaymentController::class, 'show'])
             ->middleware('signed')
             ->name('deposit.show');
         Route::post('/reservation/{code}/deposit', [PublicPaymentController::class, 'start'])
-            ->middleware(['signed', 'throttle:5,1'])
+            ->middleware(['signed', 'throttle:public-write'])
             ->name('deposit.start');
         Route::get('/reservation/{code}/cancel', [PublicBookingController::class, 'cancelShow'])
             ->middleware('signed')
             ->name('cancel.show');
         Route::post('/reservation/{code}/cancel', [PublicBookingController::class, 'cancelStore'])
-            ->middleware(['signed', 'throttle:5,1'])
+            ->middleware(['signed', 'throttle:public-write'])
             ->name('cancel.store');
         Route::get('/reservation/{code}', [PublicBookingController::class, 'confirmation'])
             ->name('confirmation');
@@ -61,7 +70,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'verified', 'platform_admin'])
+Route::middleware(['auth', 'verified', 'platform_admin', 'throttle:platform'])
     ->prefix('platform')
     ->name('platform.')
     ->group(function (): void {
@@ -94,10 +103,11 @@ Route::get('/dashboard', DashboardController::class)
         'tenant',
         'verified',
         'permission:'.PermissionName::VIEW_DASHBOARD->value,
+        'throttle:tenant',
     ])
     ->name('dashboard');
 
-Route::middleware(['auth', 'tenant'])->group(function (): void {
+Route::middleware(['auth', 'tenant', 'throttle:tenant'])->group(function (): void {
     Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
     Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
 
