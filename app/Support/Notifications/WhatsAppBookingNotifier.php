@@ -35,6 +35,10 @@ final class WhatsAppBookingNotifier
             return;
         }
 
+        if (strlen($phone) === 10 && preg_match('/^(809|829|849)/', $phone) === 1) {
+            $phone = '1'.$phone;
+        }
+
         Http::withToken($token)
             ->timeout(10)
             ->post("https://graph.facebook.com/{$version}/{$phoneNumberId}/messages", [
