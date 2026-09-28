@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\ResolveTenant;
+use App\Jobs\EnforceSubscriptionLifecycleJob;
 use App\Jobs\ScanOperationalAlertsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -22,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->job(new ScanOperationalAlertsJob)
             ->everyFifteenMinutes()
+            ->withoutOverlapping(10)
+            ->onOneServer();
+
+        $schedule->job(new EnforceSubscriptionLifecycleJob)
+            ->hourly()
             ->withoutOverlapping(10)
             ->onOneServer();
     })
