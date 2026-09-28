@@ -131,6 +131,8 @@ final class BackupManager
         $tables = (array) ($payload['tables'] ?? []);
 
         DB::transaction(function () use ($tables): void {
+            $connection = DB::connection();
+
             Schema::disableForeignKeyConstraints();
 
             try {
@@ -151,19 +153,20 @@ final class BackupManager
                         continue;
                     }
 
-                    $identityInsert = DB::getDriverName() === 'sqlsrv' && Schema::hasColumn($table, 'id');
+                    $identityInsert = $connection->getDriverName() === 'sqlsrv'
+                        && array_key_exists('id', $rows[0]);
 
                     if ($identityInsert) {
-                        DB::statement('SET IDENTITY_INSERT ['.$table.'] ON');
+                        $connection->getPdo()->exec('SET IDENTITY_INSERT [dbo].['.$table.'] ON');
                     }
 
                     try {
                         foreach (array_chunk($rows, 100) as $chunk) {
-                            DB::table($table)->insert($chunk);
+                            $connection->table($table)->insert($chunk);
                         }
                     } finally {
                         if ($identityInsert) {
-                            DB::statement('SET IDENTITY_INSERT ['.$table.'] OFF');
+                            $connection->getPdo()->exec('SET IDENTITY_INSERT [dbo].['.$table.'] OFF');
                         }
                     }
                 }
