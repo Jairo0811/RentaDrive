@@ -17,6 +17,7 @@ use App\Rules\DominicanCedula;
 use App\Support\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -150,13 +151,33 @@ final class PublicBookingController extends Controller
         $branch = $quote['branch'];
 
         $reservation = DB::transaction(function () use (
-            $company,
             $branch,
             $vehicle,
             $quote,
             $customerData,
             $references,
+            $availability,
         ): Reservation {
+            /** @var Vehicle $lockedVehicle */
+            $lockedVehicle = Vehicle::query()
+                ->whereKey($vehicle->getKey())
+                ->where('branch_id', $branch->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $availability->isVehicleAvailable(
+                $lockedVehicle,
+                $quote['startAt'],
+                $quote['endAt'],
+            )) {
+                throw ValidationException::withMessages([
+                    'vehicle_id' => 'Este vehículo acaba de ser reservado para ese período. Busca otra opción disponible.',
+                ]);
+            }
+
+            $dailyRate = $lockedVehicle->effective_daily_rate;
+            $estimatedTotal = round($quote['days'] * $dailyRate, 2);
+
             $customer = Customer::query()->firstOrCreate(
                 ['document_number' => $customerData['document_number']],
                 [
@@ -165,7 +186,6 @@ final class PublicBookingController extends Controller
                     'last_name' => $customerData['last_name'],
                     'email' => $customerData['email'],
                     'phone' => $customerData['phone'],
-                    'license_number' => $customerData['license_number'] ?? null,
                     'status' => 'active',
                 ],
             );
@@ -180,14 +200,14 @@ final class PublicBookingController extends Controller
             return Reservation::query()->create([
                 'code' => $references->generate(Reservation::class, 'code', 'RES'),
                 'customer_id' => $customer->getKey(),
-                'vehicle_category_id' => $vehicle->vehicle_category_id,
-                'vehicle_id' => $vehicle->getKey(),
+                'vehicle_category_id' => $lockedVehicle->vehicle_category_id,
+                'vehicle_id' => $lockedVehicle->getKey(),
                 'start_at' => $quote['startAt'],
                 'end_at' => $quote['endAt'],
                 'pickup_location' => $branch->name,
                 'return_location' => $branch->name,
-                'daily_rate' => $quote['dailyRate'],
-                'estimated_total' => $quote['estimatedTotal'],
+                'daily_rate' => $dailyRate,
+                'estimated_total' => $estimatedTotal,
                 'status' => 'pending',
                 'notes' => 'Reserva creada desde el portal público.',
                 'created_by' => null,
@@ -334,7 +354,7 @@ final class PublicBookingController extends Controller
         $tenant->set($company);
     }
 
-    private function activeBranches(Company $company)
+    private function activeBranches(Company $company): Collection
     {
         return $company->branches()
             ->where('is_active', true)
