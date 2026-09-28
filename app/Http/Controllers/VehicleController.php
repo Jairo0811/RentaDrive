@@ -68,7 +68,7 @@ final class VehicleController extends Controller
         $data = $request->safe()->except(['photo', 'remove_photo']);
 
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), 'public');
+            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), (string) config('rentadrive.storage.public_disk', 'public'));
         }
 
         $vehicle = Vehicle::query()->create($data);
@@ -105,16 +105,16 @@ final class VehicleController extends Controller
         $data = $request->safe()->except(['photo', 'remove_photo']);
 
         if ($request->boolean('remove_photo') && $vehicle->photo_path !== null) {
-            Storage::disk('public')->delete($vehicle->photo_path);
+            Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($vehicle->photo_path);
             $data['photo_path'] = null;
         }
 
         if ($request->hasFile('photo')) {
             if ($vehicle->photo_path !== null) {
-                Storage::disk('public')->delete($vehicle->photo_path);
+                Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($vehicle->photo_path);
             }
 
-            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), 'public');
+            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), (string) config('rentadrive.storage.public_disk', 'public'));
         }
 
         $vehicle->update($data);
@@ -131,7 +131,7 @@ final class VehicleController extends Controller
         }
 
         if ($vehicle->photo_path !== null) {
-            Storage::disk('public')->delete($vehicle->photo_path);
+            Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($vehicle->photo_path);
         }
 
         $vehicle->delete();
