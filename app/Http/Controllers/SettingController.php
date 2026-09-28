@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Support\Fiscal\FiscalSequenceService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ final class SettingController extends Controller
 {
     private const FIXED_ITBIS_RATE = '18';
 
-    public function edit(Request $request): View
+    public function edit(Request $request, FiscalSequenceService $fiscalSequences): View
     {
         $company = $request->user()?->company;
         abort_unless($company !== null, 403);
@@ -25,13 +26,22 @@ final class SettingController extends Controller
         return view('settings.edit', [
             'settings' => Setting::query()->pluck('value', 'key'),
             'company' => $company,
+            'fiscalSequences' => $fiscalSequences->serialize($company),
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
-    {
+    public function update(
+        Request $request,
+        FiscalSequenceService $fiscalSequences,
+    ): RedirectResponse {
         $company = $request->user()?->company;
         abort_unless($company !== null, 403);
+
+        if ($request->filled('fiscal_rnc')) {
+            $request->merge([
+                'fiscal_rnc' => preg_replace('/\D+/', '', (string) $request->input('fiscal_rnc')),
+            ]);
+        }
 
         $data = $request->validate([
             'business_name' => ['required', 'string', 'max:255'],
@@ -60,6 +70,16 @@ final class SettingController extends Controller
             'promo_codes' => ['nullable', 'string', 'max:10000'],
             'email_confirmation_enabled' => ['nullable', 'boolean'],
             'whatsapp_confirmation_enabled' => ['nullable', 'boolean'],
+            'payment_gateway' => ['required', Rule::in(['manual', 'hosted'])],
+            'deposit_type' => ['required', Rule::in(['percent', 'fixed'])],
+            'deposit_value' => ['required', 'numeric', 'min:0', 'max:999999999'],
+            'fiscal_enabled' => ['nullable', 'boolean'],
+            'fiscal_mode' => ['required', Rule::in(['paper', 'electronic'])],
+            'fiscal_authorized_electronic_issuer' => ['nullable', 'boolean'],
+            'fiscal_legal_name' => ['nullable', 'string', 'max:160'],
+            'fiscal_rnc' => ['nullable', 'digits:9'],
+            'fiscal_address' => ['nullable', 'string', 'max:255'],
+            'fiscal_sequences' => ['nullable', 'string', 'max:10000'],
         ]);
 
         $data['tax_rate'] = self::FIXED_ITBIS_RATE;
@@ -78,7 +98,7 @@ final class SettingController extends Controller
             'default_pickup_location' => ['operations', 'operations.default_pickup_location'],
         ];
 
-        DB::transaction(function () use ($request, $company, $data, $map): void {
+        DB::transaction(function () use ($request, $company, $data, $map, $fiscalSequences): void {
             foreach ($map as $field => [$group, $key]) {
                 Setting::query()->updateOrCreate(
                     ['key' => $key],
@@ -97,6 +117,21 @@ final class SettingController extends Controller
             Arr::set($companySettings, 'booking.promo_codes', $data['promo_codes'] ?? '');
             Arr::set($companySettings, 'booking.email_confirmation_enabled', $request->boolean('email_confirmation_enabled'));
             Arr::set($companySettings, 'booking.whatsapp_confirmation_enabled', $request->boolean('whatsapp_confirmation_enabled'));
+
+            Arr::set($companySettings, 'payments.gateway', $data['payment_gateway']);
+            Arr::set($companySettings, 'payments.deposit_type', $data['deposit_type']);
+            Arr::set($companySettings, 'payments.deposit_value', (float) $data['deposit_value']);
+
+            Arr::set($companySettings, 'fiscal.enabled', $request->boolean('fiscal_enabled'));
+            Arr::set($companySettings, 'fiscal.mode', $data['fiscal_mode']);
+            Arr::set(
+                $companySettings,
+                'fiscal.authorized_electronic_issuer',
+                $request->boolean('fiscal_authorized_electronic_issuer'),
+            );
+            Arr::set($companySettings, 'fiscal.legal_name', $data['fiscal_legal_name'] ?? '');
+            Arr::set($companySettings, 'fiscal.rnc', $data['fiscal_rnc'] ?? '');
+            Arr::set($companySettings, 'fiscal.address', $data['fiscal_address'] ?? '');
 
             $oldLogoPath = Arr::get($companySettings, 'branding.logo_path');
 
@@ -127,8 +162,10 @@ final class SettingController extends Controller
                 'public_domain' => $data['public_domain'],
                 'settings' => $companySettings,
             ])->save();
+
+            $fiscalSequences->syncFromText($company, (string) ($data['fiscal_sequences'] ?? ''));
         });
 
-        return back()->with('status', 'Configuración comercial guardada.');
+        return back()->with('status', 'Configuración comercial, de pagos y fiscal guardada.');
     }
 }
