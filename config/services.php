@@ -41,6 +41,8 @@ return [
         'graph_version' => env('WHATSAPP_GRAPH_VERSION'),
         'booking_template' => env('WHATSAPP_BOOKING_TEMPLATE'),
         'booking_template_language' => env('WHATSAPP_BOOKING_TEMPLATE_LANGUAGE', 'es'),
+        'automation_template' => env('WHATSAPP_AUTOMATION_TEMPLATE'),
+        'automation_template_language' => env('WHATSAPP_AUTOMATION_TEMPLATE_LANGUAGE', 'es'),
     ],
 
     'payment_gateway' => [
