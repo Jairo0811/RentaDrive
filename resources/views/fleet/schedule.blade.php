@@ -69,6 +69,7 @@
                         <div class="sticky left-0 z-20 bg-slate-50 px-4 py-3 text-xs font-black uppercase tracking-[.14em] text-slate-500 dark:bg-slate-950">
                             Vehículo
                         </div>
+
                         @foreach ($days as $day)
                             <div class="border-l border-slate-200 px-2 py-3 text-center dark:border-slate-800 {{ $day->isToday() ? 'bg-blue-50 dark:bg-blue-950/30' : '' }}">
                                 <p class="text-[10px] font-black uppercase tracking-wider text-slate-400">{{ ucfirst($day->translatedFormat('D')) }}</p>
@@ -79,34 +80,34 @@
                     </div>
 
                     @foreach ($rows as $row)
-                        @php($vehicle = $row['vehicle'])
                         <div class="grid grid-cols-[250px_repeat(14,minmax(72px,1fr))] border-b border-slate-100 last:border-0 dark:border-slate-800">
-                            <a href="{{ route('vehicles.show', $vehicle) }}" class="sticky left-0 z-10 flex items-center gap-3 bg-white px-4 py-3 transition hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800">
-                                @if ($vehicle->photo_path)
-                                    <img src="{{ $vehicle->photo_url }}" alt="" class="h-11 w-16 rounded-lg object-cover" aria-hidden="true">
+                            <a href="{{ route('vehicles.show', $row['vehicle']) }}" class="sticky left-0 z-10 flex items-center gap-3 bg-white px-4 py-3 transition hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800">
+                                @if ($row['vehicle']->photo_url)
+                                    <img src="{{ $row['vehicle']->photo_url }}" alt="" class="h-11 w-16 rounded-lg object-cover" aria-hidden="true">
                                 @else
                                     <span class="grid h-11 w-16 place-items-center rounded-lg bg-slate-100 text-blue-600 dark:bg-slate-800 dark:text-blue-300">
                                         <i class="fa-solid fa-car-side text-xl" aria-hidden="true"></i>
                                     </span>
                                 @endif
+
                                 <span class="min-w-0">
-                                    <strong class="block truncate text-sm text-slate-900 dark:text-white">{{ $vehicle->model->display_name }}</strong>
-                                    <span class="mt-0.5 block truncate text-xs text-slate-500">{{ $vehicle->plate }} · {{ $vehicle->branch?->name ?? 'Sin sucursal' }}</span>
+                                    <strong class="block truncate text-sm text-slate-900 dark:text-white">{{ $row['vehicle']->model->display_name }}</strong>
+                                    <span class="mt-0.5 block truncate text-xs text-slate-500">{{ $row['vehicle']->plate }} · {{ $row['vehicle']->branch?->name ?? 'Sin sucursal' }}</span>
                                 </span>
                             </a>
 
                             @foreach ($row['cells'] as $cell)
-                                @php
-                                    $classes = match ($cell['status']) {
-                                        'rented' => 'bg-violet-100 text-violet-700 hover:bg-violet-200 dark:bg-violet-950/45 dark:text-violet-300 dark:hover:bg-violet-950/70',
-                                        'reserved' => 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-950/45 dark:text-blue-300 dark:hover:bg-blue-950/70',
-                                        'maintenance' => 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-950/45 dark:text-amber-300 dark:hover:bg-amber-950/70',
-                                        'inactive' => 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400',
-                                        default => 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-950/40',
-                                    };
-                                @endphp
                                 <div class="border-l border-slate-100 p-1.5 dark:border-slate-800">
-                                    <a href="{{ $cell['url'] }}" class="focus-ring flex min-h-14 items-center justify-center rounded-lg px-1.5 py-2 text-center text-[10px] font-black leading-4 transition {{ $classes }}" title="{{ $cell['label'] }}">
+                                    <a
+                                        href="{{ $cell['url'] }}"
+                                        class="focus-ring flex min-h-14 items-center justify-center rounded-lg px-1.5 py-2 text-center text-[10px] font-black leading-4 transition
+                                            {{ $cell['status'] === 'rented' ? 'bg-violet-100 text-violet-700 hover:bg-violet-200 dark:bg-violet-950/45 dark:text-violet-300 dark:hover:bg-violet-950/70' : '' }}
+                                            {{ $cell['status'] === 'reserved' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-950/45 dark:text-blue-300 dark:hover:bg-blue-950/70' : '' }}
+                                            {{ $cell['status'] === 'maintenance' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-950/45 dark:text-amber-300 dark:hover:bg-amber-950/70' : '' }}
+                                            {{ $cell['status'] === 'inactive' ? 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400' : '' }}
+                                            {{ $cell['status'] === 'available' ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-950/40' : '' }}"
+                                        title="{{ $cell['label'] }}"
+                                    >
                                         <span class="line-clamp-2">{{ $cell['label'] }}</span>
                                     </a>
                                 </div>
