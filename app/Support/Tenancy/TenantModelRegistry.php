@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Tenancy;
 
 use App\Models\AuditLog;
+use App\Models\AutomationDelivery;
 use App\Models\Customer;
 use App\Models\FiscalSequence;
 use App\Models\Inspection;
@@ -13,6 +14,7 @@ use App\Models\Payment;
 use App\Models\PaymentIntent;
 use App\Models\PaymentRefund;
 use App\Models\Rental;
+use App\Models\RentalSignature;
 use App\Models\Reservation;
 use App\Models\Setting;
 use App\Models\Vehicle;
@@ -39,11 +41,13 @@ final class TenantModelRegistry
             Reservation::class,
             Rental::class,
             Inspection::class,
+            RentalSignature::class,
             Invoice::class,
             Payment::class,
             PaymentIntent::class,
             PaymentRefund::class,
             FiscalSequence::class,
+            AutomationDelivery::class,
             Setting::class,
             AuditLog::class,
         ];
