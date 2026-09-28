@@ -1,0 +1,42 @@
+name: Refresh Composer Lock
+
+on:
+  push:
+    branches:
+      - feature/commercial-booking-ui
+    paths:
+      - .github/lock-refresh-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, gd, iconv, libxml, simplexml, xml, xmlreader, xmlwriter, zip
+          tools: composer:v2
+
+      - name: Refresh patched dependencies
+        run: composer update maatwebsite/excel league/commonmark --with-all-dependencies --no-scripts --no-interaction --no-progress
+
+      - name: Security audit
+        run: composer audit --locked --no-interaction
+
+      - name: Commit lock file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add composer.lock
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: refresh secure composer lock"
+          git push origin HEAD:${{ github.ref_name }}
