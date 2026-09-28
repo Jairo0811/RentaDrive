@@ -9,8 +9,8 @@ interface FiscalProvider
     public function name(): string;
 
     /**
-     * @param array<string,mixed> $payload
-     * @return array{status:string,reference:?string,response:array<string,mixed>}
+     * @param  array<string, mixed>  $payload
+     * @return array{status: string, reference: ?string, response: array<string, mixed>}
      */
     public function submit(array $payload, string $idempotencyKey): array;
 }
