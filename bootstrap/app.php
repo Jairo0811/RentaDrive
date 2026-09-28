@@ -35,15 +35,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping(10)
             ->onOneServer();
 
-        $schedule->job(new CreatePlatformBackupJob)
+        $schedule->job(new CreatePlatformBackupJob, 'maintenance')
             ->dailyAt('02:30')
-            ->onQueue('maintenance')
             ->withoutOverlapping(120)
             ->onOneServer();
 
-        $schedule->job(new MonitorPlatformHealthJob)
+        $schedule->job(new MonitorPlatformHealthJob, 'maintenance')
             ->everyFiveMinutes()
-            ->onQueue('maintenance')
             ->withoutOverlapping(5)
             ->onOneServer();
     })
