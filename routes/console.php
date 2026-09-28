@@ -1,6 +1,8 @@
 <?php
 
 use App\Jobs\ScanOperationalAlertsJob;
+use App\Models\BackupSnapshot;
+use App\Support\Production\BackupManager;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -70,3 +72,42 @@ Artisan::command('rentadrive:automation-scan', function () {
 
     return Command::SUCCESS;
 })->purpose('Escanea reservas, devoluciones, mantenimientos y documentos próximos a vencer.');
+
+
+Artisan::command('rentadrive:backup:create', function (BackupManager $backups) {
+    $snapshot = $backups->create(auth()->id());
+
+    $this->info('Backup creado y verificado: #'.$snapshot->getKey().' · '.$snapshot->path);
+
+    return Command::SUCCESS;
+})->purpose('Crea un backup cifrado y verificable del dominio SaaS.');
+
+Artisan::command('rentadrive:backup:verify {snapshot}', function (BackupManager $backups, int $snapshot) {
+    $record = BackupSnapshot::query()->findOrFail($snapshot);
+    $backups->verify($record);
+
+    $this->info('Backup #'.$record->getKey().' verificado correctamente.');
+
+    return Command::SUCCESS;
+})->purpose('Verifica existencia, checksum, cifrado y formato de un backup.');
+
+Artisan::command('rentadrive:backup:restore {snapshot} {--force} {--allow-production}', function (BackupManager $backups, int $snapshot) {
+    if (app()->environment('production') && ! $this->option('allow-production')) {
+        $this->error('En producción debes añadir --allow-production explícitamente.');
+
+        return Command::FAILURE;
+    }
+
+    if (! $this->option('force') && ! $this->confirm('Esta operación reemplazará los datos de negocio actuales. ¿Continuar?')) {
+        $this->warn('Restauración cancelada.');
+
+        return Command::SUCCESS;
+    }
+
+    $record = BackupSnapshot::query()->findOrFail($snapshot);
+    $backups->restore($record);
+
+    $this->info('Backup #'.$record->getKey().' restaurado.');
+
+    return Command::SUCCESS;
+})->purpose('Restaura un backup cifrado de RentaDrive con confirmación explícita.');
