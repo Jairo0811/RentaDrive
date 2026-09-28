@@ -92,22 +92,30 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 - [x] Política de cancelación por horas y cancelación self-service mediante enlace firmado.
 - [x] Confirmaciones por email y adaptador de WhatsApp Cloud API configurable por tenant.
 
-**Criterio de cierre de Fase 2:** toda cotización se recalcula en backend, persiste su desglose, respeta aislamiento multi-tenant y la suite CI debe pasar sobre SQL Server 2022.\n\n## Fase 3 — Payments
+**Criterio de cierre de Fase 2:** toda cotización se recalcula en backend, persiste su desglose, respeta aislamiento multi-tenant y la suite CI debe pasar sobre SQL Server 2022.
 
-- Abstracción de pasarela de pagos.
-- Depósitos de reserva.
-- Pagos parciales/totales.
-- Reembolsos.
-- Webhooks idempotentes.
-- Conciliación y auditoría.
+## Fase 3 — Payments
+
+- [x] Abstracción desacoplada de pasarela de pagos.
+- [x] Depósitos configurables de reserva.
+- [x] Pagos parciales/totales y libro de cobros auditable.
+- [x] Reembolsos parciales/totales sin borrar evidencia.
+- [x] Webhooks firmados e idempotentes.
+- [x] Conciliación y reparación de saldos.
+
+**Criterio de cierre de Fase 3:** cobros y reembolsos deben ser trazables, los webhooks no pueden duplicar movimientos y la conciliación debe reconstruir saldos desde el libro de pagos.
 
 ## Fase 4 — Dominican Edition
 
-- Perfil fiscal dominicano.
-- NCF/e-CF mediante integración compatible.
-- RNC y datos fiscales.
-- ITBIS y reglas fiscales configuradas con controles de integridad.
-- Integraciones locales cuando sean técnicamente y legalmente viables.
+- [x] Perfil fiscal dominicano por tenant.
+- [x] NCF y e-CF mediante secuencias autorizadas e integración desacoplada.
+- [x] RNC, razón social y domicilio fiscal.
+- [x] ITBIS general protegido en 18% y recálculo íntegro antes de emisión.
+- [x] B01/B02 y e-CF E31/E32 con controles de secuencia, vencimiento y autorización.
+- [x] Facturas fiscalizadas protegidas contra alteración posterior de importes.
+- [x] Adaptador fiscal preparado para proveedor certificado o conector propio.
+
+**Criterio de cierre de Fase 4:** RentaDrive controla identidad fiscal, secuencias y consistencia contable; la emisión e-CF real exige credenciales, autorización y proveedor/conector configurados en el entorno de despliegue.
 
 ## Fase 5 — Digital Rental
 
