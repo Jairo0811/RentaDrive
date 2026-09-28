@@ -21,7 +21,7 @@ final class PaymentLedgerService
     ) {}
 
     /**
-     * @param array<string,mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function record(array $data): Payment
     {
@@ -110,10 +110,12 @@ final class PaymentLedgerService
             return;
         }
 
-        $paidAmount = round((float) $invoice->payments()
+        $netPaid = $invoice->payments()
             ->whereIn('status', ['completed', 'partial_refund', 'refunded'])
             ->selectRaw('COALESCE(SUM(amount - refunded_amount), 0) AS net_paid')
-            ->value('net_paid'), 2);
+            ->value('net_paid');
+
+        $paidAmount = round((float) $netPaid, 2);
 
         $balance = max(0, round((float) $invoice->total - $paidAmount, 2));
 
@@ -137,10 +139,12 @@ final class PaymentLedgerService
             return;
         }
 
-        $paid = round((float) $reservation->payments()
+        $netPaid = $reservation->payments()
             ->whereIn('status', ['completed', 'partial_refund', 'refunded'])
             ->selectRaw('COALESCE(SUM(amount - refunded_amount), 0) AS net_paid')
-            ->value('net_paid'), 2);
+            ->value('net_paid');
+
+        $paid = round((float) $netPaid, 2);
 
         $reservation->update([
             'deposit_paid' => min((float) $reservation->deposit_required, $paid),
