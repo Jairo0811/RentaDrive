@@ -30,11 +30,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        RateLimiter::for('public-read', fn (Request $request): Limit => Limit::perMinute(120)
-            ->by('public-read:'.$request->ip().':'.(string) $request->route('company')));
+        RateLimiter::for('public-read', function (Request $request): Limit {
+            $company = $request->route('company');
+            $companyKey = $company instanceof \App\Models\Company
+                ? (string) $company->getKey()
+                : (string) $company;
 
-        RateLimiter::for('public-write', fn (Request $request): Limit => Limit::perMinute(10)
-            ->by('public-write:'.$request->ip().':'.(string) $request->route('company')));
+            return Limit::perMinute(120)
+                ->by('public-read:'.$request->ip().':'.$companyKey);
+        });
+
+        RateLimiter::for('public-write', function (Request $request): Limit {
+            $company = $request->route('company');
+            $companyKey = $company instanceof \App\Models\Company
+                ? (string) $company->getKey()
+                : (string) $company;
+
+            return Limit::perMinute(10)
+                ->by('public-write:'.$request->ip().':'.$companyKey);
+        });
 
         RateLimiter::for('tenant', fn (Request $request): Limit => Limit::perMinute(300)
             ->by('tenant:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
