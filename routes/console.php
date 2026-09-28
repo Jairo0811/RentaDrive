@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ScanOperationalAlertsJob;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -62,3 +63,11 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
 
     return Command::SUCCESS;
 })->purpose('Provisiona o actualiza un SuperAdmin de RentaDrive sin exponer la contraseña.');
+
+
+Artisan::command('rentadrive:automation-scan', function () {
+    ScanOperationalAlertsJob::dispatchSync();
+    $this->info('Escaneo de automatizaciones completado.');
+
+    return Command::SUCCESS;
+})->purpose('Escanea reservas, devoluciones, mantenimientos y documentos próximos a vencer.');
