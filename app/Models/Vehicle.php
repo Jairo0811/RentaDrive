@@ -98,7 +98,7 @@ class Vehicle extends Model
     {
         return Attribute::get(
             fn (): ?string => $this->photo_path
-                ? Storage::disk('public')->url($this->photo_path)
+                ? Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->url($this->photo_path)
                 : null,
         );
     }
