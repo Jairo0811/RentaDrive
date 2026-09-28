@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Domain\Operations\Services\ReferenceNumberService;
 use App\Http\Requests\PaymentRequest;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Support\Payments\PaymentLedgerService;
+use App\Support\Payments\PaymentReconciliationService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class PaymentController extends Controller
@@ -19,7 +19,7 @@ final class PaymentController extends Controller
     public function index(Request $request): View
     {
         $payments = Payment::query()
-            ->with(['invoice.customer', 'receiver'])
+            ->with(['invoice.customer', 'reservation.customer', 'receiver', 'refunds'])
             ->when($request->filled('method'), fn ($query) => $query->where('method', $request->string('method')))
             ->latest('paid_at')
             ->paginate(15)
@@ -31,54 +31,75 @@ final class PaymentController extends Controller
         ]);
     }
 
-    public function store(PaymentRequest $request, ReferenceNumberService $references): RedirectResponse
+    public function store(PaymentRequest $request, PaymentLedgerService $ledger): RedirectResponse
     {
         $data = $request->validated();
 
-        DB::transaction(function () use ($data, $references): void {
-            /** @var Invoice $invoice */
-            $invoice = Invoice::query()->lockForUpdate()->findOrFail($data['invoice_id']);
+        /** @var Invoice $invoice */
+        $invoice = Invoice::query()->findOrFail($data['invoice_id']);
 
-            if ((float) $data['amount'] > (float) $invoice->balance) {
-                throw ValidationException::withMessages([
-                    'amount' => 'El pago no puede exceder el balance pendiente de la factura.',
-                ]);
-            }
-
-            Payment::query()->create([
-                ...$data,
-                'receipt_number' => $references->generate(Payment::class, 'receipt_number', 'REC'),
-                'received_by' => auth()->id(),
+        if ((float) $data['amount'] > (float) $invoice->balance) {
+            throw ValidationException::withMessages([
+                'amount' => 'El pago no puede exceder el balance pendiente de la factura.',
             ]);
+        }
 
-            $paidAmount = (float) $invoice->paid_amount + (float) $data['amount'];
-            $balance = max(0, (float) $invoice->total - $paidAmount);
-
-            $invoice->update([
-                'paid_amount' => $paidAmount,
-                'balance' => $balance,
-                'status' => $balance <= 0 ? 'paid' : 'partial',
-            ]);
-        });
+        $ledger->record([
+            ...$data,
+            'gateway' => 'manual',
+            'currency' => $request->user()?->company?->currency ?? 'DOP',
+            'status' => 'completed',
+            'received_by' => auth()->id(),
+        ]);
 
         return back()->with('status', 'Pago aplicado correctamente.');
     }
 
-    public function destroy(Payment $payment): RedirectResponse
-    {
-        DB::transaction(function () use ($payment): void {
-            /** @var Invoice $invoice */
-            $invoice = $payment->invoice()->lockForUpdate()->firstOrFail();
-            $payment->delete();
-            $paidAmount = (float) $invoice->payments()->sum('amount');
-            $balance = max(0, (float) $invoice->total - $paidAmount);
-            $invoice->update([
-                'paid_amount' => $paidAmount,
-                'balance' => $balance,
-                'status' => $balance <= 0 ? 'paid' : ($paidAmount > 0 ? 'partial' : 'pending'),
-            ]);
-        });
+    public function refund(
+        Request $request,
+        Payment $payment,
+        PaymentLedgerService $ledger,
+    ): RedirectResponse {
+        $data = $request->validate([
+            'amount' => ['required', 'numeric', 'gt:0'],
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
 
-        return back()->with('status', 'Pago anulado y factura recalculada.');
+        $refund = $ledger->refund(
+            $payment,
+            round((float) $data['amount'], 2),
+            $data['reason'] ?? null,
+        );
+
+        return back()->with('status', 'Reembolso registrado con estado '.$refund->status.'.');
+    }
+
+    public function destroy(Payment $payment, PaymentLedgerService $ledger): RedirectResponse
+    {
+        $net = $payment->netAmount();
+
+        if ($net <= 0) {
+            throw ValidationException::withMessages([
+                'payment' => 'El pago ya está totalmente reembolsado.',
+            ]);
+        }
+
+        $ledger->refund($payment, $net, 'Anulación administrativa del pago.');
+
+        return back()->with('status', 'Pago anulado mediante reembolso íntegro; se preservó la trazabilidad.');
+    }
+
+    public function reconcile(PaymentReconciliationService $reconciliation): RedirectResponse
+    {
+        $result = $reconciliation->reconcile(true);
+
+        return back()->with(
+            'status',
+            sprintf(
+                'Conciliación completada: %d factura(s) y %d reserva(s) reparadas.',
+                $result['invoice_mismatches'],
+                $result['reservation_mismatches'],
+            ),
+        );
     }
 }
