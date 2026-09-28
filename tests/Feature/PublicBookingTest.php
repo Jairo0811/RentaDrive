@@ -40,7 +40,7 @@ final class PublicBookingTest extends TestCase
         $company->update(['public_domain' => 'reservas.example.com']);
         app(TenantContext::class)->clear();
 
-        $this->withServerVariables(['HTTP_HOST' => 'reservas.example.com'])
+        $this->withHeader('Host', 'reservas.example.com')
             ->get('/')
             ->assertRedirect('/r/'.$company->slug);
     }
