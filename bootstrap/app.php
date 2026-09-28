@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\ResolveTenant;
+use App\Jobs\CreatePlatformBackupJob;
 use App\Jobs\EnforceSubscriptionLifecycleJob;
 use App\Jobs\ScanOperationalAlertsJob;
 use Illuminate\Console\Scheduling\Schedule;
@@ -29,6 +30,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(new EnforceSubscriptionLifecycleJob)
             ->hourly()
             ->withoutOverlapping(10)
+            ->onOneServer();
+
+        $schedule->job(new CreatePlatformBackupJob)
+            ->dailyAt('02:30')
+            ->onQueue('maintenance')
+            ->withoutOverlapping(120)
             ->onOneServer();
     })
     ->withMiddleware(function (Middleware $middleware): void {
