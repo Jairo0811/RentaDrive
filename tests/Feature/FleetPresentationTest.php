@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Domain\Security\Enums\RoleName;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
@@ -99,7 +100,7 @@ final class FleetPresentationTest extends TestCase
             'is_active' => true,
         ]);
 
-        $vehicle = \App\Models\Vehicle::query()->create([
+        $vehicle = Vehicle::query()->create([
             'branch_id' => $administrator->branch_id,
             'vehicle_model_id' => $model->id,
             'vehicle_category_id' => $category->id,
