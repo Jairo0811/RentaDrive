@@ -117,8 +117,11 @@ final class PlatformCompanyController extends Controller
         return view('platform.companies.form', compact('company'));
     }
 
-    public function update(CompanyUpdateRequest $request, Company $company): RedirectResponse
-    {
+    public function update(
+        CompanyUpdateRequest $request,
+        Company $company,
+        SubscriptionService $subscriptions,
+    ): RedirectResponse {
         $data = $request->validated();
 
         if ($data['status'] !== 'trial') {
@@ -126,6 +129,23 @@ final class PlatformCompanyController extends Controller
         }
 
         $company->update($data);
+
+        $currentSubscription = $subscriptions->current($company);
+
+        if ($data['status'] === 'active' && (
+            $currentSubscription === null
+            || $currentSubscription->status !== 'active'
+            || $currentSubscription->plan_code !== $data['plan_code']
+        )) {
+            $subscriptions->activate($company, $data['plan_code']);
+        } elseif ($data['status'] === 'trial' && (
+            $currentSubscription === null
+            || $currentSubscription->status !== 'trialing'
+        )) {
+            $subscriptions->createTrial($company);
+        } elseif ($data['status'] === 'cancelled' && $currentSubscription?->status !== 'cancelled') {
+            $subscriptions->cancel($company);
+        }
 
         return redirect()
             ->route('platform.companies.edit', $company)
