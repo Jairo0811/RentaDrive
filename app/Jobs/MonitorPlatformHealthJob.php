@@ -51,7 +51,7 @@ final class MonitorPlatformHealthJob implements ShouldQueue
             ->implode(PHP_EOL);
 
         Mail::raw(
-            "RentaDrive detectó un estado degradado:".PHP_EOL.PHP_EOL.$lines,
+            'RentaDrive detectó un estado degradado:'.PHP_EOL.PHP_EOL.$lines,
             fn ($message) => $message
                 ->to($opsEmail)
                 ->subject('RentaDrive · alerta de producción'),

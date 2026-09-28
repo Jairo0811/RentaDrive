@@ -27,9 +27,9 @@ final class EnforceSubscriptionLifecycleJob implements ShouldQueue
             ->where('status', 'trialing')
             ->whereNotNull('trial_ends_at')
             ->where('trial_ends_at', '<=', $now)
-            ->chunkById(100, function ($subscriptions) use ($now): void {
+            ->chunkById(100, function ($subscriptions): void {
                 foreach ($subscriptions as $subscription) {
-                    DB::transaction(function () use ($subscription, $now): void {
+                    DB::transaction(function () use ($subscription): void {
                         $subscription->update(['status' => 'expired']);
 
                         if ($subscription->company?->status === 'trial') {

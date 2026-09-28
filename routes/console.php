@@ -2,8 +2,8 @@
 
 use App\Jobs\ScanOperationalAlertsJob;
 use App\Models\BackupSnapshot;
-use App\Support\Production\BackupManager;
 use App\Models\User;
+use App\Support\Production\BackupManager;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
@@ -72,7 +72,6 @@ Artisan::command('rentadrive:automation-scan', function () {
 
     return Command::SUCCESS;
 })->purpose('Escanea reservas, devoluciones, mantenimientos y documentos próximos a vencer.');
-
 
 Artisan::command('rentadrive:backup:create', function (BackupManager $backups) {
     $snapshot = $backups->create(auth()->id());

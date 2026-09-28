@@ -2,11 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Company;
 use App\Support\Tenancy\TenantContext;
-use Illuminate\Cache\RateLimiting\Limit;
 use App\Support\Tenancy\TenantModelRegistry;
 use App\Support\Tenancy\TenantResolver;
 use App\Support\Tenancy\TenantScope;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('public-read', function (Request $request): Limit {
             $company = $request->route('company');
-            $companyKey = $company instanceof \App\Models\Company
+            $companyKey = $company instanceof Company
                 ? (string) $company->getKey()
                 : (string) $company;
 
@@ -42,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('public-write', function (Request $request): Limit {
             $company = $request->route('company');
-            $companyKey = $company instanceof \App\Models\Company
+            $companyKey = $company instanceof Company
                 ? (string) $company->getKey()
                 : (string) $company;
 
