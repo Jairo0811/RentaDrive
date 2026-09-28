@@ -73,7 +73,7 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 - [x] Tarjetas visuales de vehículos con fotografía, sucursal, datos operativos, tarifa y alerta de mantenimiento.
 - [x] Fotografía principal administrable por vehículo, con almacenamiento público controlado.
 - [x] Calendario operativo de 14 días por vehículo, sucursal, reservas, alquileres y mantenimiento.
-- [ ] Personalización white-label de logo, colores y dominio por empresa.
+- [x] Personalización white-label de logo, colores y dominio por empresa.
 
 ### 2B. Booking Engine
 
@@ -85,14 +85,14 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 - [x] Reserva online creada como `pending`.
 - [x] Confirmación visual con código de reserva.
 - [x] Pruebas de aislamiento multi-tenant del portal público.
-- [ ] Tarifas semanales y mensuales.
-- [ ] Tarifas de temporada.
-- [ ] Extras y seguros.
-- [ ] Códigos promocionales y descuentos.
-- [ ] Políticas de cancelación y cancelación self-service.
-- [ ] Confirmaciones por email/WhatsApp.
+- [x] Tarifas semanales y mensuales mediante descuentos configurables por duración.
+- [x] Tarifas de temporada mediante multiplicadores configurables por rango de fechas.
+- [x] Extras y seguros configurables por día o cargo único.
+- [x] Códigos promocionales porcentuales o fijos con vigencia opcional.
+- [x] Política de cancelación por horas y cancelación self-service mediante enlace firmado.
+- [x] Confirmaciones por email y adaptador de WhatsApp Cloud API configurable por tenant.
 
-## Fase 3 — Payments
+**Criterio de cierre de Fase 2:** toda cotización se recalcula en backend, persiste su desglose, respeta aislamiento multi-tenant y la suite CI debe pasar sobre SQL Server 2022.\n\n## Fase 3 — Payments
 
 - Abstracción de pasarela de pagos.
 - Depósitos de reserva.
