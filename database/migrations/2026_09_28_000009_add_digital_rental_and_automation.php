@@ -67,6 +67,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vehicles', function (Blueprint $table): void {
+            $table->dropIndex(['insurance_expires_at']);
+            $table->dropIndex(['registration_expires_at']);
             $table->dropColumn(['insurance_expires_at', 'registration_expires_at']);
         });
 
@@ -74,6 +76,8 @@ return new class extends Migration
         Schema::dropIfExists('rental_signatures');
 
         Schema::table('inspections', function (Blueprint $table): void {
+            $table->dropIndex(['evidence_hash']);
+            $table->dropIndex(['sealed_at']);
             $table->dropColumn([
                 'accessories_checklist',
                 'damage_items',
