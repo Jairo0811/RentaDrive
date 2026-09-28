@@ -13,6 +13,7 @@ use App\Http\Controllers\Platform\PlatformBranchController;
 use App\Http\Controllers\Platform\PlatformCompanyController;
 use App\Http\Controllers\Platform\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Public\PublicBookingController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
@@ -23,6 +24,19 @@ use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+Route::prefix('r/{company:slug}')
+    ->name('public.booking.')
+    ->group(function (): void {
+        Route::get('/', [PublicBookingController::class, 'show'])->name('show');
+        Route::get('/search', [PublicBookingController::class, 'search'])->name('search');
+        Route::get('/reserve', [PublicBookingController::class, 'create'])->name('create');
+        Route::post('/reserve', [PublicBookingController::class, 'store'])
+            ->middleware('throttle:5,1')
+            ->name('store');
+        Route::get('/reservation/{code}', [PublicBookingController::class, 'confirmation'])
+            ->name('confirmation');
+    });
 
 Route::middleware(['auth'])->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
