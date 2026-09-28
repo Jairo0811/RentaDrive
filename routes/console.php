@@ -64,7 +64,6 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
     return Command::SUCCESS;
 })->purpose('Provisiona o actualiza un SuperAdmin de RentaDrive sin exponer la contraseña.');
 
-
 Artisan::command('rentadrive:automation-scan', function () {
     ScanOperationalAlertsJob::dispatchSync();
     $this->info('Escaneo de automatizaciones completado.');
