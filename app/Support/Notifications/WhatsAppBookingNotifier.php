@@ -23,7 +23,9 @@ final class WhatsAppBookingNotifier
         $phoneNumberId = (string) config('services.whatsapp.phone_number_id');
         $template = (string) config('services.whatsapp.booking_template');
 
-        if ($token === '' || $phoneNumberId === '' || $template === '' || $reservation->customer?->phone === null) {
+        $version = (string) config('services.whatsapp.graph_version');
+
+        if ($token === '' || $phoneNumberId === '' || $version === '' || $template === '' || $reservation->customer?->phone === null) {
             return;
         }
 
@@ -32,8 +34,6 @@ final class WhatsAppBookingNotifier
         if ($phone === '') {
             return;
         }
-
-        $version = (string) config('services.whatsapp.graph_version', 'v23.0');
 
         Http::withToken($token)
             ->timeout(10)
