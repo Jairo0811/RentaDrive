@@ -149,6 +149,41 @@
         </section>
 
         <section class="panel p-5 sm:p-6">
+            <h2 class="font-black text-slate-950 dark:text-white">Automatizaciones</h2>
+            <p class="mt-1 text-sm text-slate-500">Recordatorios operativos procesados por colas, con deduplicación por evento.</p>
+
+            <div class="mt-5 flex flex-wrap gap-5">
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="automation_email_enabled" value="1" @checked(old('automation_email_enabled', $company->setting('automation.email_enabled', true)))>
+                    Email automático
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="automation_whatsapp_enabled" value="1" @checked(old('automation_whatsapp_enabled', $company->setting('automation.whatsapp_enabled', false)))>
+                    WhatsApp automático
+                </label>
+            </div>
+
+            <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <div>
+                    <label class="form-label" for="reservation_reminder_hours">Reserva antes de iniciar (horas)</label>
+                    <input id="reservation_reminder_hours" name="reservation_reminder_hours" type="number" min="1" max="168" class="form-input" value="{{ old('reservation_reminder_hours', $company->setting('automation.reservation_reminder_hours', 24)) }}" required>
+                </div>
+                <div>
+                    <label class="form-label" for="return_reminder_hours">Devolución próxima (horas)</label>
+                    <input id="return_reminder_hours" name="return_reminder_hours" type="number" min="1" max="72" class="form-input" value="{{ old('return_reminder_hours', $company->setting('automation.return_reminder_hours', 4)) }}" required>
+                </div>
+                <div>
+                    <label class="form-label" for="maintenance_reminder_days">Mantenimiento (días)</label>
+                    <input id="maintenance_reminder_days" name="maintenance_reminder_days" type="number" min="1" max="90" class="form-input" value="{{ old('maintenance_reminder_days', $company->setting('automation.maintenance_reminder_days', 7)) }}" required>
+                </div>
+                <div>
+                    <label class="form-label" for="document_reminder_days">Documentos (días)</label>
+                    <input id="document_reminder_days" name="document_reminder_days" type="number" min="1" max="180" class="form-input" value="{{ old('document_reminder_days', $company->setting('automation.document_reminder_days', 30)) }}" required>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel p-5 sm:p-6">
             <h2 class="font-black text-slate-950 dark:text-white">Operación y confirmaciones</h2>
             <div class="mt-5 grid gap-5 md:grid-cols-3">
                 <div>
