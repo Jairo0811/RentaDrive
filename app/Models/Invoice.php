@@ -28,6 +28,17 @@ class Invoice extends Model
         'balance',
         'status',
         'notes',
+        'fiscal_document_type',
+        'ncf',
+        'fiscal_status',
+        'fiscal_provider',
+        'fiscal_reference',
+        'tax_rate',
+        'taxable_amount',
+        'exempt_amount',
+        'fiscal_payload',
+        'fiscal_response',
+        'fiscal_issued_at',
     ];
 
     protected function casts(): array
@@ -41,6 +52,12 @@ class Invoice extends Model
             'total' => 'decimal:2',
             'paid_amount' => 'decimal:2',
             'balance' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'taxable_amount' => 'decimal:2',
+            'exempt_amount' => 'decimal:2',
+            'fiscal_payload' => 'array',
+            'fiscal_response' => 'array',
+            'fiscal_issued_at' => 'datetime',
         ];
     }
 
@@ -57,5 +74,10 @@ class Invoice extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function paymentIntents(): HasMany
+    {
+        return $this->hasMany(PaymentIntent::class);
     }
 }
