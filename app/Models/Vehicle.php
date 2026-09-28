@@ -32,6 +32,8 @@ class Vehicle extends Model
         'status',
         'acquisition_date',
         'next_maintenance_at',
+        'insurance_expires_at',
+        'registration_expires_at',
         'photo_path',
         'notes',
     ];
@@ -43,6 +45,8 @@ class Vehicle extends Model
             'daily_rate_override' => 'decimal:2',
             'mileage' => 'integer',
             'next_maintenance_at' => 'integer',
+            'insurance_expires_at' => 'date',
+            'registration_expires_at' => 'date',
         ];
     }
 
