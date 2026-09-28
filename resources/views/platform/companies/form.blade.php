@@ -91,4 +91,85 @@
             <button class="btn-primary">{{ $company->exists ? 'Guardar cambios' : 'Provisionar empresa' }}</button>
         </div>
     </form>
+
+    @if ($company->exists)
+        @php($subscription = $company->subscriptions()->latest('started_at')->latest('id')->first())
+        <section class="panel mt-6 p-5 sm:p-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600">Suscripción SaaS</p>
+                    <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">
+                        {{ $subscription ? strtoupper($subscription->status) : 'Sin suscripción' }}
+                    </h2>
+                    @if ($subscription)
+                        <p class="mt-1 text-sm text-slate-500">
+                            {{ config('rentadrive.plans.'.$subscription->plan_code.'.name', $subscription->plan_code) }}
+                            · {{ $subscription->billing_cycle === 'yearly' ? 'Anual' : 'Mensual' }}
+                            · {{ ucfirst($subscription->provider) }}
+                        </p>
+                    @endif
+                </div>
+
+                @if ($subscription?->trial_ends_at)
+                    <p class="text-sm text-slate-500">Trial hasta {{ $subscription->trial_ends_at->format('d/m/Y h:i A') }}</p>
+                @elseif ($subscription?->current_period_ends_at)
+                    <p class="text-sm text-slate-500">Período hasta {{ $subscription->current_period_ends_at->format('d/m/Y h:i A') }}</p>
+                @elseif ($subscription?->grace_ends_at)
+                    <p class="text-sm text-amber-600">Gracia hasta {{ $subscription->grace_ends_at->format('d/m/Y h:i A') }}</p>
+                @endif
+            </div>
+
+            <form method="POST" action="{{ route('platform.companies.subscription.activate', $company) }}" class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                @csrf
+                <div>
+                    <label class="form-label" for="subscription_plan_code">Plan</label>
+                    <select id="subscription_plan_code" name="plan_code" class="form-input">
+                        @foreach (config('rentadrive.plans') as $code => $plan)
+                            <option value="{{ $code }}" @selected(($subscription?->plan_code ?? $company->plan_code) === $code)>{{ $plan['name'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="billing_cycle">Ciclo</label>
+                    <select id="billing_cycle" name="billing_cycle" class="form-input">
+                        <option value="monthly">Mensual</option>
+                        <option value="yearly">Anual</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="provider">Proveedor</label>
+                    <select id="provider" name="provider" class="form-input">
+                        <option value="manual">Manual</option>
+                        <option value="external">Externo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="provider_reference">Referencia externa</label>
+                    <input id="provider_reference" name="provider_reference" class="form-input" value="{{ $subscription?->provider_reference }}">
+                </div>
+                <div class="md:col-span-2 xl:col-span-4">
+                    <button class="btn-primary">Activar / renovar suscripción</button>
+                </div>
+            </form>
+
+            @if ($subscription && in_array($subscription->status, ['active', 'trialing'], true))
+                <div class="mt-5 flex flex-wrap gap-3 border-t border-slate-200 pt-5 dark:border-slate-800">
+                    <form method="POST" action="{{ route('platform.companies.subscription.past-due', $company) }}" class="flex items-end gap-3">
+                        @csrf
+                        <div>
+                            <label class="form-label" for="grace_days">Días de gracia</label>
+                            <input id="grace_days" type="number" min="1" max="30" name="grace_days" value="7" class="form-input w-28">
+                        </div>
+                        <button class="btn-secondary">Marcar en mora</button>
+                    </form>
+
+                    <form method="POST" action="{{ route('platform.companies.subscription.cancel', $company) }}" class="self-end">
+                        @csrf
+                        @method('DELETE')
+                        <button class="inline-flex rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950/30">Cancelar suscripción</button>
+                    </form>
+                </div>
+            @endif
+        </section>
+    @endif
 </x-app-layout>
