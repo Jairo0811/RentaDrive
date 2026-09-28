@@ -11,6 +11,7 @@ use App\Http\Requests\Platform\CompanyUpdateRequest;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\Commercial\SubscriptionService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,11 +49,11 @@ final class PlatformCompanyController extends Controller
         return view('platform.companies.form', ['company' => new Company]);
     }
 
-    public function store(CompanyStoreRequest $request): RedirectResponse
+    public function store(CompanyStoreRequest $request, SubscriptionService $subscriptions): RedirectResponse
     {
         $data = $request->validated();
 
-        $company = DB::transaction(function () use ($data): Company {
+        $company = DB::transaction(function () use ($data, $subscriptions): Company {
             $status = $data['status'];
             $trialEndsAt = $status === 'trial'
                 ? now()->addDays((int) config('rentadrive.trial_days', 14))
@@ -96,6 +97,12 @@ final class PlatformCompanyController extends Controller
             ]);
 
             $administrator->syncRoles([RoleName::ADMINISTRATOR->value]);
+
+            if ($status === 'trial') {
+                $subscriptions->createTrial($company);
+            } else {
+                $subscriptions->activate($company, $data['plan_code']);
+            }
 
             return $company;
         });
