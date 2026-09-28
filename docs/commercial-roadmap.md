@@ -63,14 +63,34 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 
 **Criterio de cierre de 1C:** npm audit sin vulnerabilidades high/critical, build de producción, Pint y PHPUnit deben pasar contra SQL Server 2022.
 
-## Fase 2 — Booking Engine
+## Fase 2 — Booking Engine + experiencia comercial
 
-- Sitio público por empresa.
-- Disponibilidad por fechas/categoría/sucursal.
-- Cotización.
-- Extras y seguros.
-- Reserva online.
-- Confirmaciones y cancelaciones.
+### 2A. UI/UX comercial
+
+- [x] Landing pública de RentaDrive separada del login administrativo.
+- [x] Layout público responsive con modo claro/oscuro y accesibilidad existente.
+- [x] Portal público por empresa usando el `slug` del tenant.
+- [x] Tarjetas visuales de vehículos con datos operativos y tarifa.
+- [ ] Fotografías administrables por vehículo.
+- [ ] Calendario operativo tipo timeline por vehículo.
+- [ ] Personalización white-label de logo, colores y dominio por empresa.
+
+### 2B. Booking Engine
+
+- [x] Disponibilidad por fechas y sucursal.
+- [x] Filtro opcional por categoría.
+- [x] Exclusión de reservas, alquileres activos, mantenimiento e inactivos.
+- [x] Cotización calculada en backend según tarifa diaria y duración.
+- [x] Checkout público con datos mínimos del cliente.
+- [x] Reserva online creada como `pending`.
+- [x] Confirmación visual con código de reserva.
+- [x] Pruebas de aislamiento multi-tenant del portal público.
+- [ ] Tarifas semanales y mensuales.
+- [ ] Tarifas de temporada.
+- [ ] Extras y seguros.
+- [ ] Códigos promocionales y descuentos.
+- [ ] Políticas de cancelación y cancelación self-service.
+- [ ] Confirmaciones por email/WhatsApp.
 
 ## Fase 3 — Payments
 
