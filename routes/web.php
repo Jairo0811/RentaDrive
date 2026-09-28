@@ -15,6 +15,7 @@ use App\Http\Controllers\Platform\PlatformCompanyController;
 use App\Http\Controllers\Platform\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\PublicBookingController;
+use App\Http\Controllers\Public\PublicPaymentController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
@@ -35,6 +36,12 @@ Route::prefix('r/{company:slug}')
         Route::post('/reserve', [PublicBookingController::class, 'store'])
             ->middleware('throttle:5,1')
             ->name('store');
+        Route::get('/reservation/{code}/deposit', [PublicPaymentController::class, 'show'])
+            ->middleware('signed')
+            ->name('deposit.show');
+        Route::post('/reservation/{code}/deposit', [PublicPaymentController::class, 'start'])
+            ->middleware(['signed', 'throttle:5,1'])
+            ->name('deposit.start');
         Route::get('/reservation/{code}/cancel', [PublicBookingController::class, 'cancelShow'])
             ->middleware('signed')
             ->name('cancel.show');
