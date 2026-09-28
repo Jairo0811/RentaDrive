@@ -142,10 +142,19 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])
         ->middleware('permission:'.PermissionName::VIEW_INVOICES->value)
         ->name('invoices.download');
+    Route::post('/invoices/{invoice}/fiscal', [InvoiceController::class, 'issueFiscal'])
+        ->middleware('permission:'.PermissionName::MANAGE_INVOICES->value)
+        ->name('invoices.fiscal.issue');
     Route::resource('invoices', InvoiceController::class)->only(['index', 'show', 'update'])
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_INVOICES->value)
         ->middlewareFor(['update'], 'permission:'.PermissionName::MANAGE_INVOICES->value);
 
+    Route::post('/payments/reconcile', [PaymentController::class, 'reconcile'])
+        ->middleware('permission:'.PermissionName::MANAGE_PAYMENTS->value)
+        ->name('payments.reconcile');
+    Route::post('/payments/{payment}/refund', [PaymentController::class, 'refund'])
+        ->middleware('permission:'.PermissionName::MANAGE_PAYMENTS->value)
+        ->name('payments.refund');
     Route::resource('payments', PaymentController::class)->only(['index', 'store', 'destroy'])
         ->middlewareFor(['index'], 'permission:'.PermissionName::VIEW_PAYMENTS->value)
         ->middlewareFor(['store', 'destroy'], 'permission:'.PermissionName::MANAGE_PAYMENTS->value);
