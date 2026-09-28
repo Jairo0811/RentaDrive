@@ -90,8 +90,8 @@
             <h2 class="font-black text-slate-950 dark:text-white">Evidencias fotográficas</h2>
             <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($inspection->photos as $photo)
-                    <a href="{{ Storage::url($photo) }}" target="_blank" rel="noopener">
-                        <img src="{{ Storage::url($photo) }}" alt="Evidencia de inspección" class="aspect-video w-full rounded-xl object-cover">
+                    <a href="{{ Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->url($photo) }}" target="_blank" rel="noopener">
+                        <img src="{{ Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->url($photo) }}" alt="Evidencia de inspección" class="aspect-video w-full rounded-xl object-cover">
                     </a>
                 @endforeach
             </div>
