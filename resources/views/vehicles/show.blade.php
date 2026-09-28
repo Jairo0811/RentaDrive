@@ -43,7 +43,7 @@
                             <p class="mt-1 text-sm text-slate-500">{{ $vehicle->branch?->name ?? 'Sin sucursal asignada' }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-black text-slate-950 dark:text-white">RD$ {{ number_format($vehicle->effective_daily_rate, 2) }}</p>
+                            <p class="text-2xl font-black text-slate-950 dark:text-white">{{ $currency }} {{ number_format($vehicle->effective_daily_rate, 2) }}</p>
                             <p class="text-xs text-slate-500">tarifa diaria</p>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                                         <td class="font-bold">{{ $rental->code }}</td>
                                         <td>{{ $rental->customer->full_name }}</td>
                                         <td>{{ $rental->start_at->format('d/m/Y') }}</td>
-                                        <td>RD$ {{ number_format((float) $rental->total, 2) }}</td>
+                                        <td>{{ $currency }} {{ number_format((float) $rental->total, 2) }}</td>
                                         <td><x-status-badge :status="$rental->status" /></td>
                                         <td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-600">Ver</a></td>
                                     </tr>
@@ -146,7 +146,7 @@
                                         <td class="font-bold">{{ $maintenance->maintenance_type }}</td>
                                         <td>{{ $maintenance->scheduled_at->format('d/m/Y h:i A') }}</td>
                                         <td>{{ $maintenance->provider ?: '—' }}</td>
-                                        <td>RD$ {{ number_format((float) $maintenance->cost, 2) }}</td>
+                                        <td>{{ $currency }} {{ number_format((float) $maintenance->cost, 2) }}</td>
                                         <td><x-status-badge :status="$maintenance->status" /></td>
                                     </tr>
                                 @endforeach
