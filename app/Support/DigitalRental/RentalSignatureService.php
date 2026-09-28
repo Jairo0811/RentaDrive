@@ -67,7 +67,7 @@ final class RentalSignatureService
         $binary = $this->decodeSignature($signatureData);
         $path = 'rental-signatures/'.$rental->company_id.'/'.$rental->code.'-'.bin2hex(random_bytes(10)).'.png';
 
-        Storage::disk('local')->put($path, $binary);
+        Storage::disk((string) config('rentadrive.storage.private_disk', 'local'))->put($path, $binary);
 
         try {
             return DB::transaction(fn (): RentalSignature => RentalSignature::query()->create([
@@ -84,19 +84,19 @@ final class RentalSignatureService
                 'created_by' => auth()->id(),
             ]));
         } catch (\Throwable $exception) {
-            Storage::disk('local')->delete($path);
+            Storage::disk((string) config('rentadrive.storage.private_disk', 'local'))->delete($path);
             throw $exception;
         }
     }
 
     public function dataUri(?RentalSignature $signature): ?string
     {
-        if ($signature === null || ! Storage::disk('local')->exists($signature->signature_path)) {
+        if ($signature === null || ! Storage::disk((string) config('rentadrive.storage.private_disk', 'local'))->exists($signature->signature_path)) {
             return null;
         }
 
         return 'data:image/png;base64,'.base64_encode(
-            Storage::disk('local')->get($signature->signature_path),
+            Storage::disk((string) config('rentadrive.storage.private_disk', 'local'))->get($signature->signature_path),
         );
     }
 
