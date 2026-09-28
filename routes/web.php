@@ -35,6 +35,12 @@ Route::prefix('r/{company:slug}')
         Route::post('/reserve', [PublicBookingController::class, 'store'])
             ->middleware('throttle:5,1')
             ->name('store');
+        Route::get('/reservation/{code}/cancel', [PublicBookingController::class, 'cancelShow'])
+            ->middleware('signed')
+            ->name('cancel.show');
+        Route::post('/reservation/{code}/cancel', [PublicBookingController::class, 'cancelStore'])
+            ->middleware(['signed', 'throttle:5,1'])
+            ->name('cancel.store');
         Route::get('/reservation/{code}', [PublicBookingController::class, 'confirmation'])
             ->name('confirmation');
     });
