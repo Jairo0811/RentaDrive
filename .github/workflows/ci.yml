@@ -60,6 +60,9 @@ jobs:
       - name: Install backend dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Audit backend dependencies
+        run: composer audit --locked --no-interaction
+
       - name: Install frontend dependencies
         run: npm ci
 
@@ -106,6 +109,15 @@ jobs:
           } while (true);
           PHP
 
+      - name: Production boot checks
+        run: |
+          php artisan migrate:fresh --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan schedule:list
+          php artisan optimize:clear
+
       - name: Validate code style
         run: ./vendor/bin/pint --test
 
@@ -121,3 +133,17 @@ jobs:
           name: phpunit-diagnostics
           path: test-output.txt
           retention-days: 3
+
+
+  container:
+    runs-on: ubuntu-24.04
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build production image
+        run: docker build --tag rentadrive:ci .
+
+      - name: Inspect production image
+        run: docker image inspect rentadrive:ci > /dev/null
