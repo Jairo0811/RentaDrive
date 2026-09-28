@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 final class FiscalSequenceService
 {
     /**
-     * @var array<string,int>
+     * @var array<string, int>
      */
     private const LENGTHS = [
         'B01' => 8,
@@ -71,7 +71,7 @@ final class FiscalSequenceService
     {
         $seen = [];
 
-        DB::transaction(function () use ($company, $raw, &$seen): void {
+        DB::transaction(function () use ($raw, &$seen): void {
             foreach (preg_split('/\R/', $raw) ?: [] as $line) {
                 $parts = array_map('trim', explode('|', $line));
 
@@ -114,14 +114,17 @@ final class FiscalSequenceService
                 $seen[] = $type;
             }
 
-            FiscalSequence::query()
-                ->when($seen !== [], fn ($query) => $query->whereNotIn('document_type', $seen))
-                ->when($seen === [], fn ($query) => $query)
-                ->update(['is_active' => false]);
+            $query = FiscalSequence::query();
+
+            if ($seen !== []) {
+                $query->whereNotIn('document_type', $seen);
+            }
+
+            $query->update(['is_active' => false]);
         });
     }
 
-    public function serialize(Company $company): string
+    public function serialize(): string
     {
         return FiscalSequence::query()
             ->orderBy('document_type')
