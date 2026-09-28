@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Public;
 use App\Domain\Operations\Services\ReferenceNumberService;
 use App\Domain\Operations\Services\ReservationAvailabilityService;
 use App\Http\Controllers\Controller;
+use App\Mail\PublicReservationCreated;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\Customer;
@@ -14,6 +15,9 @@ use App\Models\Reservation;
 use App\Models\Vehicle;
 use App\Models\VehicleCategory;
 use App\Rules\DominicanCedula;
+use App\Support\Commercial\BookingConfig;
+use App\Support\Commercial\BookingPricingService;
+use App\Support\Notifications\WhatsAppBookingNotifier;
 use App\Support\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
@@ -21,8 +25,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 final class PublicBookingController extends Controller
 {
@@ -33,11 +40,9 @@ final class PublicBookingController extends Controller
         return view('public.booking', [
             'company' => $company,
             'branches' => $this->activeBranches($company),
-            'categories' => VehicleCategory::query()
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(),
+            'categories' => VehicleCategory::query()->where('is_active', true)->orderBy('name')->get(),
             'vehicles' => collect(),
+            'quotes' => collect(),
             'search' => [],
             'days' => null,
             'searchPerformed' => false,
@@ -49,6 +54,7 @@ final class PublicBookingController extends Controller
         Company $company,
         TenantContext $tenant,
         ReservationAvailabilityService $availability,
+        BookingPricingService $pricingService,
     ): View {
         $this->activateTenant($company, $tenant);
         $search = $this->validateSearch($request, $company);
@@ -76,14 +82,18 @@ final class PublicBookingController extends Controller
             ->filter(fn (Vehicle $vehicle): bool => $availability->isVehicleAvailable($vehicle, $startAt, $endAt))
             ->values();
 
+        $quotes = $vehicles->mapWithKeys(
+            fn (Vehicle $vehicle): array => [
+                $vehicle->getKey() => $pricingService->quote($company, $vehicle, $startAt, $endAt),
+            ],
+        );
+
         return view('public.booking', [
             'company' => $company,
             'branches' => $this->activeBranches($company),
-            'categories' => VehicleCategory::query()
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(),
+            'categories' => VehicleCategory::query()->where('is_active', true)->orderBy('name')->get(),
             'vehicles' => $vehicles,
+            'quotes' => $quotes,
             'search' => $search,
             'days' => $days,
             'searchPerformed' => true,
@@ -95,9 +105,11 @@ final class PublicBookingController extends Controller
         Company $company,
         TenantContext $tenant,
         ReservationAvailabilityService $availability,
+        BookingPricingService $pricingService,
+        BookingConfig $config,
     ): View {
         $this->activateTenant($company, $tenant);
-        $quote = $this->resolveQuote($request, $company, $tenant, $availability);
+        $quote = $this->resolveQuote($request, $company, $tenant, $availability, $pricingService, $config);
 
         return view('public.reserve', [
             'company' => $company,
@@ -111,9 +123,18 @@ final class PublicBookingController extends Controller
         TenantContext $tenant,
         ReservationAvailabilityService $availability,
         ReferenceNumberService $references,
+        BookingPricingService $pricingService,
+        BookingConfig $config,
+        WhatsAppBookingNotifier $whatsApp,
     ): RedirectResponse {
         $this->activateTenant($company, $tenant);
-        $quote = $this->resolveQuote($request, $company, $tenant, $availability);
+        $quote = $this->resolveQuote($request, $company, $tenant, $availability, $pricingService, $config);
+
+        if ($request->filled('promo_code') && $quote['pricing']['promo_code'] === null) {
+            throw ValidationException::withMessages([
+                'promo_code' => 'El código promocional no existe o no está vigente.',
+            ]);
+        }
 
         $documentType = (string) $request->input('document_type');
         $documentNumber = trim((string) $request->input('document_number'));
@@ -150,12 +171,14 @@ final class PublicBookingController extends Controller
         $branch = $quote['branch'];
 
         $reservation = DB::transaction(function () use (
+            $company,
             $branch,
             $vehicle,
             $quote,
             $customerData,
             $references,
             $availability,
+            $pricingService,
         ): Reservation {
             /** @var Vehicle $lockedVehicle */
             $lockedVehicle = Vehicle::query()
@@ -164,18 +187,26 @@ final class PublicBookingController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (! $availability->isVehicleAvailable(
-                $lockedVehicle,
-                $quote['startAt'],
-                $quote['endAt'],
-            )) {
+            if (! $availability->isVehicleAvailable($lockedVehicle, $quote['startAt'], $quote['endAt'])) {
                 throw ValidationException::withMessages([
                     'vehicle_id' => 'Este vehículo acaba de ser reservado para ese período. Busca otra opción disponible.',
                 ]);
             }
 
-            $dailyRate = $lockedVehicle->effective_daily_rate;
-            $estimatedTotal = round($quote['days'] * $dailyRate, 2);
+            $pricing = $pricingService->quote(
+                $company,
+                $lockedVehicle,
+                $quote['startAt'],
+                $quote['endAt'],
+                $quote['selectedExtraCodes'],
+                $quote['requestedPromoCode'],
+            );
+
+            if ($quote['requestedPromoCode'] !== null && $pricing['promo_code'] === null) {
+                throw ValidationException::withMessages([
+                    'promo_code' => 'El código promocional dejó de estar vigente.',
+                ]);
+            }
 
             $customer = Customer::query()->firstOrCreate(
                 ['document_number' => $customerData['document_number']],
@@ -205,13 +236,36 @@ final class PublicBookingController extends Controller
                 'end_at' => $quote['endAt'],
                 'pickup_location' => $branch->name,
                 'return_location' => $branch->name,
-                'daily_rate' => $dailyRate,
-                'estimated_total' => $estimatedTotal,
+                'daily_rate' => $pricing['daily_rate'],
+                'base_total' => $pricing['seasonal_total'],
+                'extras_total' => $pricing['extras_total'],
+                'discount_total' => $pricing['discount_total'],
+                'promo_code' => $pricing['promo_code'],
+                'pricing_breakdown' => $pricing,
+                'estimated_total' => $pricing['estimated_total'],
                 'status' => 'pending',
                 'notes' => 'Reserva creada desde el portal público.',
                 'created_by' => null,
             ]);
         });
+
+        $reservation->load(['customer', 'vehicle.model.brand', 'category']);
+        $cancellationUrl = $this->cancellationUrl($company, $reservation, $config);
+
+        if ($config->emailConfirmationEnabled($company) && $reservation->customer?->email !== null) {
+            try {
+                Mail::to($reservation->customer->email)
+                    ->send(new PublicReservationCreated($company, $reservation, $cancellationUrl));
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        }
+
+        try {
+            $whatsApp->sendCreated($company, $reservation);
+        } catch (Throwable $exception) {
+            report($exception);
+        }
 
         return redirect()->route('public.booking.confirmation', [
             'company' => $company->slug,
@@ -223,15 +277,75 @@ final class PublicBookingController extends Controller
         Company $company,
         string $code,
         TenantContext $tenant,
+        BookingConfig $config,
     ): View {
         $this->activateTenant($company, $tenant);
 
         $reservation = Reservation::query()
-            ->with(['vehicle.model.brand', 'category'])
+            ->with(['customer', 'vehicle.model.brand', 'category'])
             ->where('code', $code)
             ->firstOrFail();
 
-        return view('public.confirmation', compact('company', 'reservation'));
+        return view('public.confirmation', [
+            'company' => $company,
+            'reservation' => $reservation,
+            'cancellationUrl' => $this->cancellationUrl($company, $reservation, $config),
+        ]);
+    }
+
+    public function cancelShow(
+        Company $company,
+        string $code,
+        TenantContext $tenant,
+        BookingConfig $config,
+    ): View {
+        $this->activateTenant($company, $tenant);
+        $reservation = Reservation::query()->where('code', $code)->firstOrFail();
+        $deadline = $this->cancellationDeadline($company, $reservation, $config);
+
+        return view('public.cancel', [
+            'company' => $company,
+            'reservation' => $reservation,
+            'deadline' => $deadline,
+            'canCancel' => $this->canCancel($company, $reservation, $config),
+        ]);
+    }
+
+    public function cancelStore(
+        Request $request,
+        Company $company,
+        string $code,
+        TenantContext $tenant,
+        BookingConfig $config,
+    ): RedirectResponse {
+        $this->activateTenant($company, $tenant);
+        $validated = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        DB::transaction(function () use ($company, $code, $config, $validated): void {
+            $reservation = Reservation::query()
+                ->where('code', $code)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $this->canCancel($company, $reservation, $config)) {
+                throw ValidationException::withMessages([
+                    'reservation' => 'La ventana de cancelación en línea ya cerró.',
+                ]);
+            }
+
+            $reservation->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now($company->timezone),
+                'cancellation_reason' => $validated['reason'] ?? 'Cancelada por el cliente desde el portal público.',
+            ]);
+        });
+
+        return redirect()->route('public.booking.confirmation', [
+            'company' => $company->slug,
+            'code' => $code,
+        ])->with('status', 'Reserva cancelada correctamente.');
     }
 
     /**
@@ -264,21 +378,15 @@ final class PublicBookingController extends Controller
     }
 
     /**
-     * @return array{
-     *     branch: Branch,
-     *     vehicle: Vehicle,
-     *     startAt: CarbonImmutable,
-     *     endAt: CarbonImmutable,
-     *     days: int,
-     *     dailyRate: float,
-     *     estimatedTotal: float
-     * }
+     * @return array<string, mixed>
      */
     private function resolveQuote(
         Request $request,
         Company $company,
         TenantContext $tenant,
         ReservationAvailabilityService $availability,
+        BookingPricingService $pricingService,
+        BookingConfig $config,
     ): array {
         $data = $request->validate([
             'branch_id' => [
@@ -299,6 +407,9 @@ final class PublicBookingController extends Controller
             ],
             'start_at' => ['required', 'date', 'after_or_equal:today'],
             'end_at' => ['required', 'date', 'after:start_at'],
+            'extras' => ['nullable', 'array', 'max:20'],
+            'extras.*' => ['string', 'max:40'],
+            'promo_code' => ['nullable', 'string', 'max:40'],
         ]);
 
         $branch = $company->branches()
@@ -323,19 +434,34 @@ final class PublicBookingController extends Controller
             ]);
         }
 
-        $days = $availability->rentalDays($startAt, $endAt);
-        $dailyRate = $vehicle->effective_daily_rate;
-        $estimatedTotal = round($days * $dailyRate, 2);
+        $selectedExtraCodes = array_values(array_filter((array) ($data['extras'] ?? [])));
+        $requestedPromoCode = isset($data['promo_code']) && trim((string) $data['promo_code']) !== ''
+            ? strtoupper(trim((string) $data['promo_code']))
+            : null;
 
-        return compact(
-            'branch',
-            'vehicle',
-            'startAt',
-            'endAt',
-            'days',
-            'dailyRate',
-            'estimatedTotal',
+        $pricing = $pricingService->quote(
+            $company,
+            $vehicle,
+            $startAt,
+            $endAt,
+            $selectedExtraCodes,
+            $requestedPromoCode,
         );
+
+        return [
+            'branch' => $branch,
+            'vehicle' => $vehicle,
+            'startAt' => $startAt,
+            'endAt' => $endAt,
+            'days' => $pricing['days'],
+            'dailyRate' => $pricing['daily_rate'],
+            'estimatedTotal' => $pricing['estimated_total'],
+            'pricing' => $pricing,
+            'availableExtras' => $config->extras($company),
+            'selectedExtraCodes' => $selectedExtraCodes,
+            'requestedPromoCode' => $requestedPromoCode,
+            'promoInvalid' => $requestedPromoCode !== null && $pricing['promo_code'] === null,
+        ];
     }
 
     private function activateTenant(Company $company, TenantContext $tenant): void
@@ -351,6 +477,45 @@ final class PublicBookingController extends Controller
         }
 
         $tenant->set($company);
+    }
+
+    private function cancellationDeadline(
+        Company $company,
+        Reservation $reservation,
+        BookingConfig $config,
+    ): CarbonImmutable {
+        return CarbonImmutable::parse($reservation->start_at, $company->timezone)
+            ->subHours($config->cancellationHours($company));
+    }
+
+    private function canCancel(
+        Company $company,
+        Reservation $reservation,
+        BookingConfig $config,
+    ): bool {
+        return in_array($reservation->status, ['pending', 'confirmed'], true)
+            && ! $reservation->rental()->exists()
+            && CarbonImmutable::now($company->timezone)->lt(
+                $this->cancellationDeadline($company, $reservation, $config),
+            );
+    }
+
+    private function cancellationUrl(
+        Company $company,
+        Reservation $reservation,
+        BookingConfig $config,
+    ): ?string {
+        if (! $this->canCancel($company, $reservation, $config)) {
+            return null;
+        }
+
+        $deadline = $this->cancellationDeadline($company, $reservation, $config);
+
+        return URL::temporarySignedRoute(
+            'public.booking.cancel.show',
+            $deadline,
+            ['company' => $company->slug, 'code' => $reservation->code],
+        );
     }
 
     private function activeBranches(Company $company): Collection
