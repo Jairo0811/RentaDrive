@@ -24,11 +24,17 @@ class Reservation extends Model
         'pickup_location',
         'return_location',
         'daily_rate',
+        'base_total',
+        'extras_total',
+        'discount_total',
+        'promo_code',
+        'pricing_breakdown',
         'estimated_total',
         'status',
         'notes',
         'created_by',
         'cancelled_at',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
@@ -38,7 +44,11 @@ class Reservation extends Model
             'end_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'daily_rate' => 'decimal:2',
+            'base_total' => 'decimal:2',
+            'extras_total' => 'decimal:2',
+            'discount_total' => 'decimal:2',
             'estimated_total' => 'decimal:2',
+            'pricing_breakdown' => 'array',
         ];
     }
 
