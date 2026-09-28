@@ -41,7 +41,7 @@ final class InvoiceController extends Controller
 
     public function show(Invoice $invoice): View
     {
-        $invoice->load(['customer', 'rental.vehicle.model.brand', 'payments.receiver', 'payments.refunds']);
+        $invoice->load(['company', 'customer', 'rental.vehicle.model.brand', 'payments.receiver', 'payments.refunds']);
 
         return view('invoices.show', compact('invoice'));
     }
@@ -103,7 +103,7 @@ final class InvoiceController extends Controller
 
     public function download(Invoice $invoice): Response
     {
-        $invoice->load(['customer', 'rental.vehicle.model.brand', 'payments']);
+        $invoice->load(['company', 'customer', 'rental.vehicle.model.brand', 'payments']);
 
         return Pdf::loadView('documents.invoice', compact('invoice'))
             ->setPaper('letter')
