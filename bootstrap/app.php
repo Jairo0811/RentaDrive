@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\ResolveTenant;
+use App\Jobs\ScanOperationalAlertsJob;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->job(new ScanOperationalAlertsJob)
+            ->everyFifteenMinutes()
+            ->withoutOverlapping(10)
+            ->onOneServer();
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'permission' => PermissionMiddleware::class,
