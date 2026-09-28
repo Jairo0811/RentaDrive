@@ -27,7 +27,7 @@ final class PaymentController extends Controller
 
         return view('payments.index', [
             'payments' => $payments,
-            'openInvoices' => Invoice::query()->with('customer')->where('balance', '>', 0)->orderBy('due_at')->get(),
+            'openInvoices' => Invoice::query()->with(['customer', 'company'])->where('balance', '>', 0)->orderBy('due_at')->get(),
         ]);
     }
 
