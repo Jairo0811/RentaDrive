@@ -18,6 +18,7 @@ use App\Rules\DominicanCedula;
 use App\Support\Commercial\BookingConfig;
 use App\Support\Commercial\BookingPricingService;
 use App\Support\Notifications\WhatsAppBookingNotifier;
+use App\Support\Payments\PaymentConfig;
 use App\Support\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
@@ -125,6 +126,7 @@ final class PublicBookingController extends Controller
         ReferenceNumberService $references,
         BookingPricingService $pricingService,
         BookingConfig $config,
+        PaymentConfig $paymentConfig,
         WhatsAppBookingNotifier $whatsApp,
     ): RedirectResponse {
         $this->activateTenant($company, $tenant);
@@ -179,6 +181,7 @@ final class PublicBookingController extends Controller
             $references,
             $availability,
             $pricingService,
+            $paymentConfig,
         ): Reservation {
             /** @var Vehicle $lockedVehicle */
             $lockedVehicle = Vehicle::query()
@@ -243,6 +246,8 @@ final class PublicBookingController extends Controller
                 'promo_code' => $pricing['promo_code'],
                 'pricing_breakdown' => $pricing,
                 'estimated_total' => $pricing['estimated_total'],
+                'deposit_required' => $paymentConfig->depositRequired($company, (float) $pricing['estimated_total']),
+                'deposit_paid' => 0,
                 'status' => 'pending',
                 'notes' => 'Reserva creada desde el portal público.',
                 'created_by' => null,
@@ -290,6 +295,7 @@ final class PublicBookingController extends Controller
             'company' => $company,
             'reservation' => $reservation,
             'cancellationUrl' => $this->cancellationUrl($company, $reservation, $config),
+            'depositPaymentUrl' => $this->depositPaymentUrl($company, $reservation),
         ]);
     }
 
@@ -514,6 +520,29 @@ final class PublicBookingController extends Controller
         return URL::temporarySignedRoute(
             'public.booking.cancel.show',
             $deadline,
+            ['company' => $company->slug, 'code' => $reservation->code],
+        );
+    }
+
+
+    private function depositPaymentUrl(Company $company, Reservation $reservation): ?string
+    {
+        if (
+            ! in_array($reservation->status, ['pending', 'confirmed'], true)
+            || (float) $reservation->deposit_required <= (float) $reservation->deposit_paid
+        ) {
+            return null;
+        }
+
+        $expiresAt = CarbonImmutable::parse($reservation->start_at, $company->timezone)->subHour();
+
+        if ($expiresAt->isPast()) {
+            return null;
+        }
+
+        return URL::temporarySignedRoute(
+            'public.booking.deposit.show',
+            $expiresAt,
             ['company' => $company->slug, 'code' => $reservation->code],
         );
     }
