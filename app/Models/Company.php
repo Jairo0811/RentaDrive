@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
@@ -26,6 +27,7 @@ final class Company extends Model
         'status',
         'plan_code',
         'trial_ends_at',
+        'onboarding_completed_at',
         'public_domain',
         'settings',
     ];
@@ -34,6 +36,7 @@ final class Company extends Model
     {
         return [
             'trial_ends_at' => 'datetime',
+            'onboarding_completed_at' => 'datetime',
             'settings' => 'array',
         ];
     }
@@ -48,6 +51,19 @@ final class Company extends Model
         return $this->hasMany(User::class);
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function currentSubscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class)->ofMany([
+            'started_at' => 'max',
+            'id' => 'max',
+        ]);
+    }
+
     public function setting(string $key, mixed $default = null): mixed
     {
         return Arr::get($this->settings ?? [], $key, $default);
@@ -58,7 +74,7 @@ final class Company extends Model
         $path = $this->setting('branding.logo_path');
 
         return is_string($path) && $path !== ''
-            ? Storage::disk('public')->url($path)
+            ? Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->url($path)
             : null;
     }
 }
