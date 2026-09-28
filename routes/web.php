@@ -9,10 +9,12 @@ use App\Http\Controllers\FleetScheduleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Platform\PlatformBranchController;
 use App\Http\Controllers\Platform\PlatformCompanyController;
 use App\Http\Controllers\Platform\PlatformDashboardController;
+use App\Http\Controllers\Platform\PlatformSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\PublicBookingController;
 use App\Http\Controllers\Public\PublicPaymentController;
@@ -73,6 +75,10 @@ Route::middleware(['auth', 'verified', 'platform_admin'])
         Route::patch('/companies/{company}/suspend', [PlatformCompanyController::class, 'suspend'])->name('companies.suspend');
         Route::patch('/companies/{company}/activate', [PlatformCompanyController::class, 'activate'])->name('companies.activate');
 
+        Route::post('/companies/{company}/subscription/activate', [PlatformSubscriptionController::class, 'activate'])->name('companies.subscription.activate');
+        Route::post('/companies/{company}/subscription/past-due', [PlatformSubscriptionController::class, 'pastDue'])->name('companies.subscription.past-due');
+        Route::delete('/companies/{company}/subscription', [PlatformSubscriptionController::class, 'cancel'])->name('companies.subscription.cancel');
+
         Route::get('/companies/{company}/branches', [PlatformBranchController::class, 'index'])->name('companies.branches.index');
         Route::get('/companies/{company}/branches/create', [PlatformBranchController::class, 'create'])->name('companies.branches.create');
         Route::post('/companies/{company}/branches', [PlatformBranchController::class, 'store'])->name('companies.branches.store');
@@ -92,6 +98,9 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth', 'tenant'])->group(function (): void {
+    Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
+
     Route::resource('customers', CustomerController::class)
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_CUSTOMERS->value)
         ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:'.PermissionName::MANAGE_CUSTOMERS->value);
