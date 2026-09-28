@@ -119,19 +119,31 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 
 ## Fase 5 — Digital Rental
 
-- Firma de contratos.
-- Check-in y check-out móvil.
-- Fotografías por inspección.
-- Registro de daños.
-- Combustible, kilometraje y accesorios.
-- Evidencia auditable del proceso de entrega/devolución.
+- [x] Firma digital de contratos con evidencia en storage privado.
+- [x] Check-in y check-out móvil optimizados para teléfono/tablet.
+- [x] Fotografías obligatorias en el flujo móvil de inspección.
+- [x] Registro estructurado de daños y observaciones.
+- [x] Combustible, kilometraje y checklist de accesorios.
+- [x] Evidencia sellada con SHA-256 y protección contra eliminación.
+- [x] Cierre del alquiler condicionado a contrato firmado, entrega sellada y devolución sellada.
+- [x] Kilometraje, combustible y hora real de retorno derivados del check-out sellado.
+
+**Criterio de cierre de Fase 5:** el expediente digital debe conservar contrato firmado, check-in y check-out inmutables; el cierre no puede sustituir manualmente los datos sellados de devolución y la suite CI debe pasar sobre SQL Server 2022.
 
 ## Fase 6 — Automation
 
-- Email y WhatsApp mediante proveedores desacoplados.
-- Recordatorios de reservas y devoluciones.
-- Alertas de mantenimiento y documentos.
-- Jobs y colas de producción.
+- [x] Email y WhatsApp mediante proveedores/canales desacoplados.
+- [x] Recordatorios de reservas próximas.
+- [x] Recordatorios de devoluciones y alquileres vencidos.
+- [x] Alertas de mantenimiento por fecha y kilometraje.
+- [x] Alertas de licencias, seguros y documentos de vehículos.
+- [x] Entregas idempotentes por tenant, evento y canal.
+- [x] Jobs con reintentos y backoff mediante la cola `notifications`.
+- [x] Scanner operativo programado cada 15 minutos.
+- [x] Configuración de ventanas de recordatorio por tenant.
+- [x] Comando manual de diagnóstico y operación documentada de worker/scheduler.
+
+**Criterio de cierre de Fase 6:** los eventos no pueden duplicar notificaciones, los envíos deben ejecutarse mediante colas desacopladas y el scheduler/worker de producción debe quedar documentado y cubierto por pruebas de integración.
 
 ## Fase 7 — SaaS Production
 
