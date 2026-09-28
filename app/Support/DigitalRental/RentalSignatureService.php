@@ -110,7 +110,7 @@ final class RentalSignatureService
 
         $binary = base64_decode($matches[1], true);
 
-        if ($binary === false || strlen($binary) < 100 || strlen($binary) > 2_000_000) {
+        if ($binary === false || strlen($binary) < 50 || strlen($binary) > 2_000_000) {
             throw ValidationException::withMessages([
                 'signature' => 'La firma digital está vacía o excede el tamaño permitido.',
             ]);
