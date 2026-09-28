@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php&logoColor=white" alt="PHP 8.4+">
   <img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13">
   <img src="https://img.shields.io/badge/SQL%20Server-2017+-CC2927?logo=microsoftsqlserver&logoColor=white" alt="SQL Server">
-  <img src="https://img.shields.io/badge/Tests-35%20passing-success" alt="35 tests passing">
+  <img src="https://img.shields.io/badge/Tests-81%20passing-success" alt="35 tests passing">
 </p>
 
 **RentaDrive** es una plataforma web profesional para la gestión integral de empresas de alquiler de vehículos. Centraliza clientes, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría dentro de un flujo operativo completo.
@@ -31,13 +31,13 @@ El proyecto nació como trabajo final de la asignatura **Análisis y Diseño de 
 
 ## ✅ Estado actual
 
-La versión **1.0.0** está finalizada y lista para uso académico, portafolio profesional y evolución comercial.
+La modernización comercial está completa hasta **SaaS Production (Fases 1–7)**. El proyecto conserva su origen académico y ahora incorpora una base técnica preparada para pilotos comerciales controlados.
 
-- 🧪 35 pruebas automatizadas aprobadas.
-- 🎯 103 assertions.
+- 🧪 81 pruebas automatizadas aprobadas.
+- 🎯 286 assertions.
 - 🎨 Laravel Pint validado.
 - ⚡ Build de Vite aprobado.
-- 🗄️ SQL Server como motor principal y SQLite en memoria para testing.
+- 🗄️ SQL Server como motor oficial; el CI valida la suite contra SQL Server 2022.
 - 📊 Dashboard con métricas, gráficos y calendario.
 - 📱 Aplicación instalable como PWA.
 - 📄 Facturas, contratos y reportes operativos en PDF.
@@ -141,7 +141,7 @@ Validaciones manuales recomendadas:
 </p>
 
 - 🐘 **PHP 8.4.1 o superior**.
-- 🔺 **Laravel 13.8**.
+- 🔺 **Laravel 13.x**.
 - 📦 **Composer** para gestión de dependencias.
 - 🗃️ **Eloquent ORM** para persistencia y relaciones.
 - 🧱 Migraciones, seeders, factories y servicios de dominio.
@@ -207,7 +207,33 @@ Validaciones manuales recomendadas:
 - 🎭 **Mockery**.
 - 🧬 **Faker**.
 - 🤖 **GitHub Actions** para integración continua.
-- 🟢 **Node.js 22+** y npm 10+.
+- 🟢 **Node.js 24** en CI y npm para build reproducible.
+
+## ☁️ SaaS comercial y producción
+
+La evolución comercial incorpora multiempresa/multisucursal, booking público white-label, pagos auditables, Dominican Edition fiscal, alquiler digital, automatizaciones y controles de producción.
+
+La capa SaaS incluye:
+
+- 🧾 Suscripciones por tenant con trial, vigencia, mora, gracia, suspensión y cancelación.
+- 🚀 Onboarding comercial guiado.
+- 🔐 Backups cifrados con verificación SHA-256 y restore probado.
+- ❤️ Endpoints de liveness/readiness para base de datos, cache, storage, colas y backups.
+- 🗂️ Storage público y privado configurable para almacenamiento persistente compartido.
+- 🛡️ Rate limiting por superficie, headers de seguridad, CSP/HSTS en producción y request IDs.
+- 🐳 Imagen Docker reproducible y procesos separados para web, workers y scheduler.
+- 📦 Pipeline de release para imágenes inmutables.
+- 🔎 Composer audit + npm audit como gates del CI.
+
+Documentación operativa:
+
+```text
+docs/commercial-roadmap.md
+docs/digital-rental-and-automation.md
+docs/production.md
+```
+
+> La puesta en producción real requiere infraestructura, secretos, DNS/TLS, almacenamiento persistente y credenciales de los proveedores externos correspondientes.
 
 ## 📥 Instalación
 
@@ -344,13 +370,12 @@ GitHub: [@Jairo0811](https://github.com/Jairo0811)
 
 ## 🗺️ Evolución futura
 
-- Completar auditoría de accesibilidad por módulo y proceso.
+- Completar la auditoría formal de accesibilidad por módulo y proceso.
 - Incorporar pruebas automatizadas de accesibilidad al flujo CI.
-- Multiempresa y multisucursal.
-- Firma digital de contratos.
-- Integración con correo y WhatsApp.
-- API REST con OpenAPI/Swagger.
-- Integración oficial con servicios de identidad, cuando exista acceso autorizado.
+- Conectar proveedores comerciales reales de suscripción/cobro según el mercado de despliegue.
+- Completar certificación e-CF con credenciales y autorización reales cuando corresponda.
+- Ampliar observabilidad con una plataforma externa de métricas/tracing si la operación lo requiere.
+- Publicar una API REST documentada con OpenAPI/Swagger cuando exista una necesidad de integración externa.
 
 ## 📄 Licencia
 
