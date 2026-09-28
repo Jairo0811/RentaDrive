@@ -34,6 +34,44 @@
         </div>
 
         <aside class="space-y-6">
+            <section class="panel p-5 sm:p-6">
+                <h2 class="font-black text-slate-950 dark:text-white">Comprobante fiscal</h2>
+                <dl class="mt-4 space-y-2 text-sm">
+                    <div class="flex justify-between gap-4"><dt class="text-slate-500">Estado</dt><dd class="font-bold">{{ strtoupper($invoice->fiscal_status) }}</dd></div>
+                    @if ($invoice->fiscal_document_type)
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500">Tipo</dt><dd class="font-bold">{{ $invoice->fiscal_document_type }}</dd></div>
+                    @endif
+                    @if ($invoice->ncf)
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500">NCF / e-NCF</dt><dd class="font-mono font-bold">{{ $invoice->ncf }}</dd></div>
+                    @endif
+                    <div class="flex justify-between gap-4"><dt class="text-slate-500">ITBIS</dt><dd class="font-bold">{{ number_format((float) $invoice->tax_rate, 2) }}%</dd></div>
+                    @if ($invoice->fiscal_reference)
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500">Referencia proveedor</dt><dd class="break-all text-right font-bold">{{ $invoice->fiscal_reference }}</dd></div>
+                    @endif
+                </dl>
+
+                @can('manage invoices')
+                    @if ($invoice->rental->status === 'closed' && ! in_array($invoice->fiscal_status, ['issued', 'pending', 'accepted'], true))
+                        <form method="POST" action="{{ route('invoices.fiscal.issue', $invoice) }}" class="mt-5 space-y-3">
+                            @csrf
+                            <div>
+                                <label class="form-label" for="fiscal_document_type">Tipo</label>
+                                <select id="fiscal_document_type" name="fiscal_document_type" class="form-input">
+                                    <option value="">Automático según cliente/configuración</option>
+                                    <option value="B01">B01 · Crédito fiscal</option>
+                                    <option value="B02">B02 · Consumo</option>
+                                    <option value="E31">E31 · Crédito fiscal electrónico</option>
+                                    <option value="E32">E32 · Consumo electrónico</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary w-full">Emitir comprobante fiscal</button>
+                        </form>
+                    @elseif ($invoice->rental->status !== 'closed')
+                        <p class="mt-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">Cierra el alquiler antes de emitir el comprobante fiscal definitivo.</p>
+                    @endif
+                @endcan
+            </section>
+
             @can('manage payments')
                 @if ((float) $invoice->balance > 0)
                     <section class="panel p-5 sm:p-6">
