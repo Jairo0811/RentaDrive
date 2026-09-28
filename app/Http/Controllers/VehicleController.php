@@ -49,6 +49,7 @@ final class VehicleController extends Controller
             'categories' => VehicleCategory::query()->orderBy('name')->get(),
             'branches' => $company->branches()->where('is_active', true)->orderByDesc('is_primary')->orderBy('name')->get(),
             'currency' => $company->currency,
+            'currency' => $company->currency,
         ]);
     }
 
@@ -85,7 +86,10 @@ final class VehicleController extends Controller
             'rentals' => fn ($query) => $query->with('customer')->latest()->limit(10),
         ]);
 
-        return view('vehicles.show', compact('vehicle'));
+        return view('vehicles.show', [
+            'vehicle' => $vehicle,
+            'currency' => auth()->user()?->company?->currency ?? 'DOP',
+        ]);
     }
 
     public function edit(Vehicle $vehicle): View
