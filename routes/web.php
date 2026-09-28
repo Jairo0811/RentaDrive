@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FleetCatalogController;
+use App\Http\Controllers\FleetScheduleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\InvoiceController;
@@ -84,6 +85,10 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::get('/fleet/catalogs', [FleetCatalogController::class, 'index'])
         ->middleware('permission:'.PermissionName::VIEW_VEHICLES->value)
         ->name('fleet.catalogs');
+
+    Route::get('/fleet/schedule', FleetScheduleController::class)
+        ->middleware('permission:'.PermissionName::VIEW_VEHICLES->value)
+        ->name('fleet.schedule');
 
     Route::middleware('permission:'.PermissionName::MANAGE_VEHICLES->value)->group(function (): void {
         Route::post('/fleet/brands', [FleetCatalogController::class, 'storeBrand'])->name('fleet.brands.store');
