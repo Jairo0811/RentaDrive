@@ -1,47 +1,109 @@
 <x-app-layout>
     <x-slot name="header">
-        <div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $vehicle->display_name }}</p><p class="text-xs text-slate-500">Ficha de flota</p></div>
+        <div>
+            <p class="text-lg font-black text-slate-950 dark:text-white">{{ $vehicle->display_name }}</p>
+            <p class="text-xs text-slate-500">Ficha de flota</p>
+        </div>
     </x-slot>
 
     <x-page-header :title="$vehicle->model->display_name" :subtitle="$vehicle->code.' · '.$vehicle->plate">
         <x-slot name="actions">
-            @can('manage vehicles')<a href="{{ route('vehicles.edit', $vehicle) }}" class="btn-secondary">Editar vehículo</a>@endcan
+            <a href="{{ route('fleet.schedule', ['branch' => $vehicle->branch_id]) }}" class="btn-secondary">
+                <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+                Calendario
+            </a>
+            @can('manage vehicles')
+                <a href="{{ route('vehicles.edit', $vehicle) }}" class="btn-secondary">Editar vehículo</a>
+            @endcan
         </x-slot>
     </x-page-header>
 
-    <div class="grid gap-6 xl:grid-cols-[.75fr_1.25fr]">
-        <section class="panel p-5 sm:p-6">
-            <div class="flex items-center justify-between"><h2 class="font-black text-slate-950 dark:text-white">Resumen</h2><x-status-badge :status="$vehicle->status" /></div>
-            <dl class="mt-6 space-y-4 text-sm">
-                @foreach ([
-                    'Categoría' => $vehicle->category->name,
-                    'Color' => $vehicle->color,
-                    'Transmisión' => $vehicle->transmission === 'automatic' ? 'Automática' : 'Manual',
-                    'Combustible' => ucfirst($vehicle->fuel_type),
-                    'Asientos' => $vehicle->seats,
-                    'Kilometraje' => number_format($vehicle->mileage).' km',
-                    'Tarifa diaria' => 'RD$ '.number_format($vehicle->effective_daily_rate, 2),
-                    'VIN' => $vehicle->vin ?: 'No indicado',
-                    'Próximo mantenimiento' => $vehicle->next_maintenance_at ? number_format($vehicle->next_maintenance_at).' km' : 'No programado',
-                ] as $label => $value)
-                    <div class="flex justify-between gap-5 border-b border-slate-100 pb-3 last:border-0 dark:border-slate-800"><dt class="font-semibold text-slate-500">{{ $label }}</dt><dd class="text-right text-slate-800 dark:text-slate-200">{{ $value }}</dd></div>
-                @endforeach
-            </dl>
-        </section>
+    <div class="grid gap-6 xl:grid-cols-[.8fr_1.2fr]">
+        <div class="space-y-6">
+            <section class="panel overflow-hidden">
+                <div class="relative h-64 bg-gradient-to-br from-slate-950 via-[#071a38] to-blue-950 sm:h-72">
+                    @if ($vehicle->photo_url)
+                        <img src="{{ $vehicle->photo_url }}" alt="{{ $vehicle->model->display_name }}" class="h-full w-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" aria-hidden="true"></div>
+                    @else
+                        <div class="grid h-full place-items-center">
+                            <i class="fa-solid fa-car-side text-8xl text-blue-200/80" aria-hidden="true"></i>
+                        </div>
+                    @endif
+                    <div class="absolute bottom-4 left-4">
+                        <x-status-badge :status="$vehicle->status" />
+                    </div>
+                </div>
+
+                <div class="p-5 sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-[.16em] text-blue-600 dark:text-blue-400">{{ $vehicle->category->name }}</p>
+                            <h2 class="mt-1 text-2xl font-black text-slate-950 dark:text-white">{{ $vehicle->model->display_name }}</h2>
+                            <p class="mt-1 text-sm text-slate-500">{{ $vehicle->branch?->name ?? 'Sin sucursal asignada' }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-black text-slate-950 dark:text-white">RD$ {{ number_format($vehicle->effective_daily_rate, 2) }}</p>
+                            <p class="text-xs text-slate-500">tarifa diaria</p>
+                        </div>
+                    </div>
+
+                    <dl class="mt-6 space-y-4 text-sm">
+                        @foreach ([
+                            'Código' => $vehicle->code,
+                            'Placa' => $vehicle->plate,
+                            'Color' => $vehicle->color,
+                            'Transmisión' => $vehicle->transmission === 'automatic' ? 'Automática' : 'Manual',
+                            'Combustible' => ucfirst($vehicle->fuel_type),
+                            'Asientos' => $vehicle->seats,
+                            'Kilometraje' => number_format($vehicle->mileage).' km',
+                            'VIN' => $vehicle->vin ?: 'No indicado',
+                            'Próximo mantenimiento' => $vehicle->next_maintenance_at ? number_format($vehicle->next_maintenance_at).' km' : 'No programado',
+                        ] as $label => $value)
+                            <div class="flex justify-between gap-5 border-b border-slate-100 pb-3 last:border-0 dark:border-slate-800">
+                                <dt class="font-semibold text-slate-500">{{ $label }}</dt>
+                                <dd class="text-right text-slate-800 dark:text-slate-200">{{ $value }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
+
+                    @if ($vehicle->next_maintenance_at)
+                        @php($remaining = $vehicle->next_maintenance_at - $vehicle->mileage)
+                        <div class="mt-5 rounded-xl {{ $remaining <= 1000 ? 'border border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300' : 'bg-slate-50 text-slate-600 dark:bg-slate-800/60 dark:text-slate-300' }} px-4 py-3 text-sm">
+                            <i class="fa-solid fa-screwdriver-wrench mr-2" aria-hidden="true"></i>
+                            @if ($remaining <= 0)
+                                El mantenimiento está vencido por {{ number_format(abs($remaining)) }} km.
+                            @else
+                                Faltan {{ number_format($remaining) }} km para el próximo mantenimiento.
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </section>
+        </div>
 
         <div class="space-y-6">
             <section class="panel overflow-hidden">
-                <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Historial de alquileres</h2></div>
+                <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+                    <h2 class="font-black text-slate-950 dark:text-white">Historial de alquileres</h2>
+                </div>
                 @if ($vehicle->rentals->isEmpty())
                     <x-empty-state title="Sin alquileres" message="La actividad de esta unidad aparecerá aquí." />
                 @else
                     <div class="overflow-x-auto">
                         <table class="data-table">
-                            <thead><tr><th>Código</th><th>Cliente</th><th>Inicio</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+                            <thead>
+                                <tr><th>Código</th><th>Cliente</th><th>Inicio</th><th>Total</th><th>Estado</th><th></th></tr>
+                            </thead>
                             <tbody>
                                 @foreach ($vehicle->rentals as $rental)
                                     <tr>
-                                        <td class="font-bold">{{ $rental->code }}</td><td>{{ $rental->customer->full_name }}</td><td>{{ $rental->start_at->format('d/m/Y') }}</td><td>RD$ {{ number_format((float) $rental->total, 2) }}</td><td><x-status-badge :status="$rental->status" /></td><td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-600">Ver</a></td>
+                                        <td class="font-bold">{{ $rental->code }}</td>
+                                        <td>{{ $rental->customer->full_name }}</td>
+                                        <td>{{ $rental->start_at->format('d/m/Y') }}</td>
+                                        <td>RD$ {{ number_format((float) $rental->total, 2) }}</td>
+                                        <td><x-status-badge :status="$rental->status" /></td>
+                                        <td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-600">Ver</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -69,7 +131,9 @@
             @endcan
 
             <section class="table-shell">
-                <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Mantenimientos</h2></div>
+                <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+                    <h2 class="font-black text-slate-950 dark:text-white">Mantenimientos</h2>
+                </div>
                 @if ($vehicle->maintenances->isEmpty())
                     <x-empty-state title="Sin mantenimientos" message="No hay intervenciones registradas." />
                 @else
@@ -78,7 +142,13 @@
                             <thead><tr><th>Tipo</th><th>Programado</th><th>Proveedor</th><th>Costo</th><th>Estado</th></tr></thead>
                             <tbody>
                                 @foreach ($vehicle->maintenances as $maintenance)
-                                    <tr><td class="font-bold">{{ $maintenance->maintenance_type }}</td><td>{{ $maintenance->scheduled_at->format('d/m/Y h:i A') }}</td><td>{{ $maintenance->provider ?: '—' }}</td><td>RD$ {{ number_format((float) $maintenance->cost, 2) }}</td><td><x-status-badge :status="$maintenance->status" /></td></tr>
+                                    <tr>
+                                        <td class="font-bold">{{ $maintenance->maintenance_type }}</td>
+                                        <td>{{ $maintenance->scheduled_at->format('d/m/Y h:i A') }}</td>
+                                        <td>{{ $maintenance->provider ?: '—' }}</td>
+                                        <td>RD$ {{ number_format((float) $maintenance->cost, 2) }}</td>
+                                        <td><x-status-badge :status="$maintenance->status" /></td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
