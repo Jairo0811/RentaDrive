@@ -26,7 +26,7 @@ final class SettingController extends Controller
         return view('settings.edit', [
             'settings' => Setting::query()->pluck('value', 'key'),
             'company' => $company,
-            'fiscalSequences' => $fiscalSequences->serialize($company),
+            'fiscalSequences' => $fiscalSequences->serialize(),
         ]);
     }
 
