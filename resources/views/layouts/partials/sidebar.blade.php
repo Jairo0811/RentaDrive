@@ -36,6 +36,12 @@
                     <span class="nav-icon"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
                     Dashboard
                 </a>
+                @if (Auth::user()->company?->onboarding_completed_at === null)
+                    <a href="{{ route('onboarding.show') }}" class="nav-item {{ request()->routeIs('onboarding.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}">
+                        <span class="nav-icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></span>
+                        Onboarding
+                    </a>
+                @endif
             </div>
 
             <div>
