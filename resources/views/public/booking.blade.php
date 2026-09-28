@@ -1,5 +1,6 @@
 <x-public-layout
     :title="$company->name.' · Reservas'"
+    :company="$company"
     :home-url="route('public.booking.show', ['company' => $company->slug])"
     :badge="$company->name"
 >
@@ -110,7 +111,8 @@
             <div class="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
                 @forelse ($vehicles as $vehicle)
                     @php
-                        $estimated = round($vehicle->effective_daily_rate * $days, 2);
+                        $quote = $quotes->get($vehicle->getKey());
+                        $estimated = $quote['estimated_total'];
                     @endphp
                     <article class="panel overflow-hidden">
                         <div class="relative grid h-52 place-items-center overflow-hidden bg-gradient-to-br from-slate-950 via-[#071a38] to-blue-950 text-white">
@@ -145,9 +147,15 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Estimado</p>
-                                    <p class="mt-1 text-lg font-black text-blue-600 dark:text-blue-400">{{ $company->currency }} {{ number_format($estimated, 2) }}</p>
+                                    <p class="brand-text mt-1 text-lg font-black">{{ $company->currency }} {{ number_format($estimated, 2) }}</p>
+                                    @if ($quote['duration_discount'] > 0)
+                                        <p class="mt-1 text-xs font-bold text-emerald-600">Ahorra {{ number_format($quote['duration_discount_percent'], 0) }}% por duración</p>
+                                    @endif
                                 </div>
                             </div>
+                            @if (! empty($quote['season_names']))
+                                <p class="mt-3 text-xs text-slate-500">Tarifa de temporada aplicada: {{ implode(', ', $quote['season_names']) }}.</p>
+                            @endif
 
                             <a
                                 href="{{ route('public.booking.create', [
