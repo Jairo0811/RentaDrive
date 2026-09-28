@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">Configuración</p>
-            <p class="text-xs text-slate-500">Negocio, white-label y booking</p>
+            <p class="text-xs text-slate-500">Negocio, booking, pagos y fiscalidad</p>
         </div>
     </x-slot>
 
@@ -75,6 +75,75 @@
                     <label class="form-label" for="promo_codes">Promociones</label>
                     <textarea id="promo_codes" name="promo_codes" rows="6" class="form-input font-mono text-xs" placeholder="WELCOME10|percent|10|2026-01-01|2026-12-31">{{ old('promo_codes', $company->setting('booking.promo_codes', '')) }}</textarea>
                     <p class="mt-2 text-xs text-slate-500">Código|percent/fixed|valor|inicio|fin. Fechas opcionales.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel p-5 sm:p-6">
+            <h2 class="font-black text-slate-950 dark:text-white">Pagos y depósitos</h2>
+            <p class="mt-1 text-sm text-slate-500">Define cuánto se exige al reservar y cómo se procesa el checkout.</p>
+            <div class="mt-5 grid gap-5 md:grid-cols-3">
+                <div>
+                    <label class="form-label" for="payment_gateway">Pasarela</label>
+                    <select id="payment_gateway" name="payment_gateway" class="form-input">
+                        <option value="manual" @selected(old('payment_gateway', $company->setting('payments.gateway', 'manual')) === 'manual')>Manual</option>
+                        <option value="hosted" @selected(old('payment_gateway', $company->setting('payments.gateway', 'manual')) === 'hosted')>Hosted adapter</option>
+                    </select>
+                    <p class="mt-2 text-xs text-slate-500">Hosted usa credenciales del entorno; nunca se guardan secretos aquí.</p>
+                </div>
+                <div>
+                    <label class="form-label" for="deposit_type">Tipo de depósito</label>
+                    <select id="deposit_type" name="deposit_type" class="form-input">
+                        <option value="percent" @selected(old('deposit_type', $company->setting('payments.deposit_type', 'percent')) === 'percent')>Porcentaje</option>
+                        <option value="fixed" @selected(old('deposit_type', $company->setting('payments.deposit_type', 'percent')) === 'fixed')>Monto fijo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="deposit_value">Valor del depósito</label>
+                    <input id="deposit_value" name="deposit_value" type="number" min="0" step="0.01" class="form-input" value="{{ old('deposit_value', $company->setting('payments.deposit_value', 20)) }}" required>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel p-5 sm:p-6">
+            <h2 class="font-black text-slate-950 dark:text-white">Dominican Edition · Fiscal</h2>
+            <p class="mt-1 text-sm text-slate-500">NCF/e-CF por tenant. El ITBIS general permanece protegido en 18%.</p>
+
+            <div class="mt-5 flex flex-wrap gap-5">
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="fiscal_enabled" value="1" @checked(old('fiscal_enabled', $company->setting('fiscal.enabled', false)))>
+                    Habilitar facturación fiscal
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="fiscal_authorized_electronic_issuer" value="1" @checked(old('fiscal_authorized_electronic_issuer', $company->setting('fiscal.authorized_electronic_issuer', false)))>
+                    Emisor electrónico autorizado por DGII
+                </label>
+            </div>
+
+            <div class="mt-5 grid gap-5 md:grid-cols-2">
+                <div>
+                    <label class="form-label" for="fiscal_mode">Modalidad</label>
+                    <select id="fiscal_mode" name="fiscal_mode" class="form-input">
+                        <option value="electronic" @selected(old('fiscal_mode', $company->setting('fiscal.mode', 'electronic')) === 'electronic')>e-CF electrónico</option>
+                        <option value="paper" @selected(old('fiscal_mode', $company->setting('fiscal.mode', 'electronic')) === 'paper')>NCF no electrónico</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="fiscal_rnc">RNC emisor</label>
+                    <input id="fiscal_rnc" name="fiscal_rnc" inputmode="numeric" class="form-input" value="{{ old('fiscal_rnc', $company->setting('fiscal.rnc', $company->rnc)) }}" placeholder="9 dígitos">
+                </div>
+                <div>
+                    <label class="form-label" for="fiscal_legal_name">Razón social</label>
+                    <input id="fiscal_legal_name" name="fiscal_legal_name" class="form-input" value="{{ old('fiscal_legal_name', $company->setting('fiscal.legal_name', $company->legal_name ?: $company->name)) }}">
+                </div>
+                <div>
+                    <label class="form-label" for="fiscal_address">Domicilio fiscal</label>
+                    <input id="fiscal_address" name="fiscal_address" class="form-input" value="{{ old('fiscal_address', $company->setting('fiscal.address', '')) }}">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="form-label" for="fiscal_sequences">Secuencias autorizadas</label>
+                    <textarea id="fiscal_sequences" name="fiscal_sequences" rows="6" class="form-input font-mono text-xs" placeholder="E31|1|9999999999|2027-12-31&#10;E32|1|9999999999|2027-12-31">{{ old('fiscal_sequences', $fiscalSequences) }}</textarea>
+                    <p class="mt-2 text-xs text-slate-500">Formato: Tipo|próximo|final|vencimiento. Soporta B01, B02, E31 y E32. Solo carga secuencias realmente autorizadas.</p>
                 </div>
             </div>
         </section>
