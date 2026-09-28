@@ -69,6 +69,31 @@
 
         @if ($rental->notes)<p><strong>Notas:</strong> {{ $rental->notes }}</p>@endif
 
+        @if ($rental->renterSignature)
+            <h2>Firma digital</h2>
+            <div class="field">
+                <small>Firmado por</small>
+                <strong>{{ $rental->renterSignature->signer_name }}</strong><br>
+                {{ $rental->renterSignature->signer_document }} · {{ $rental->renterSignature->signed_at->format('d/m/Y h:i A') }}
+                @if ($signatureDataUri)
+                    <div style="margin-top:14px"><img src="{{ $signatureDataUri }}" alt="Firma digital del arrendatario" style="max-height:120px;max-width:360px"></div>
+                @endif
+                <p style="font-family:monospace;font-size:9px;word-break:break-all">Hash: {{ $rental->renterSignature->contract_hash }}</p>
+            </div>
+        @endif
+
+        @if ($rental->inspections->isNotEmpty())
+            <h2>Evidencia operacional</h2>
+            @foreach ($rental->inspections as $inspection)
+                <p><strong>{{ $inspection->type === 'delivery' ? 'Entrega' : 'Devolución' }}:</strong>
+                    {{ $inspection->inspected_at->format('d/m/Y h:i A') }} ·
+                    {{ number_format($inspection->mileage) }} km ·
+                    {{ $inspection->fuel_level }}%
+                    @if ($inspection->evidence_hash)<br><span style="font-family:monospace;font-size:9px">Sello: {{ $inspection->evidence_hash }}</span>@endif
+                </p>
+            @endforeach
+        @endif
+
         <div class="signatures">
             <div class="signature">Firma del arrendatario<br><strong>{{ $rental->customer->full_name }}</strong></div>
             <div class="signature">Representante de RentaDrive<br><strong>{{ $rental->opener?->name ?: '________________' }}</strong></div>
