@@ -115,12 +115,6 @@
                         <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                     </div>
 
-                    <div class="sm:col-span-2">
-                        <label for="license_number" class="form-label">Licencia de conducir <span class="font-normal text-slate-400">(opcional por ahora)</span></label>
-                        <input id="license_number" name="license_number" class="form-input" value="{{ old('license_number') }}">
-                        <x-input-error :messages="$errors->get('license_number')" class="mt-2" />
-                    </div>
-
                     <label class="sm:col-span-2 flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm dark:border-slate-800">
                         <input type="checkbox" name="terms" value="1" class="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" required>
                         <span>
