@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Mail\PublicReservationCreated;
 use App\Models\Branch;
 use App\Models\Company;
+use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Vehicle;
 use App\Models\VehicleBrand;
@@ -229,9 +230,9 @@ final class PublicBookingTest extends TestCase
         ]);
     }
 
-    private function createCustomerForTenant(): \App\Models\Customer
+    private function createCustomerForTenant(): Customer
     {
-        return \App\Models\Customer::query()->create([
+        return Customer::query()->create([
             'document_type' => 'passport',
             'document_number' => 'PASS-CANCEL',
             'first_name' => 'Cliente',
