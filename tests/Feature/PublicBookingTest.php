@@ -13,8 +13,12 @@ use App\Models\Vehicle;
 use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
+use App\Support\Commercial\BookingPricingService;
+use App\Support\Notifications\WhatsAppBookingNotifier;
 use App\Support\Tenancy\TenantContext;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
@@ -191,6 +195,96 @@ final class PublicBookingTest extends TestCase
             'vehicle_id' => $vehicle->id,
             'status' => 'pending',
         ]);
+    }
+
+    public function test_monthly_and_seasonal_pricing_are_calculated_in_backend(): void
+    {
+        [$company, $branch, $vehicle] = $this->companyWithFleet('seasonal', 'Toyota', 'RAV4', 'SE');
+        $startAt = CarbonImmutable::instance(now()->addDays(2)->startOfHour());
+        $endAt = $startAt->addDays(30);
+
+        $company->update([
+            'settings' => [
+                'booking' => [
+                    'weekly_discount_percent' => 10,
+                    'monthly_discount_percent' => 20,
+                    'seasonal_rules' => 'Temporada Alta|'.$startAt->format('Y-m-d').'|'.$endAt->format('Y-m-d').'|1.10',
+                ],
+            ],
+        ]);
+
+        app(TenantContext::class)->set($company, $branch);
+
+        $pricing = app(BookingPricingService::class)->quote(
+            $company,
+            $vehicle->load('category'),
+            $startAt,
+            $endAt,
+        );
+
+        $this->assertSame(30, $pricing['days']);
+        $this->assertSame(82500.0, $pricing['seasonal_total']);
+        $this->assertSame(20.0, $pricing['duration_discount_percent']);
+        $this->assertSame(66000.0, $pricing['estimated_total']);
+        $this->assertSame(['Temporada Alta'], $pricing['season_names']);
+    }
+
+    public function test_whatsapp_booking_adapter_uses_configured_template(): void
+    {
+        Http::fake();
+
+        [$company, $branch, $vehicle] = $this->companyWithFleet('whatsapp', 'Nissan', 'Kicks', 'WA');
+        $company->update([
+            'settings' => [
+                'booking' => [
+                    'whatsapp_confirmation_enabled' => true,
+                ],
+            ],
+        ]);
+
+        app(TenantContext::class)->set($company, $branch);
+
+        $customer = Customer::query()->create([
+            'document_type' => 'passport',
+            'document_number' => 'PASS-WA',
+            'first_name' => 'Cliente',
+            'last_name' => 'WhatsApp',
+            'email' => 'wa@example.com',
+            'phone' => '8095550199',
+            'status' => 'active',
+        ]);
+
+        $reservation = Reservation::query()->create([
+            'code' => 'RES-WA-001',
+            'customer_id' => $customer->id,
+            'vehicle_category_id' => $vehicle->vehicle_category_id,
+            'vehicle_id' => $vehicle->id,
+            'start_at' => now()->addDays(3),
+            'end_at' => now()->addDays(5),
+            'pickup_location' => $branch->name,
+            'return_location' => $branch->name,
+            'daily_rate' => 2500,
+            'estimated_total' => 5000,
+            'status' => 'pending',
+        ])->load('customer');
+
+        config([
+            'services.whatsapp.token' => 'test-token',
+            'services.whatsapp.phone_number_id' => '123456',
+            'services.whatsapp.graph_version' => 'v-test',
+            'services.whatsapp.booking_template' => 'booking_confirmation',
+            'services.whatsapp.booking_template_language' => 'es',
+        ]);
+
+        app(WhatsAppBookingNotifier::class)->sendCreated($company, $reservation);
+
+        Http::assertSent(function ($request): bool {
+            $data = $request->data();
+
+            return str_contains($request->url(), '/v-test/123456/messages')
+                && $data['to'] === '18095550199'
+                && $data['template']['name'] === 'booking_confirmation';
+        });
     }
 
     public function test_customer_can_cancel_with_a_valid_signed_link_before_deadline(): void
