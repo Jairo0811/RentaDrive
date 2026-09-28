@@ -49,6 +49,10 @@
                     @endif
 
                     <div class="flex justify-between gap-4 p-4"><dt class="font-black">Total estimado</dt><dd class="brand-text text-right font-black">{{ $company->currency }} {{ number_format((float) $reservation->estimated_total, 2) }}</dd></div>
+                    @if ((float) $reservation->deposit_required > 0)
+                        <div class="flex justify-between gap-4 p-4"><dt class="text-slate-500">Depósito requerido</dt><dd class="text-right font-bold">{{ $company->currency }} {{ number_format((float) $reservation->deposit_required, 2) }}</dd></div>
+                        <div class="flex justify-between gap-4 p-4"><dt class="text-slate-500">Depósito pagado</dt><dd class="text-right font-bold text-emerald-600">{{ $company->currency }} {{ number_format((float) $reservation->deposit_paid, 2) }}</dd></div>
+                    @endif
                 </dl>
 
                 @if (is_array($reservation->pricing_breakdown) && ! empty($reservation->pricing_breakdown['selected_extras']))
@@ -64,6 +68,12 @@
 
                 <div class="mt-8 flex flex-wrap justify-center gap-3">
                     <a href="{{ route('public.booking.show', ['company' => $company->slug]) }}" class="btn-primary">Volver al portal</a>
+
+                    @if ($depositPaymentUrl)
+                        <a href="{{ $depositPaymentUrl }}" class="btn-primary">
+                            Pagar depósito
+                        </a>
+                    @endif
 
                     @if ($cancellationUrl)
                         <a href="{{ $cancellationUrl }}" class="btn-secondary">
