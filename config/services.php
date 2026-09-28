@@ -43,4 +43,17 @@ return [
         'booking_template_language' => env('WHATSAPP_BOOKING_TEMPLATE_LANGUAGE', 'es'),
     ],
 
+    'payment_gateway' => [
+        'base_url' => env('PAYMENT_GATEWAY_BASE_URL'),
+        'token' => env('PAYMENT_GATEWAY_TOKEN'),
+        'webhook_secret' => env('PAYMENT_GATEWAY_WEBHOOK_SECRET'),
+        'timeout' => env('PAYMENT_GATEWAY_TIMEOUT', 15),
+    ],
+
+    'fiscal_gateway' => [
+        'base_url' => env('FISCAL_GATEWAY_BASE_URL'),
+        'token' => env('FISCAL_GATEWAY_TOKEN'),
+        'timeout' => env('FISCAL_GATEWAY_TIMEOUT', 20),
+    ],
+
 ];
