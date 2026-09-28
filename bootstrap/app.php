@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Middleware\EnsurePlatformAdmin;
+use App\Http\Middleware\RequestId;
 use App\Http\Middleware\ResolveTenant;
+use App\Http\Middleware\SecurityHeaders;
 use App\Jobs\CreatePlatformBackupJob;
 use App\Jobs\EnforceSubscriptionLifecycleJob;
+use App\Jobs\MonitorPlatformHealthJob;
 use App\Jobs\ScanOperationalAlertsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -37,8 +40,17 @@ return Application::configure(basePath: dirname(__DIR__))
             ->onQueue('maintenance')
             ->withoutOverlapping(120)
             ->onOneServer();
+
+        $schedule->job(new MonitorPlatformHealthJob)
+            ->everyFiveMinutes()
+            ->onQueue('maintenance')
+            ->withoutOverlapping(5)
+            ->onOneServer();
     })
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(RequestId::class);
+        $middleware->append(SecurityHeaders::class);
+
         $middleware->alias([
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,
