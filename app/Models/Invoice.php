@@ -61,6 +61,11 @@ class Invoice extends Model
         ];
     }
 
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
     public function rental(): BelongsTo
     {
         return $this->belongsTo(Rental::class);
