@@ -45,6 +45,8 @@ class Rental extends Model
             'start_at' => 'datetime',
             'expected_return_at' => 'datetime',
             'returned_at' => 'datetime',
+            'opening_mileage' => 'integer',
+            'closing_mileage' => 'integer',
             'fuel_out' => 'decimal:2',
             'fuel_in' => 'decimal:2',
             'daily_rate' => 'decimal:2',
