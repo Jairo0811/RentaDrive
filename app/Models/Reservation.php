@@ -8,6 +8,7 @@ use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservation extends Model
@@ -30,6 +31,8 @@ class Reservation extends Model
         'promo_code',
         'pricing_breakdown',
         'estimated_total',
+        'deposit_required',
+        'deposit_paid',
         'status',
         'notes',
         'created_by',
@@ -48,6 +51,8 @@ class Reservation extends Model
             'extras_total' => 'decimal:2',
             'discount_total' => 'decimal:2',
             'estimated_total' => 'decimal:2',
+            'deposit_required' => 'decimal:2',
+            'deposit_paid' => 'decimal:2',
             'pricing_breakdown' => 'array',
         ];
     }
@@ -75,5 +80,15 @@ class Reservation extends Model
     public function rental(): HasOne
     {
         return $this->hasOne(Rental::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function paymentIntents(): HasMany
+    {
+        return $this->hasMany(PaymentIntent::class);
     }
 }
