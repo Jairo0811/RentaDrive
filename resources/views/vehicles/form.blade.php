@@ -86,7 +86,7 @@
                             <select id="vehicle_category_id" name="vehicle_category_id" class="form-input" required>
                                 <option value="">Selecciona</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" @selected((string) old('vehicle_category_id', $vehicle->vehicle_category_id) === (string) $category->id)>{{ $category->name }} — RD$ {{ number_format((float) $category->daily_rate, 2) }}</option>
+                                    <option value="{{ $category->id }}" @selected((string) old('vehicle_category_id', $vehicle->vehicle_category_id) === (string) $category->id)>{{ $category->name }} — {{ $currency }} {{ number_format((float) $category->daily_rate, 2) }}</option>
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('vehicle_category_id')" class="mt-2" />
