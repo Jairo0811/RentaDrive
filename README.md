@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/images/rentadrive-racing.png" alt="RentaDrive" width="460">
+  <img src="public/images/rentadrive-racing.png" alt="RentaDrive" width="720">
 </p>
 
 <p align="center">
