@@ -1,0 +1,42 @@
+services:
+  app:
+    image: ${RENTADRIVE_IMAGE:?Define RENTADRIVE_IMAGE}
+    env_file: .env.production
+    restart: unless-stopped
+    ports:
+      - "${RENTADRIVE_HTTP_PORT:-8080}:80"
+    volumes:
+      - rentadrive-external-public:/mnt/rentadrive/public
+      - rentadrive-external-private:/mnt/rentadrive/private
+
+  queue:
+    image: ${RENTADRIVE_IMAGE:?Define RENTADRIVE_IMAGE}
+    env_file: .env.production
+    restart: unless-stopped
+    command:
+      - php
+      - artisan
+      - queue:work
+      - --queue=notifications,maintenance,default
+      - --tries=3
+      - --backoff=60
+      - --timeout=120
+      - --sleep=3
+    volumes:
+      - rentadrive-external-public:/mnt/rentadrive/public
+      - rentadrive-external-private:/mnt/rentadrive/private
+
+  scheduler:
+    image: ${RENTADRIVE_IMAGE:?Define RENTADRIVE_IMAGE}
+    env_file: .env.production
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work"]
+    volumes:
+      - rentadrive-external-public:/mnt/rentadrive/public
+      - rentadrive-external-private:/mnt/rentadrive/private
+
+volumes:
+  rentadrive-external-public:
+    external: true
+  rentadrive-external-private:
+    external: true

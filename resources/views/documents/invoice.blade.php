@@ -31,9 +31,28 @@
                     <p class="title">FACTURA</p>
                     <p style="font-size:16px;font-weight:bold;margin:5px 0 0">{{ $invoice->number }}</p>
                     <p class="muted">Emitida: {{ $invoice->issued_at->format('d/m/Y') }}<br>Vence: {{ $invoice->due_at?->format('d/m/Y') ?: 'No definido' }}</p>
+                    @if ($invoice->ncf)
+                        <p style="font-size:12px;font-weight:bold;margin:8px 0 0">NCF / e-NCF: {{ $invoice->ncf }}</p>
+                        <p class="muted" style="margin:2px 0 0">Tipo {{ $invoice->fiscal_document_type }} · {{ strtoupper($invoice->fiscal_status) }}</p>
+                    @endif
                 </td>
             </tr>
         </table>
+    </div>
+
+    <div class="grid">
+        <div class="cell">
+            @if ($invoice->company)
+                <p class="muted" style="font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase">Emisor</p>
+                <p style="font-size:14px;font-weight:bold;margin:5px 0">{{ $invoice->company->setting('fiscal.legal_name', $invoice->company->legal_name ?: $invoice->company->name) }}</p>
+                <p class="muted" style="margin:0">RNC {{ $invoice->company->setting('fiscal.rnc', $invoice->company->rnc ?: '—') }}</p>
+            @endif
+        </div>
+        <div class="cell right">
+            <p class="muted" style="font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase">Resumen fiscal</p>
+            <p style="font-size:14px;font-weight:bold;margin:5px 0">ITBIS {{ number_format((float) $invoice->tax_rate, 2) }}%</p>
+            <p class="muted" style="margin:0">Base gravada RD$ {{ number_format((float) $invoice->taxable_amount, 2) }}</p>
+        </div>
     </div>
 
     <div class="grid">
@@ -63,7 +82,7 @@
 
     <table class="totals">
         <tr><td class="muted">Subtotal</td><td class="right">RD$ {{ number_format((float) $invoice->subtotal, 2) }}</td></tr>
-        <tr><td class="muted">Impuesto</td><td class="right">RD$ {{ number_format((float) $invoice->tax, 2) }}</td></tr>
+        <tr><td class="muted">ITBIS ({{ number_format((float) $invoice->tax_rate, 2) }}%)</td><td class="right">RD$ {{ number_format((float) $invoice->tax, 2) }}</td></tr>
         <tr><td class="muted">Descuento</td><td class="right">- RD$ {{ number_format((float) $invoice->discount, 2) }}</td></tr>
         <tr><td class="total">TOTAL</td><td class="total right">RD$ {{ number_format((float) $invoice->total, 2) }}</td></tr>
         <tr><td class="muted">Pagado</td><td class="right">RD$ {{ number_format((float) $invoice->paid_amount, 2) }}</td></tr>

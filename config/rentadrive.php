@@ -4,6 +4,54 @@ declare(strict_types=1);
 
 return [
     'trial_days' => 14,
+    'subscription_grace_days' => 7,
+
+    'storage' => [
+        'public_disk' => env('RENTADRIVE_PUBLIC_DISK', 'public'),
+        'private_disk' => env('RENTADRIVE_PRIVATE_DISK', 'local'),
+        'backup_disk' => env('RENTADRIVE_BACKUP_DISK', env('RENTADRIVE_PRIVATE_DISK', 'local')),
+    ],
+
+    'health' => [
+        'ops_email' => env('RENTADRIVE_OPS_EMAIL'),
+        'max_failed_jobs' => (int) env('RENTADRIVE_MAX_FAILED_JOBS', 25),
+        'max_backup_age_hours' => (int) env('RENTADRIVE_MAX_BACKUP_AGE_HOURS', 30),
+    ],
+
+    'backup' => [
+        'retention_days' => (int) env('RENTADRIVE_BACKUP_RETENTION_DAYS', 14),
+        'require_external_in_production' => (bool) env('RENTADRIVE_BACKUP_REQUIRE_EXTERNAL', true),
+        'tables' => [
+            'companies',
+            'branches',
+            'users',
+            'permissions',
+            'roles',
+            'role_has_permissions',
+            'model_has_permissions',
+            'model_has_roles',
+            'vehicle_brands',
+            'vehicle_categories',
+            'vehicle_models',
+            'customers',
+            'vehicles',
+            'vehicle_maintenances',
+            'reservations',
+            'rentals',
+            'inspections',
+            'rental_signatures',
+            'invoices',
+            'payments',
+            'payment_intents',
+            'payment_refunds',
+            'payment_webhook_events',
+            'fiscal_sequences',
+            'automation_deliveries',
+            'settings',
+            'audit_logs',
+            'subscriptions',
+        ],
+    ],
 
     'plans' => [
         'starter' => [

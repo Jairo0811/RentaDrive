@@ -2,13 +2,17 @@
 
 namespace App\Providers;
 
+use App\Models\Company;
 use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantModelRegistry;
 use App\Support\Tenancy\TenantResolver;
 use App\Support\Tenancy\TenantScope;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\ConnectionEstablished;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +31,38 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('public-read', function (Request $request): Limit {
+            $company = $request->route('company');
+            $companyKey = $company instanceof Company
+                ? (string) $company->getKey()
+                : (string) $company;
+
+            return Limit::perMinute(120)
+                ->by('public-read:'.$request->ip().':'.$companyKey);
+        });
+
+        RateLimiter::for('public-write', function (Request $request): Limit {
+            $company = $request->route('company');
+            $companyKey = $company instanceof Company
+                ? (string) $company->getKey()
+                : (string) $company;
+
+            return Limit::perMinute(10)
+                ->by('public-write:'.$request->ip().':'.$companyKey);
+        });
+
+        RateLimiter::for('tenant', fn (Request $request): Limit => Limit::perMinute(300)
+            ->by('tenant:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
+        RateLimiter::for('platform', fn (Request $request): Limit => Limit::perMinute(180)
+            ->by('platform:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
+        RateLimiter::for('webhook', fn (Request $request): Limit => Limit::perMinute(240)
+            ->by('webhook:'.$request->ip()));
+
+        RateLimiter::for('health', fn (Request $request): Limit => Limit::perMinute(60)
+            ->by('health:'.$request->ip()));
+
         Event::listen(
             ConnectionEstablished::class,
             static function (ConnectionEstablished $event): void {

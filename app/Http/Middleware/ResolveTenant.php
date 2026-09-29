@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Commercial\SubscriptionService;
 use App\Support\Tenancy\TenantContext;
 use Closure;
 use Illuminate\Http\Request;
@@ -11,7 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResolveTenant
 {
-    public function __construct(private readonly TenantContext $tenantContext) {}
+    public function __construct(
+        private readonly TenantContext $tenantContext,
+        private readonly SubscriptionService $subscriptions,
+    ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -31,13 +35,11 @@ final class ResolveTenant
             'La empresa asociada a tu usuario no está habilitada.',
         );
 
-        if ($company->status === 'trial') {
-            abort_unless(
-                $company->trial_ends_at !== null && $company->trial_ends_at->isFuture(),
-                403,
-                'El período de prueba de tu empresa ha vencido.',
-            );
-        }
+        abort_unless(
+            $this->subscriptions->entitled($company),
+            403,
+            'La suscripción de tu empresa no está habilitada o su período de gracia venció.',
+        );
 
         if ($user->branch !== null) {
             abort_unless($user->branch->company_id === $user->company_id, 403, 'La sucursal asignada no pertenece a tu empresa.');

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Platform;
 
 use App\Http\Controllers\Controller;
+use App\Models\BackupSnapshot;
 use App\Models\Branch;
 use App\Models\Company;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 
@@ -24,6 +26,8 @@ final class PlatformDashboardController extends Controller
                 ->where('is_platform_admin', false)
                 ->whereNotNull('company_id')
                 ->count(),
+            'active_subscriptions' => Subscription::query()->whereIn('status', ['active', 'trialing'])->count(),
+            'past_due_subscriptions' => Subscription::query()->where('status', 'past_due')->count(),
         ];
 
         $latestCompanies = Company::query()
@@ -32,6 +36,11 @@ final class PlatformDashboardController extends Controller
             ->limit(8)
             ->get();
 
-        return view('platform.dashboard', compact('metrics', 'latestCompanies'));
+        $latestBackup = BackupSnapshot::query()
+            ->where('status', 'completed')
+            ->latest('completed_at')
+            ->first();
+
+        return view('platform.dashboard', compact('metrics', 'latestCompanies', 'latestBackup'));
     }
 }

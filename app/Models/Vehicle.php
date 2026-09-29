@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Vehicle extends Model
 {
     use Auditable, HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'vehicle_model_id',
         'vehicle_category_id',
         'code',
@@ -30,6 +32,9 @@ class Vehicle extends Model
         'status',
         'acquisition_date',
         'next_maintenance_at',
+        'insurance_expires_at',
+        'registration_expires_at',
+        'photo_path',
         'notes',
     ];
 
@@ -40,7 +45,14 @@ class Vehicle extends Model
             'daily_rate_override' => 'decimal:2',
             'mileage' => 'integer',
             'next_maintenance_at' => 'integer',
+            'insurance_expires_at' => 'date',
+            'registration_expires_at' => 'date',
         ];
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function model(): BelongsTo
@@ -79,6 +91,15 @@ class Vehicle extends Model
     {
         return Attribute::get(
             fn (): float => (float) ($this->daily_rate_override ?? $this->category?->daily_rate ?? 0),
+        );
+    }
+
+    protected function photoUrl(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => $this->photo_path
+                ? Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->url($this->photo_path)
+                : null,
         );
     }
 }

@@ -15,7 +15,7 @@
         </x-slot>
     </x-page-header>
 
-    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6" aria-label="Métricas de plataforma">
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-8" aria-label="Métricas de plataforma">
         @foreach ([
             ['label' => 'Empresas', 'value' => $metrics['companies'], 'icon' => 'fa-building'],
             ['label' => 'En prueba', 'value' => $metrics['trial_companies'], 'icon' => 'fa-hourglass-half'],
@@ -23,6 +23,8 @@
             ['label' => 'Bloqueadas', 'value' => $metrics['blocked_companies'], 'icon' => 'fa-ban'],
             ['label' => 'Sucursales activas', 'value' => $metrics['active_branches'], 'icon' => 'fa-location-dot'],
             ['label' => 'Usuarios tenant', 'value' => $metrics['tenant_users'], 'icon' => 'fa-users'],
+            ['label' => 'Suscripciones OK', 'value' => $metrics['active_subscriptions'], 'icon' => 'fa-credit-card'],
+            ['label' => 'En mora', 'value' => $metrics['past_due_subscriptions'], 'icon' => 'fa-triangle-exclamation'],
         ] as $card)
             <article class="panel p-5">
                 <div class="flex items-start justify-between gap-3">
@@ -36,6 +38,25 @@
                 </div>
             </article>
         @endforeach
+    </section>
+
+    <section class="panel mt-6 p-5 sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600">Continuidad operativa</p>
+                <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">Último backup de plataforma</h2>
+            </div>
+            @if ($latestBackup)
+                <div class="text-right text-sm">
+                    <p class="font-bold {{ $latestBackup->verified_at ? 'text-emerald-600' : 'text-amber-600' }}">
+                        {{ $latestBackup->verified_at ? 'Verificado' : 'Pendiente de verificación' }}
+                    </p>
+                    <p class="mt-1 text-xs text-slate-500">{{ $latestBackup->completed_at?->format('d/m/Y h:i A') }}</p>
+                </div>
+            @else
+                <span class="text-sm font-bold text-amber-600">Aún no existe un backup verificado</span>
+            @endif
+        </div>
     </section>
 
     <section class="panel mt-6 overflow-hidden">

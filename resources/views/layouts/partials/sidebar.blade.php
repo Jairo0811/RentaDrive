@@ -36,6 +36,12 @@
                     <span class="nav-icon"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
                     Dashboard
                 </a>
+                @if (Auth::user()->company?->onboarding_completed_at === null)
+                    <a href="{{ route('onboarding.show') }}" class="nav-item {{ request()->routeIs('onboarding.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}">
+                        <span class="nav-icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></span>
+                        Onboarding
+                    </a>
+                @endif
             </div>
 
             <div>
@@ -45,7 +51,8 @@
                 @endcan
                 @can('view vehicles')
                     <a href="{{ route('vehicles.index') }}" class="nav-item {{ request()->routeIs('vehicles.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-car-side" aria-hidden="true"></i></span>Flota</a>
-                    <a href="{{ route('fleet.catalogs') }}" class="nav-item {{ request()->routeIs('fleet.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>Catálogos</a>
+                    <a href="{{ route('fleet.schedule') }}" class="nav-item {{ request()->routeIs('fleet.schedule') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>Calendario de flota</a>
+                    <a href="{{ route('fleet.catalogs') }}" class="nav-item {{ request()->routeIs('fleet.catalogs') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>Catálogos</a>
                 @endcan
                 @can('view reservations')
                     <a href="{{ route('reservations.index') }}" class="nav-item {{ request()->routeIs('reservations.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i></span>Reservas</a>

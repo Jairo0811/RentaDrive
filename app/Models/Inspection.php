@@ -24,8 +24,14 @@ class Inspection extends Model
         'interior_condition',
         'tires_condition',
         'accessories',
+        'accessories_checklist',
         'damages',
+        'damage_items',
         'photos',
+        'latitude',
+        'longitude',
+        'evidence_hash',
+        'sealed_at',
         'inspected_by',
     ];
 
@@ -35,6 +41,11 @@ class Inspection extends Model
             'inspected_at' => 'datetime',
             'fuel_level' => 'decimal:2',
             'photos' => 'array',
+            'accessories_checklist' => 'array',
+            'damage_items' => 'array',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
+            'sealed_at' => 'datetime',
         ];
     }
 
@@ -51,5 +62,10 @@ class Inspection extends Model
     public function inspector(): BelongsTo
     {
         return $this->belongsTo(User::class, 'inspected_by');
+    }
+
+    public function isSealed(): bool
+    {
+        return $this->sealed_at !== null && $this->evidence_hash !== null;
     }
 }

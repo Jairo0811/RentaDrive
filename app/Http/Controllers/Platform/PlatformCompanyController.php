@@ -11,6 +11,7 @@ use App\Http\Requests\Platform\CompanyUpdateRequest;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\Commercial\SubscriptionService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,11 +49,11 @@ final class PlatformCompanyController extends Controller
         return view('platform.companies.form', ['company' => new Company]);
     }
 
-    public function store(CompanyStoreRequest $request): RedirectResponse
+    public function store(CompanyStoreRequest $request, SubscriptionService $subscriptions): RedirectResponse
     {
         $data = $request->validated();
 
-        $company = DB::transaction(function () use ($data): Company {
+        $company = DB::transaction(function () use ($data, $subscriptions): Company {
             $status = $data['status'];
             $trialEndsAt = $status === 'trial'
                 ? now()->addDays((int) config('rentadrive.trial_days', 14))
@@ -97,6 +98,12 @@ final class PlatformCompanyController extends Controller
 
             $administrator->syncRoles([RoleName::ADMINISTRATOR->value]);
 
+            if ($status === 'trial') {
+                $subscriptions->createTrial($company);
+            } else {
+                $subscriptions->activate($company, $data['plan_code']);
+            }
+
             return $company;
         });
 
@@ -110,8 +117,11 @@ final class PlatformCompanyController extends Controller
         return view('platform.companies.form', compact('company'));
     }
 
-    public function update(CompanyUpdateRequest $request, Company $company): RedirectResponse
-    {
+    public function update(
+        CompanyUpdateRequest $request,
+        Company $company,
+        SubscriptionService $subscriptions,
+    ): RedirectResponse {
         $data = $request->validated();
 
         if ($data['status'] !== 'trial') {
@@ -119,6 +129,23 @@ final class PlatformCompanyController extends Controller
         }
 
         $company->update($data);
+
+        $currentSubscription = $subscriptions->current($company);
+
+        if ($data['status'] === 'active' && (
+            $currentSubscription === null
+            || $currentSubscription->status !== 'active'
+            || $currentSubscription->plan_code !== $data['plan_code']
+        )) {
+            $subscriptions->activate($company, $data['plan_code']);
+        } elseif ($data['status'] === 'trial' && (
+            $currentSubscription === null
+            || $currentSubscription->status !== 'trialing'
+        )) {
+            $subscriptions->createTrial($company);
+        } elseif ($data['status'] === 'cancelled' && $currentSubscription?->status !== 'cancelled') {
+            $subscriptions->cancel($company);
+        }
 
         return redirect()
             ->route('platform.companies.edit', $company)

@@ -45,6 +45,8 @@ class Rental extends Model
             'start_at' => 'datetime',
             'expected_return_at' => 'datetime',
             'returned_at' => 'datetime',
+            'opening_mileage' => 'integer',
+            'closing_mileage' => 'integer',
             'fuel_out' => 'decimal:2',
             'fuel_in' => 'decimal:2',
             'daily_rate' => 'decimal:2',
@@ -84,6 +86,16 @@ class Rental extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class);
+    }
+
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(RentalSignature::class);
+    }
+
+    public function renterSignature(): HasOne
+    {
+        return $this->hasOne(RentalSignature::class)->where('role', 'renter');
     }
 
     public function invoice(): HasOne

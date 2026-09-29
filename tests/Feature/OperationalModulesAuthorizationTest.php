@@ -29,6 +29,7 @@ final class OperationalModulesAuthorizationTest extends TestCase
             '/customers',
             '/vehicles',
             '/fleet/catalogs',
+            '/fleet/schedule',
             '/reservations',
             '/rentals',
             '/inspections',
@@ -49,6 +50,7 @@ final class OperationalModulesAuthorizationTest extends TestCase
         $inspector->assignRole(RoleName::INSPECTOR->value);
 
         $this->actingAs($inspector)->get('/vehicles')->assertOk();
+        $this->actingAs($inspector)->get('/fleet/schedule')->assertOk();
         $this->actingAs($inspector)->get('/rentals')->assertOk();
         $this->actingAs($inspector)->get('/inspections')->assertOk();
         $this->actingAs($inspector)->get('/customers')->assertForbidden();

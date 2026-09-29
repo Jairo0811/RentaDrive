@@ -12,6 +12,7 @@ use App\Support\Commercial\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 final class VehicleController extends Controller
@@ -20,8 +21,11 @@ final class VehicleController extends Controller
 
     public function index(Request $request): View
     {
+        $company = $request->user()?->company;
+        abort_unless($company !== null, 403);
+
         $vehicles = Vehicle::query()
-            ->with(['model.brand', 'category'])
+            ->with(['branch', 'model.brand', 'category'])
             ->withCount(['rentals', 'maintenances'])
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
                 $search = '%'.$request->string('q')->value().'%';
@@ -35,13 +39,17 @@ final class VehicleController extends Controller
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->filled('category'), fn ($query) => $query->where('vehicle_category_id', $request->integer('category')))
+            ->when($request->filled('branch'), fn ($query) => $query->where('branch_id', $request->integer('branch')))
             ->latest()
-            ->paginate(15)
+            ->paginate(12)
             ->withQueryString();
 
         return view('vehicles.index', [
             'vehicles' => $vehicles,
             'categories' => VehicleCategory::query()->orderBy('name')->get(),
+            'branches' => $company->branches()->where('is_active', true)->orderByDesc('is_primary')->orderBy('name')->get(),
+            'currency' => $company->currency,
+            'currency' => $company->currency,
         ]);
     }
 
@@ -57,7 +65,13 @@ final class VehicleController extends Controller
 
         $this->planLimits->ensureCanAdd($company, 'vehicles', Vehicle::query()->count());
 
-        $vehicle = Vehicle::query()->create($request->validated());
+        $data = $request->safe()->except(['photo', 'remove_photo']);
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), (string) config('rentadrive.storage.public_disk', 'public'));
+        }
+
+        $vehicle = Vehicle::query()->create($data);
 
         return redirect()->route('vehicles.show', $vehicle)->with('status', 'Vehículo registrado.');
     }
@@ -65,13 +79,17 @@ final class VehicleController extends Controller
     public function show(Vehicle $vehicle): View
     {
         $vehicle->load([
+            'branch',
             'model.brand',
             'category',
             'maintenances' => fn ($query) => $query->latest('scheduled_at'),
             'rentals' => fn ($query) => $query->with('customer')->latest()->limit(10),
         ]);
 
-        return view('vehicles.show', compact('vehicle'));
+        return view('vehicles.show', [
+            'vehicle' => $vehicle,
+            'currency' => auth()->user()?->company?->currency ?? 'DOP',
+        ]);
     }
 
     public function edit(Vehicle $vehicle): View
@@ -81,7 +99,25 @@ final class VehicleController extends Controller
 
     public function update(VehicleRequest $request, Vehicle $vehicle): RedirectResponse
     {
-        $vehicle->update($request->validated());
+        $company = $request->user()?->company;
+        abort_unless($company !== null, 403);
+
+        $data = $request->safe()->except(['photo', 'remove_photo']);
+
+        if ($request->boolean('remove_photo') && $vehicle->photo_path !== null) {
+            Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($vehicle->photo_path);
+            $data['photo_path'] = null;
+        }
+
+        if ($request->hasFile('photo')) {
+            if ($vehicle->photo_path !== null) {
+                Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($vehicle->photo_path);
+            }
+
+            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), (string) config('rentadrive.storage.public_disk', 'public'));
+        }
+
+        $vehicle->update($data);
 
         return redirect()->route('vehicles.show', $vehicle)->with('status', 'Vehículo actualizado.');
     }
@@ -94,6 +130,10 @@ final class VehicleController extends Controller
             ]);
         }
 
+        if ($vehicle->photo_path !== null) {
+            Storage::disk((string) config('rentadrive.storage.public_disk', 'public'))->delete($vehicle->photo_path);
+        }
+
         $vehicle->delete();
 
         return redirect()->route('vehicles.index')->with('status', 'Vehículo eliminado.');
@@ -101,10 +141,14 @@ final class VehicleController extends Controller
 
     private function formView(Vehicle $vehicle): View
     {
+        $company = auth()->user()?->company;
+        abort_unless($company !== null, 403);
+
         return view('vehicles.form', [
             'vehicle' => $vehicle,
             'models' => VehicleModel::query()->with('brand')->where('is_active', true)->orderByDesc('year')->get(),
             'categories' => VehicleCategory::query()->where('is_active', true)->orderBy('name')->get(),
+            'branches' => $company->branches()->where('is_active', true)->orderByDesc('is_primary')->orderBy('name')->get(),
         ]);
     }
 }

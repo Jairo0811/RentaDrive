@@ -47,6 +47,23 @@ return [
             'report' => false,
         ],
 
+        'rentadrive_external_public' => [
+            'driver' => 'local',
+            'root' => env('RENTADRIVE_EXTERNAL_PUBLIC_PATH', storage_path('app/external-public')),
+            'url' => rtrim(env('RENTADRIVE_EXTERNAL_PUBLIC_URL', env('APP_URL', 'http://localhost').'/storage'), '/'),
+            'visibility' => 'public',
+            'throw' => true,
+            'report' => true,
+        ],
+
+        'rentadrive_external_private' => [
+            'driver' => 'local',
+            'root' => env('RENTADRIVE_EXTERNAL_PRIVATE_PATH', storage_path('app/external-private')),
+            'visibility' => 'private',
+            'throw' => true,
+            'report' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -8,6 +8,7 @@ use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservation extends Model
@@ -24,11 +25,19 @@ class Reservation extends Model
         'pickup_location',
         'return_location',
         'daily_rate',
+        'base_total',
+        'extras_total',
+        'discount_total',
+        'promo_code',
+        'pricing_breakdown',
         'estimated_total',
+        'deposit_required',
+        'deposit_paid',
         'status',
         'notes',
         'created_by',
         'cancelled_at',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
@@ -38,7 +47,13 @@ class Reservation extends Model
             'end_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'daily_rate' => 'decimal:2',
+            'base_total' => 'decimal:2',
+            'extras_total' => 'decimal:2',
+            'discount_total' => 'decimal:2',
             'estimated_total' => 'decimal:2',
+            'deposit_required' => 'decimal:2',
+            'deposit_paid' => 'decimal:2',
+            'pricing_breakdown' => 'array',
         ];
     }
 
@@ -65,5 +80,15 @@ class Reservation extends Model
     public function rental(): HasOne
     {
         return $this->hasOne(Rental::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function paymentIntents(): HasMany
+    {
+        return $this->hasMany(PaymentIntent::class);
     }
 }

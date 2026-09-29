@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\Vehicle;
+use App\Support\Fiscal\FiscalConfig;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +18,7 @@ final class RentalWorkflowService
     public function __construct(
         private readonly ReservationAvailabilityService $availability,
         private readonly ReferenceNumberService $references,
+        private readonly FiscalConfig $fiscal,
     ) {}
 
     /**
@@ -44,9 +46,10 @@ final class RentalWorkflowService
             $days = $this->availability->rentalDays($startAt, $endAt);
             $subtotal = round($days * (float) $data['daily_rate'], 2);
             $fees = round((float) ($data['fees'] ?? 0), 2);
-            $taxRate = (float) SettingValue::get('billing.tax_rate', '18');
-            $taxes = round(($subtotal + $fees) * ($taxRate / 100), 2);
-            $total = $subtotal + $fees + $taxes;
+            $taxable = round($subtotal + $fees, 2);
+            $taxRate = $this->fiscal->taxRate();
+            $taxes = round($taxable * ($taxRate / 100), 2);
+            $total = round($taxable + $taxes, 2);
 
             $rental = Rental::query()->create([
                 ...$data,
@@ -68,13 +71,17 @@ final class RentalWorkflowService
                 'customer_id' => $rental->customer_id,
                 'issued_at' => now()->toDateString(),
                 'due_at' => now()->addDays(7)->toDateString(),
-                'subtotal' => $subtotal + $fees,
+                'subtotal' => $taxable,
+                'tax_rate' => $taxRate,
+                'taxable_amount' => $taxable,
+                'exempt_amount' => 0,
                 'tax' => $taxes,
                 'discount' => 0,
                 'total' => $total,
                 'paid_amount' => 0,
                 'balance' => $total,
                 'status' => 'pending',
+                'fiscal_status' => 'draft',
             ]);
 
             return $rental->load(['customer', 'vehicle.model.brand', 'invoice']);
@@ -100,9 +107,10 @@ final class RentalWorkflowService
             $days = $this->availability->rentalDays($rental->start_at, $returnedAt);
             $subtotal = round($days * (float) $rental->daily_rate, 2);
             $fees = round((float) ($data['fees'] ?? $rental->fees), 2);
-            $taxRate = (float) SettingValue::get('billing.tax_rate', '18');
-            $taxes = round(($subtotal + $fees) * ($taxRate / 100), 2);
-            $total = $subtotal + $fees + $taxes;
+            $taxable = round($subtotal + $fees, 2);
+            $taxRate = $this->fiscal->taxRate();
+            $taxes = round($taxable * ($taxRate / 100), 2);
+            $total = round($taxable + $taxes, 2);
 
             $rental->update([
                 ...$data,
@@ -120,10 +128,14 @@ final class RentalWorkflowService
             ]);
 
             $invoice = $rental->invoice;
+
             if ($invoice !== null) {
-                $balance = max(0, $total - (float) $invoice->paid_amount);
+                $balance = max(0, round($total - (float) $invoice->paid_amount, 2));
+
                 $invoice->update([
-                    'subtotal' => $subtotal + $fees,
+                    'subtotal' => $taxable,
+                    'tax_rate' => $taxRate,
+                    'taxable_amount' => $taxable,
                     'tax' => $taxes,
                     'total' => $total,
                     'balance' => $balance,

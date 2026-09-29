@@ -7,19 +7,22 @@ namespace App\Http\Controllers;
 use App\Domain\Operations\Services\RentalWorkflowService;
 use App\Http\Requests\RentalRequest;
 use App\Models\Customer;
+use App\Models\Inspection;
 use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\Vehicle;
+use App\Support\DigitalRental\RentalSignatureService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 final class RentalController extends Controller
 {
     public function index(Request $request): View
     {
         $rentals = Rental::query()
-            ->with(['customer', 'vehicle.model.brand', 'invoice'])
+            ->with(['customer', 'vehicle.model.brand', 'invoice', 'renterSignature'])
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
                 $search = '%'.$request->string('q')->value().'%';
                 $query->where(function ($query) use ($search): void {
@@ -71,34 +74,87 @@ final class RentalController extends Controller
             'vehicle.category',
             'reservation',
             'inspections.inspector',
+            'renterSignature',
             'invoice.payments',
             'opener',
             'closer',
         ]);
 
-        return view('rentals.show', compact('rental'));
+        return view('rentals.show', [
+            'rental' => $rental,
+            'deliveryInspection' => $rental->inspections->firstWhere('type', 'delivery'),
+            'returnInspection' => $rental->inspections->firstWhere('type', 'return'),
+        ]);
     }
 
-    public function close(Request $request, Rental $rental, RentalWorkflowService $workflow): RedirectResponse
-    {
+    public function close(
+        Request $request,
+        Rental $rental,
+        RentalWorkflowService $workflow,
+    ): RedirectResponse {
         $validated = $request->validate([
-            'returned_at' => ['required', 'date', 'after_or_equal:'.$rental->start_at->format('Y-m-d H:i:s')],
-            'closing_mileage' => ['required', 'integer', 'gte:'.$rental->opening_mileage],
-            'fuel_in' => ['required', 'numeric', 'between:0,100'],
             'fees' => ['nullable', 'numeric', 'min:0'],
             'vehicle_status' => ['required', 'in:available,maintenance'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $workflow->close($rental, $validated);
+        if (! $rental->renterSignature()->exists()) {
+            throw ValidationException::withMessages([
+                'rental' => 'El contrato debe estar firmado digitalmente antes de cerrar el alquiler.',
+            ]);
+        }
 
-        return redirect()->route('rentals.show', $rental)->with('status', 'Alquiler cerrado y factura recalculada.');
+        $delivery = Inspection::query()
+            ->where('rental_id', $rental->getKey())
+            ->where('type', 'delivery')
+            ->whereNotNull('sealed_at')
+            ->first();
+
+        if ($delivery === null) {
+            throw ValidationException::withMessages([
+                'rental' => 'Falta el check-in de entrega sellado.',
+            ]);
+        }
+
+        $return = Inspection::query()
+            ->where('rental_id', $rental->getKey())
+            ->where('type', 'return')
+            ->whereNotNull('sealed_at')
+            ->first();
+
+        if ($return === null) {
+            throw ValidationException::withMessages([
+                'rental' => 'Falta el check-out de devolución sellado.',
+            ]);
+        }
+
+        $workflow->close($rental, [
+            ...$validated,
+            'returned_at' => $return->inspected_at,
+            'closing_mileage' => $return->mileage,
+            'fuel_in' => $return->fuel_level,
+        ]);
+
+        return redirect()->route('rentals.show', $rental)->with('status', 'Alquiler cerrado usando la evidencia digital de devolución.');
     }
 
-    public function contract(Rental $rental): View
-    {
-        $rental->load(['customer', 'vehicle.model.brand', 'vehicle.category', 'invoice']);
+    public function contract(
+        Rental $rental,
+        RentalSignatureService $signatures,
+    ): View {
+        $rental->load([
+            'customer',
+            'vehicle.model.brand',
+            'vehicle.category',
+            'invoice',
+            'renterSignature',
+            'inspections',
+            'opener',
+        ]);
 
-        return view('documents.contract', compact('rental'));
+        return view('documents.contract', [
+            'rental' => $rental,
+            'signatureDataUri' => $signatures->dataUri($rental->renterSignature),
+        ]);
     }
 }

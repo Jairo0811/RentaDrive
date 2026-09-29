@@ -23,6 +23,7 @@ final class VehicleRequest extends FormRequest
         $vehicle = $this->route('vehicle');
 
         return [
+            'branch_id' => ['required', TenantValidation::exists('branches')],
             'vehicle_model_id' => ['required', TenantValidation::exists('vehicle_models')],
             'vehicle_category_id' => ['required', TenantValidation::exists('vehicle_categories')],
             'code' => ['required', 'string', 'max:30', TenantValidation::unique('vehicles', 'code')->ignore($vehicle)],
@@ -37,6 +38,10 @@ final class VehicleRequest extends FormRequest
             'status' => ['required', Rule::in(['available', 'reserved', 'rented', 'maintenance', 'inactive'])],
             'acquisition_date' => ['nullable', 'date'],
             'next_maintenance_at' => ['nullable', 'integer', 'gte:mileage'],
+            'insurance_expires_at' => ['nullable', 'date'],
+            'registration_expires_at' => ['nullable', 'date'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'remove_photo' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ];
     }
