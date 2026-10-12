@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class ReservationController extends Controller
@@ -51,12 +52,20 @@ final class ReservationController extends Controller
         ReservationAvailabilityService $availability,
         ReferenceNumberService $references,
     ): RedirectResponse {
-        $data = $this->prepareData($request, $availability);
-        $reservation = Reservation::query()->create([
-            ...$data,
-            'code' => $references->generate(Reservation::class, 'code', 'RES'),
-            'created_by' => auth()->id(),
-        ]);
+        $reservation = DB::transaction(function () use ($request, $availability, $references): Reservation {
+            $branchId = $request->user()?->branch_id;
+            abort_unless($branchId !== null, 403, 'Tu usuario no tiene una sucursal activa asignada.');
+
+            Branch::query()->whereKey($branchId)->lockForUpdate()->firstOrFail();
+
+            $data = $this->prepareData($request, $availability);
+
+            return Reservation::query()->create([
+                ...$data,
+                'code' => $references->generate(Reservation::class, 'code', 'RES'),
+                'created_by' => auth()->id(),
+            ]);
+        }, 3);
 
         return redirect()->route('reservations.show', $reservation)->with('status', 'Reserva creada.');
     }
@@ -90,7 +99,12 @@ final class ReservationController extends Controller
         Reservation $reservation,
         ReservationAvailabilityService $availability,
     ): RedirectResponse {
-        $reservation->update($this->prepareData($request, $availability, $reservation));
+        DB::transaction(function () use ($request, $reservation, $availability): void {
+            abort_unless($reservation->branch_id !== null, 409, 'La reserva no tiene una sucursal asignada.');
+
+            Branch::query()->whereKey($reservation->branch_id)->lockForUpdate()->firstOrFail();
+            $reservation->update($this->prepareData($request, $availability, $reservation));
+        }, 3);
 
         return redirect()->route('reservations.show', $reservation)->with('status', 'Reserva actualizada.');
     }
