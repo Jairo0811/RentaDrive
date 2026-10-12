@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
@@ -35,8 +35,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: feature/booking-engine
 
       - name: Microsoft ODBC Driver 18
         run: |
@@ -62,21 +60,8 @@ jobs:
       - name: Install backend dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Resolve migrated frontend dependencies
-        run: npm install
-
-      - name: Commit migrated npm lockfile
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          if git diff --cached --quiet; then
-            echo "package-lock.json is already current"
-            exit 0
-          fi
-          git commit -m "chore: refresh npm lockfile"
-          git push origin HEAD:feature/booking-engine
+      - name: Install frontend dependencies
+        run: npm ci
 
       - name: Audit frontend dependencies
         run: npm audit --audit-level=high
