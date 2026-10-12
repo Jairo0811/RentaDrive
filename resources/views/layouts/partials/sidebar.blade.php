@@ -78,6 +78,7 @@
                         <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></span>Usuarios</a>
                     @endcan
                     @can('manage configuration')
+                        <a href="{{ route('booking-options.index') }}" class="nav-item {{ request()->routeIs('booking-options.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>Reserva online</a>
                         <a href="{{ route('settings.edit') }}" class="nav-item {{ request()->routeIs('settings.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></span>Configuración</a>
                     @endcan
                     @can('view audit log')
