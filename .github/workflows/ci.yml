@@ -60,8 +60,15 @@ jobs:
       - name: Install backend dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Resolve migrated frontend dependencies
+        run: npm install
+
+      - name: Upload generated npm lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-lockfile
+          path: package-lock.json
+          retention-days: 1
 
       - name: Audit frontend dependencies
         run: npm audit --audit-level=high
