@@ -18,9 +18,10 @@ const rentadriveUtilities = plugin(({ addUtilities }) => {
         '.panel': {
             borderRadius: '1rem',
             borderWidth: '1px',
-            borderColor: '#e2e8f0',
-            backgroundColor: '#ffffff',
-            boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+            borderColor: '#1e293b',
+            backgroundColor: '#0f172a',
+            color: '#e2e8f0',
+            boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.28)',
         },
     });
 });
