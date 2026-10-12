@@ -1,0 +1,41 @@
+name: Sync Composer Lock
+
+on:
+  push:
+    branches: [feature/fase-2-1-hardening]
+    paths:
+      - composer.json
+      - .github/workflows/sync-composer-lock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-lock:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Regenerate lock metadata
+        run: composer update --lock --no-install --no-interaction --no-progress --no-scripts --no-audit
+
+      - name: Commit synchronized lock
+        run: |
+          if git diff --quiet -- composer.lock; then
+            echo "composer.lock is already synchronized."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add composer.lock
+          git commit -m "chore: sincronizar composer lock [skip ci]"
+          git push
