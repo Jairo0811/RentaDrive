@@ -1,0 +1,61 @@
+name: Update Backend Security
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - composer.json
+      - composer.lock
+      - .github/workflows/update-backend-security.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-security:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Update vulnerable backend dependencies
+        run: |
+          composer update \
+            laravel/framework \
+            league/commonmark \
+            league/flysystem \
+            maatwebsite/excel \
+            --with-all-dependencies \
+            --no-interaction \
+            --no-progress \
+            --no-scripts \
+            --no-audit
+
+      - name: Validate Composer metadata
+        run: composer validate --strict
+
+      - name: Audit updated lock
+        run: composer audit --locked --no-interaction
+
+      - name: Commit secure lock
+        run: |
+          if git diff --quiet -- composer.lock; then
+            echo "No dependency changes were required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add composer.lock
+          git commit -m "chore: actualizar dependencias PHP vulnerables [skip ci]"
+          git push origin HEAD:${{ github.head_ref }}
