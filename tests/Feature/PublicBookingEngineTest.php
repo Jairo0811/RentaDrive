@@ -67,7 +67,7 @@ final class PublicBookingEngineTest extends TestCase
             'end_at' => $endAt->format('Y-m-d H:i:s'),
             'booking_option_ids' => [$gps->getKey(), $insurance->getKey()],
             'document_type' => 'cedula',
-            'document_number' => '001-1234567-8',
+            'document_number' => '001-1391820-5',
             'first_name' => 'Ana',
             'last_name' => 'Pérez',
             'email' => 'ana@example.test',
@@ -97,6 +97,33 @@ final class PublicBookingEngineTest extends TestCase
         $this->assertSame('9600.00', $reservation->estimated_total);
         $this->assertSame('5000.00', $reservation->deposit_amount);
         $this->assertCount(2, $reservation->bookingOptions()->get());
+        $this->assertSame('00113918205', $reservation->customer->document_number);
+    }
+
+    public function test_public_booking_rejects_invalid_dominican_cedula(): void
+    {
+        [$user, $category] = $this->tenantWithVehicle();
+        $company = $user->company;
+        $branch = $user->branch;
+        $startAt = now()->addDays(2)->setTime(9, 0, 0);
+        $endAt = $startAt->copy()->addDay();
+
+        $this->post(route('public-booking.store', $company->slug), [
+            'branch_id' => $branch->getKey(),
+            'vehicle_category_id' => $category->getKey(),
+            'start_at' => $startAt->format('Y-m-d H:i:s'),
+            'end_at' => $endAt->format('Y-m-d H:i:s'),
+            'document_type' => 'cedula',
+            'document_number' => '001-1391820-6',
+            'first_name' => 'Ana',
+            'last_name' => 'Pérez',
+            'email' => 'ana-invalid@example.test',
+            'phone' => '809-555-0101',
+        ])->assertSessionHasErrors('document_number');
+
+        $this->assertDatabaseMissing('customers', [
+            'email' => 'ana-invalid@example.test',
+        ]);
     }
 
     public function test_unassigned_public_reservation_consumes_category_capacity(): void
@@ -113,7 +140,7 @@ final class PublicBookingEngineTest extends TestCase
             'start_at' => $startAt->format('Y-m-d H:i:s'),
             'end_at' => $endAt->format('Y-m-d H:i:s'),
             'document_type' => 'passport',
-            'document_number' => 'PA-1001',
+            'document_number' => 'PA1001',
             'first_name' => 'Luis',
             'last_name' => 'Santos',
             'email' => 'luis@example.test',
@@ -136,7 +163,7 @@ final class PublicBookingEngineTest extends TestCase
             'start_at' => $startAt->format('Y-m-d H:i:s'),
             'end_at' => $endAt->format('Y-m-d H:i:s'),
             'document_type' => 'passport',
-            'document_number' => 'PA-1002',
+            'document_number' => 'PA1002',
             'first_name' => 'Marta',
             'last_name' => 'Díaz',
             'email' => 'marta@example.test',
@@ -158,7 +185,7 @@ final class PublicBookingEngineTest extends TestCase
             'start_at' => $startAt->format('Y-m-d H:i:s'),
             'end_at' => $endAt->format('Y-m-d H:i:s'),
             'document_type' => 'passport',
-            'document_number' => 'PA-2001',
+            'document_number' => 'PA2001',
             'first_name' => 'Carlos',
             'last_name' => 'Ramos',
             'email' => 'carlos@example.test',
