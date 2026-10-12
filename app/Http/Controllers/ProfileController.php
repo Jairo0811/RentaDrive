@@ -6,15 +6,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
+use App\Support\Security\AdministrativeContinuity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 final class ProfileController extends Controller
 {
+    public function __construct(private readonly AdministrativeContinuity $administrativeContinuity) {}
+
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -44,6 +48,13 @@ final class ProfileController extends Controller
 
         /** @var User $user */
         $user = $request->user();
+
+        try {
+            $this->administrativeContinuity->ensureCanDelete($user, 'account');
+        } catch (ValidationException $exception) {
+            $exception->errorBag = 'userDeletion';
+            throw $exception;
+        }
 
         /*
          * Cerrar la sesión ANTES de eliminar el usuario.

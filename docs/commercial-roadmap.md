@@ -91,50 +91,67 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 
 **Criterio de cierre de Fase 2:** migración SQL Server, portal público, backoffice, npm audit, build, Pint y PHPUnit deben quedar verdes en CI.
 
+## Fase 2.1 — Hardening previo a Payments
+
+- [x] Service Worker limitado a recursos públicos estáticos; no almacena HTML autenticado, dashboard ni URLs privadas con token.
+- [x] Protección del último Administrador activo de cada empresa.
+- [x] Protección del último SuperAdmin activo de plataforma.
+- [x] Bloqueo de desactivación o cambio de rol cuando dejaría una empresa sin Administrador activo.
+- [x] Validación de cédula dominicana en reservas públicas con normalización del documento.
+- [x] Normalización y validación consistente de pasaportes en el portal público.
+- [x] Seeders de datos operativos demo restringidos a `local` y `testing`.
+- [x] Configuración de ejemplo endurecida para despliegue HTTPS.
+- [x] `composer.lock` sincronizado con el requisito PHP 8.4.1+.
+- [x] CI con `composer validate --strict`, `composer audit --locked`, `npm audit`, build, Pint y PHPUnit sobre SQL Server 2022.
+- [x] Pruebas de regresión específicas para continuidad administrativa, documentos públicos, PWA y seeders.
+- [x] README actualizado al estado SaaS/comercial actual.
+
+**Criterio de cierre de Fase 2.1:** Composer y npm sin vulnerabilidades conocidas que rompan los gates definidos, metadata reproducible, build de producción, Pint y suite completa verdes sobre SQL Server 2022.
+
 ## Fase 3 — Payments
 
-- Abstracción de pasarela de pagos.
-- Depósitos de reserva.
-- Pagos parciales/totales.
-- Reembolsos.
-- Webhooks idempotentes.
-- Conciliación y auditoría.
+- [ ] Abstracción de pasarela de pagos.
+- [ ] Depósitos de reserva.
+- [ ] Pagos parciales/totales.
+- [ ] Reembolsos.
+- [ ] Webhooks idempotentes.
+- [ ] Conciliación y auditoría.
 
 ## Fase 4 — Dominican Edition
 
-- Perfil fiscal dominicano.
-- NCF/e-CF mediante integración compatible.
-- RNC y datos fiscales.
-- ITBIS y reglas fiscales configuradas con controles de integridad.
-- Integraciones locales cuando sean técnicamente y legalmente viables.
+- [ ] Perfil fiscal dominicano.
+- [ ] NCF/e-CF mediante integración compatible.
+- [ ] RNC y datos fiscales.
+- [ ] ITBIS y reglas fiscales configuradas con controles de integridad.
+- [ ] Integraciones locales cuando sean técnicamente y legalmente viables.
 
 ## Fase 5 — Digital Rental
 
-- Firma de contratos.
-- Check-in y check-out móvil.
-- Fotografías por inspección.
-- Registro de daños.
-- Combustible, kilometraje y accesorios.
-- Evidencia auditable del proceso de entrega/devolución.
+- [ ] Firma de contratos.
+- [ ] Check-in y check-out móvil.
+- [ ] Fotografías por inspección.
+- [ ] Registro de daños.
+- [ ] Combustible, kilometraje y accesorios.
+- [ ] Evidencia auditable del proceso de entrega/devolución.
 
 ## Fase 6 — Automation
 
-- Email y WhatsApp mediante proveedores desacoplados.
-- Recordatorios de reservas y devoluciones.
-- Alertas de mantenimiento y documentos.
-- Jobs y colas de producción.
+- [ ] Email y WhatsApp mediante proveedores desacoplados.
+- [ ] Recordatorios de reservas y devoluciones.
+- [ ] Alertas de mantenimiento y documentos.
+- [ ] Jobs y colas de producción.
 
 ## Fase 7 — SaaS Production
 
-- Suscripciones y planes.
-- Trial y onboarding.
-- Backups y recuperación.
-- Observabilidad y alertas.
-- Storage externo.
-- Rate limiting y hardening.
-- Pruebas E2E y de seguridad multi-tenant.
-- Pipeline de despliegue reproducible.
+- [ ] Suscripciones y planes.
+- [ ] Trial y onboarding.
+- [ ] Backups y recuperación.
+- [ ] Observabilidad y alertas.
+- [ ] Storage externo.
+- [ ] Rate limiting y hardening adicional de producción.
+- [ ] Pruebas E2E y de seguridad multi-tenant.
+- [ ] Pipeline de despliegue reproducible.
 
 ## Meta de salida comercial
 
-RentaDrive se considerará listo para pilotos pagados cuando tenga completadas las fases 1, 2, 3 y los controles de producción esenciales de la fase 7. La integración fiscal dominicana puede desplegarse de forma incremental según el proveedor y el proceso de certificación elegido.
+RentaDrive se considerará listo para pilotos pagados cuando tenga completadas las fases 1, 2, 2.1, 3 y los controles de producción esenciales de la fase 7. La integración fiscal dominicana puede desplegarse de forma incremental según el proveedor y el proceso de certificación elegido.

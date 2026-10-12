@@ -57,8 +57,14 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Validate Composer metadata
+        run: composer validate --strict
+
       - name: Install backend dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Audit backend dependencies
+        run: composer audit --locked --no-interaction
 
       - name: Install frontend dependencies
         run: npm ci

@@ -8,6 +8,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Branch;
 use App\Models\User;
 use App\Support\Commercial\PlanLimits;
+use App\Support\Security\AdministrativeContinuity;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,10 @@ use Spatie\Permission\Models\Role;
 
 final class UserController extends Controller
 {
-    public function __construct(private readonly PlanLimits $planLimits) {}
+    public function __construct(
+        private readonly PlanLimits $planLimits,
+        private readonly AdministrativeContinuity $administrativeContinuity,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -75,6 +79,12 @@ final class UserController extends Controller
         $role = $data['role'];
         unset($data['role'], $data['password_confirmation']);
 
+        $this->administrativeContinuity->ensureCanChangeTenantAccess(
+            $user,
+            $role,
+            (bool) $data['is_active'],
+        );
+
         if (blank($data['password'] ?? null)) {
             unset($data['password']);
         }
@@ -89,6 +99,7 @@ final class UserController extends Controller
     {
         $this->ensureSameCompany($user);
         Gate::authorize('delete', $user);
+        $this->administrativeContinuity->ensureCanDelete($user);
         $user->delete();
 
         return redirect()->route('users.index')->with('status', 'Usuario eliminado.');

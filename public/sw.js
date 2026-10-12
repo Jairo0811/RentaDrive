@@ -1,9 +1,12 @@
-const CACHE_NAME = 'rentadrive-v1';
+const CACHE_NAME = 'rentadrive-v2';
 const STATIC_ASSETS = [
-    '/login',
     '/images/rentadrive-mark.png',
     '/images/rentadrive-logo-dark.png',
     '/manifest.webmanifest',
+];
+const STATIC_PREFIXES = [
+    '/build/assets/',
+    '/images/',
 ];
 
 self.addEventListener('install', (event) => {
@@ -25,14 +28,31 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    const url = new URL(event.request.url);
+    const isStaticAsset = STATIC_ASSETS.includes(url.pathname)
+        || STATIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix));
+
+    // Nunca almacenar HTML, dashboard, datos operativos ni URLs privadas con tokens.
+    if (! isStaticAsset || event.request.mode === 'navigate') {
+        return;
+    }
+
     event.respondWith(
-        fetch(event.request)
-            .then((response) => {
+        caches.match(event.request).then((cached) => {
+            if (cached) {
+                return cached;
+            }
+
+            return fetch(event.request).then((response) => {
+                if (! response.ok || response.type !== 'basic') {
+                    return response;
+                }
+
                 const copy = response.clone();
                 caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
 
                 return response;
-            })
-            .catch(() => caches.match(event.request).then((cached) => cached ?? caches.match('/login'))),
+            });
+        }),
     );
 });
