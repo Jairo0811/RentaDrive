@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,8 +20,6 @@
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
         >
-
-        @include('layouts.partials.theme-script')
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -60,7 +58,7 @@
             <div x-init="$nextTick(() => $store.toast.show(@js('Revisa la información indicada en el formulario.'), 'error'))"></div>
         @endif
 
-        <div class="flex h-full overflow-hidden bg-slate-100 dark:bg-slate-950">
+        <div class="flex h-full overflow-hidden bg-slate-950">
             <div
                 x-cloak
                 x-show="sidebarOpen"
@@ -86,7 +84,7 @@
                     <div class="flex min-h-full flex-col">
                         <div class="mx-auto w-full max-w-[1600px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
                             @if ($errors->any())
-                                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300" role="alert" aria-labelledby="validation-errors-title">
+                                <div class="mb-6 rounded-xl border border-red-900/60 bg-red-950/50 px-4 py-3 text-sm text-red-300" role="alert" aria-labelledby="validation-errors-title">
                                     <p id="validation-errors-title" class="flex items-center gap-2 font-bold">
                                         <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                                         Revisa la información indicada:
@@ -102,12 +100,12 @@
                             {{ $slot }}
                         </div>
 
-                        <footer class="border-t border-slate-200 bg-white/80 px-4 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80 sm:px-6 lg:px-8">
-                            <div class="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-3 text-center text-sm text-slate-500 dark:text-slate-400 sm:flex-row sm:text-left">
+                        <footer class="border-t border-slate-800 bg-slate-900/80 px-4 py-4 backdrop-blur-sm sm:px-6 lg:px-8">
+                            <div class="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-3 text-center text-sm text-slate-400 sm:flex-row sm:text-left">
                                 <div class="flex items-center gap-3">
                                     <img src="{{ asset('images/rentadrive-mark.png') }}" alt="" class="h-8 w-8 rounded-lg object-contain" aria-hidden="true">
                                     <div>
-                                        <p class="font-semibold text-slate-700 dark:text-slate-200">© {{ now()->year }} RentaDrive</p>
+                                        <p class="font-semibold text-slate-200">© {{ now()->year }} RentaDrive</p>
                                         <p class="text-xs">Gestiona tu flota. Impulsa tu negocio.</p>
                                     </div>
                                 </div>
@@ -117,8 +115,8 @@
                                         <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
                                         Versión 1.0
                                     </span>
-                                    <span class="hidden text-slate-300 dark:text-slate-700 sm:inline" aria-hidden="true">•</span>
-                                    <a href="https://github.com/Jairo0811/RentaDrive" target="_blank" rel="noopener noreferrer" class="focus-ring inline-flex items-center gap-2 rounded font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300" aria-label="Abrir el repositorio de RentaDrive en GitHub en una nueva pestaña">
+                                    <span class="hidden text-slate-700 sm:inline" aria-hidden="true">•</span>
+                                    <a href="https://github.com/Jairo0811/RentaDrive" target="_blank" rel="noopener noreferrer" class="focus-ring inline-flex items-center gap-2 rounded font-semibold text-blue-400 transition hover:text-blue-300" aria-label="Abrir el repositorio de RentaDrive en GitHub en una nueva pestaña">
                                         <i class="fa-brands fa-github" aria-hidden="true"></i>
                                         GitHub
                                     </a>

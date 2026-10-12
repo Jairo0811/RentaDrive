@@ -29,21 +29,7 @@ const readBoolean = (key, fallback = false) => {
     return value === 'true';
 };
 
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const storedTheme = safeStorageGet('rentadrive-theme');
-const startsDark = storedTheme === 'dark' || (storedTheme === null && prefersDark);
-
-Alpine.store('theme', {
-    dark: startsDark,
-
-    toggle() {
-        this.dark = ! this.dark;
-        document.documentElement.classList.toggle('dark', this.dark);
-        safeStorageSet('rentadrive-theme', this.dark ? 'dark' : 'light');
-        window.dispatchEvent(new CustomEvent('rentadrive:theme-changed'));
-    },
-});
 
 const allowedFontScales = [100, 125, 150, 200];
 const allowedInterfaceScales = [100, 110, 125];
@@ -182,12 +168,11 @@ Alpine.store('toast', {
     },
 });
 
-document.documentElement.classList.toggle('dark', startsDark);
 Alpine.store('accessibility').apply();
 Alpine.start();
 
-const chartTextColor = () => document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569';
-const chartGridColor = () => document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, .12)' : 'rgba(100, 116, 139, .14)';
+const chartTextColor = () => '#94a3b8';
+const chartGridColor = () => 'rgba(148, 163, 184, .12)';
 const charts = [];
 
 const parseData = (element, attribute) => {
@@ -320,7 +305,6 @@ document.querySelector('#vehicle_id')?.addEventListener('change', () => {
     populateRentalVehicle();
 });
 
-window.addEventListener('rentadrive:theme-changed', refreshCharts);
 window.addEventListener('rentadrive:accessibility-changed', refreshCharts);
 window.addEventListener('DOMContentLoaded', buildDashboardCharts);
 
