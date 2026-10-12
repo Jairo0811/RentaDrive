@@ -26,7 +26,7 @@
         <div class="space-y-4">
             @forelse ($options as $option)
                 <article class="panel p-5">
-                    <form method="POST" action="{{ route('booking-options.update', $option) }}" class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+                    <form id="booking-option-update-{{ $option->id }}" method="POST" action="{{ route('booking-options.update', $option) }}" class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
                         @csrf @method('PUT')
                         <div><label class="form-label" for="code-{{ $option->id }}">Código</label><input id="code-{{ $option->id }}" name="code" value="{{ $option->code }}" class="form-input" required></div>
                         <div class="xl:col-span-2"><label class="form-label" for="name-{{ $option->id }}">Nombre</label><input id="name-{{ $option->id }}" name="name" value="{{ $option->name }}" class="form-input" required></div>
@@ -35,14 +35,15 @@
                         <div><label class="form-label" for="price-{{ $option->id }}">Precio</label><input id="price-{{ $option->id }}" type="number" name="price" value="{{ $option->price }}" min="0" step="0.01" class="form-input" required></div>
                         <div class="md:col-span-2 xl:col-span-4"><label class="form-label" for="description-{{ $option->id }}">Descripción</label><input id="description-{{ $option->id }}" name="description" value="{{ $option->description }}" class="form-input"></div>
                         <div><label class="form-label" for="active-{{ $option->id }}">Estado</label><select id="active-{{ $option->id }}" name="is_active" class="form-input"><option value="1" @selected($option->is_active)>Activa</option><option value="0" @selected(! $option->is_active)>Inactiva</option></select></div>
-                        <div class="flex items-end gap-2">
-                            <button class="btn-primary flex-1 justify-center">Guardar</button>
+                        <div class="flex items-end"><button class="btn-primary w-full justify-center">Guardar</button></div>
                     </form>
-                            <form method="POST" action="{{ route('booking-options.destroy', $option) }}" onsubmit="return confirm('¿Eliminar esta opción?')">
-                                @csrf @method('DELETE')
-                                <button class="btn-secondary text-red-600">Eliminar</button>
-                            </form>
-                        </div>
+
+                    <div class="mt-3 flex justify-end border-t border-slate-200 pt-3 dark:border-slate-800">
+                        <form method="POST" action="{{ route('booking-options.destroy', $option) }}" onsubmit="return confirm('¿Eliminar esta opción?')">
+                            @csrf @method('DELETE')
+                            <button class="btn-secondary text-red-600">Eliminar</button>
+                        </form>
+                    </div>
                 </article>
             @empty
                 <div class="panel p-10 text-center"><h2 class="font-black">Sin opciones configuradas</h2><p class="mt-2 text-sm text-slate-500">Crea extras o seguros para enriquecer la cotización pública.</p></div>
