@@ -48,6 +48,7 @@ final class ReservationAvailabilityService
         VehicleCategory $category,
         CarbonInterface $startAt,
         CarbonInterface $endAt,
+        ?int $ignoreReservationId = null,
     ): int {
         $vehicleIds = Vehicle::query()
             ->where('branch_id', $branch->getKey())
@@ -62,6 +63,7 @@ final class ReservationAvailabilityService
         $blockedByReservations = Reservation::query()
             ->whereIn('vehicle_id', $vehicleIds)
             ->whereIn('status', ['pending', 'confirmed'])
+            ->when($ignoreReservationId, fn ($query) => $query->whereKeyNot($ignoreReservationId))
             ->where('start_at', '<', $endAt)
             ->where('end_at', '>', $startAt)
             ->pluck('vehicle_id')
@@ -89,6 +91,7 @@ final class ReservationAvailabilityService
             ->where('vehicle_category_id', $category->getKey())
             ->whereNull('vehicle_id')
             ->whereIn('status', ['pending', 'confirmed'])
+            ->when($ignoreReservationId, fn ($query) => $query->whereKeyNot($ignoreReservationId))
             ->where('start_at', '<', $endAt)
             ->where('end_at', '>', $startAt)
             ->count();
