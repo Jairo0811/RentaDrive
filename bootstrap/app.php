@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsurePlatformAdmin;
+use App\Http\Middleware\ResolvePublicCompany;
 use App\Http\Middleware\ResolveTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'tenant' => ResolveTenant::class,
+            'public_company' => ResolvePublicCompany::class,
             'platform_admin' => EnsurePlatformAdmin::class,
         ]);
     })
