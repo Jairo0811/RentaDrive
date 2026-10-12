@@ -174,9 +174,15 @@ Esto **no constituye una certificación formal NORTIC B2**. La conformidad compl
 
 Consulta [`docs/accessibility.md`](docs/accessibility.md).
 
-## Stack tecnológico
+## 🧱 Stack tecnológico
 
-### Backend
+### ⚙️ Backend
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.4.1+" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" title="Laravel 13" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" title="Composer" width="44" height="44">
+</p>
 
 - PHP **8.4.1+**
 - Laravel **13.x**
@@ -186,7 +192,16 @@ Consulta [`docs/accessibility.md`](docs/accessibility.md).
 - Maatwebsite Excel
 - arquitectura monolítica modular con servicios de dominio
 
-### Frontend
+### 🎨 Frontend
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" title="HTML5 / Blade" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS 4" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" title="JavaScript ES Modules" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/alpinejs/alpinejs-original.svg" alt="Alpine.js" title="Alpine.js 3" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chartjs/chartjs-original.svg" alt="Chart.js" title="Chart.js 4" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" title="Vite 8" width="44" height="44">
+</p>
 
 - Blade
 - Tailwind CSS **4.x**
@@ -195,14 +210,40 @@ Consulta [`docs/accessibility.md`](docs/accessibility.md).
 - Vite **8.x**
 - JavaScript ES Modules
 
-### Base de datos
+### 🗄️ Base de datos
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-original.svg" alt="Microsoft SQL Server" title="Microsoft SQL Server" width="44" height="44">
+</p>
 
 - Microsoft SQL Server como motor oficial.
 - SQL Server 2022 en GitHub Actions.
 - ODBC Driver 18 en CI.
 - `sqlsrv` y `pdo_sqlsrv`.
 
-### Calidad
+### ♿ Accesibilidad
+
+<p>
+  <img src="https://img.shields.io/badge/NORTIC-B2%3A2017-263f88?style=for-the-badge" alt="NORTIC B2:2017">
+  <img src="https://img.shields.io/badge/WCAG-2.0%20AA%20objetivo-005A9C?style=for-the-badge&logo=w3c&logoColor=white" alt="WCAG 2.0 AA como objetivo técnico">
+  <img src="https://img.shields.io/badge/Teclado-Compatible-16a34a?style=for-the-badge" alt="Navegación por teclado">
+</p>
+
+- navegación por teclado;
+- foco visible;
+- escalado de texto;
+- alto contraste y reducción de movimiento;
+- landmarks semánticos, ARIA y skip links;
+- mensajes accesibles para tecnologías asistivas.
+
+### 🧪 Calidad, build y CI
+
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" title="Node.js" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" title="npm" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" title="Git" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" alt="GitHub Actions" title="GitHub Actions" width="44" height="44">
+</p>
 
 - PHPUnit 12.x
 - Laravel Pint
@@ -340,9 +381,30 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 
 Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico.
 
-## Origen académico
+## 🎓 Información académica
 
-RentaDrive conserva su origen como proyecto final de **SOF-007 — Análisis y Diseño de Sistemas** del ITLA. La versión actual es una modernización y evolución comercial posterior desarrollada de manera independiente.
+| Campo | Información |
+|---|---|
+| 🏫 Institución | Instituto Tecnológico de Las Américas (ITLA) |
+| 🎓 Carrera | Tecnólogo en Desarrollo de Software |
+| 📘 Asignatura | Análisis y Diseño de Sistemas (SOF-007) |
+| 👨‍🏫 Profesor | Huascar Frias Vilorio |
+| 📅 Período académico | 2017-C1 |
+| 👨🏻‍💻 Estudiante | Francis Jairo Matías Rosario |
+| 🪪 Matrícula | 2015-2984 |
+| 🚘 Proyecto | RentaDrive |
+| 🛠️ Modernización / evolución comercial | 2026 |
+
+El proyecto académico original y la evolución comercial actual son etapas distintas del mismo repositorio. La ficha anterior documenta el origen académico; no atribuye al ITLA el desarrollo comercial posterior.
+
+## 🧭 Continuidad académica
+
+RentaDrive se documenta como proyecto académico individual de **Análisis y Diseño de Sistemas (SOF-007)**. En los repositorios actualmente preservados del ITLA no se ha verificado una segunda coincidencia inequívoca por profesor o compañero que justifique otra línea de continuidad. No se infieren relaciones adicionales sin evidencia documental.
+
+## 👨🏻‍💻 Autor
+
+**Francis Jairo Matías Rosario**  
+Matrícula ITLA: **2015-2984**
 
 ## Licencia
 
