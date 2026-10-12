@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Domain\Operations\Services\ReferenceNumberService;
 use App\Domain\Operations\Services\ReservationAvailabilityService;
 use App\Http\Requests\ReservationRequest;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Vehicle;
@@ -15,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class ReservationController extends Controller
@@ -50,19 +52,35 @@ final class ReservationController extends Controller
         ReservationAvailabilityService $availability,
         ReferenceNumberService $references,
     ): RedirectResponse {
-        $data = $this->prepareData($request, $availability);
-        $reservation = Reservation::query()->create([
-            ...$data,
-            'code' => $references->generate(Reservation::class, 'code', 'RES'),
-            'created_by' => auth()->id(),
-        ]);
+        $reservation = DB::transaction(function () use ($request, $availability, $references): Reservation {
+            $branchId = $request->user()?->branch_id;
+            abort_unless($branchId !== null, 403, 'Tu usuario no tiene una sucursal activa asignada.');
+
+            Branch::query()->whereKey($branchId)->lockForUpdate()->firstOrFail();
+
+            $data = $this->prepareData($request, $availability);
+
+            return Reservation::query()->create([
+                ...$data,
+                'code' => $references->generate(Reservation::class, 'code', 'RES'),
+                'created_by' => auth()->id(),
+            ]);
+        }, 3);
 
         return redirect()->route('reservations.show', $reservation)->with('status', 'Reserva creada.');
     }
 
     public function show(Reservation $reservation): View
     {
-        $reservation->load(['customer', 'category', 'vehicle.model.brand', 'creator', 'rental']);
+        $reservation->load([
+            'customer',
+            'category',
+            'branch',
+            'vehicle.model.brand',
+            'creator',
+            'rental',
+            'bookingOptions.option',
+        ]);
 
         return view('reservations.show', compact('reservation'));
     }
@@ -81,7 +99,12 @@ final class ReservationController extends Controller
         Reservation $reservation,
         ReservationAvailabilityService $availability,
     ): RedirectResponse {
-        $reservation->update($this->prepareData($request, $availability, $reservation));
+        DB::transaction(function () use ($request, $reservation, $availability): void {
+            abort_unless($reservation->branch_id !== null, 409, 'La reserva no tiene una sucursal asignada.');
+
+            Branch::query()->whereKey($reservation->branch_id)->lockForUpdate()->firstOrFail();
+            $reservation->update($this->prepareData($request, $availability, $reservation));
+        }, 3);
 
         return redirect()->route('reservations.show', $reservation)->with('status', 'Reserva actualizada.');
     }
@@ -120,10 +143,34 @@ final class ReservationController extends Controller
         $data = $request->validated();
         $startAt = Carbon::parse($data['start_at']);
         $endAt = Carbon::parse($data['end_at']);
+        $branch = $reservation?->branch ?? $request->user()?->branch;
+
+        abort_unless($branch instanceof Branch, 403, 'La reserva no tiene una sucursal válida asignada.');
+
+        /** @var VehicleCategory $category */
+        $category = VehicleCategory::query()->findOrFail($data['vehicle_category_id']);
+
+        if ($availability->availableCategoryCount(
+            $branch,
+            $category,
+            $startAt,
+            $endAt,
+            $reservation?->getKey(),
+        ) < 1) {
+            throw ValidationException::withMessages([
+                'vehicle_category_id' => 'No queda capacidad disponible en esta categoría para el período seleccionado.',
+            ]);
+        }
 
         if (! empty($data['vehicle_id'])) {
             /** @var Vehicle $vehicle */
             $vehicle = Vehicle::query()->findOrFail($data['vehicle_id']);
+
+            if ((int) $vehicle->branch_id !== (int) $branch->getKey()) {
+                throw ValidationException::withMessages([
+                    'vehicle_id' => 'El vehículo no pertenece a la sucursal de la reserva.',
+                ]);
+            }
 
             if ((int) $vehicle->vehicle_category_id !== (int) $data['vehicle_category_id']) {
                 throw ValidationException::withMessages([
@@ -138,10 +185,17 @@ final class ReservationController extends Controller
             }
         }
 
-        $data['estimated_total'] = round(
+        $subtotal = round(
             $availability->rentalDays($startAt, $endAt) * (float) $data['daily_rate'],
             2,
         );
+
+        $data['branch_id'] = $branch->getKey();
+        $data['subtotal'] = $subtotal;
+        $data['extras_total'] = (float) ($reservation?->extras_total ?? 0);
+        $data['deposit_amount'] = (float) $category->deposit_amount;
+        $data['estimated_total'] = round($subtotal + $data['extras_total'], 2);
+        $data['source'] = $reservation?->source ?? 'internal';
         $data['cancelled_at'] = $data['status'] === 'cancelled' ? now() : null;
 
         return $data;

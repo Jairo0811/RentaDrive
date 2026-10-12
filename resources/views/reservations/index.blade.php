@@ -20,11 +20,16 @@
         @else
             <div class="overflow-x-auto">
                 <table class="data-table">
-                    <thead><tr><th>Reserva</th><th>Cliente</th><th>Vehículo / categoría</th><th>Período</th><th>Estimado</th><th>Estado</th><th></th></tr></thead>
+                    <thead><tr><th>Reserva</th><th>Origen</th><th>Cliente</th><th>Vehículo / categoría</th><th>Período</th><th>Estimado</th><th>Estado</th><th></th></tr></thead>
                     <tbody>
                         @foreach ($reservations as $reservation)
                             <tr>
                                 <td class="font-bold text-slate-900 dark:text-white">{{ $reservation->code }}</td>
+                                <td>
+                                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold {{ $reservation->source === 'public' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }}">
+                                        {{ $reservation->source === 'public' ? 'Online' : 'Interna' }}
+                                    </span>
+                                </td>
                                 <td>{{ $reservation->customer->full_name }}</td>
                                 <td><p>{{ $reservation->vehicle?->display_name ?? $reservation->category->name }}</p><p class="mt-1 text-xs text-slate-500">{{ $reservation->pickup_location }}</p></td>
                                 <td><p>{{ $reservation->start_at->format('d/m/Y h:i A') }}</p><p class="mt-1 text-xs text-slate-500">a {{ $reservation->end_at->format('d/m/Y h:i A') }}</p></td>

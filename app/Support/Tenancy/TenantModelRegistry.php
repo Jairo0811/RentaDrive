@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Support\Tenancy;
 
 use App\Models\AuditLog;
+use App\Models\BookingOption;
 use App\Models\Customer;
 use App\Models\Inspection;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Rental;
 use App\Models\Reservation;
+use App\Models\ReservationBookingOption;
 use App\Models\Setting;
 use App\Models\Vehicle;
 use App\Models\VehicleBrand;
@@ -34,6 +36,8 @@ final class TenantModelRegistry
             Vehicle::class,
             VehicleMaintenance::class,
             Reservation::class,
+            BookingOption::class,
+            ReservationBookingOption::class,
             Rental::class,
             Inspection::class,
             Invoice::class,
