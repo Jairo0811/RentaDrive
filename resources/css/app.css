@@ -8,17 +8,60 @@
     }
 
     html {
-        @apply scroll-smooth;
+        @apply scroll-smooth bg-[#030914] text-slate-100;
+        color-scheme: dark;
         font-size: var(--rentadrive-font-scale);
     }
 
     body {
-        @apply bg-slate-100 text-slate-900 dark:bg-[#030914] dark:text-slate-100;
+        @apply bg-[#030914] text-slate-100;
     }
 
     body > div.flex,
     body > div.grid {
         zoom: var(--rentadrive-interface-scale);
+    }
+
+    input,
+    select,
+    textarea {
+        color-scheme: dark;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: #94a3b8;
+        opacity: 1;
+    }
+
+    select,
+    select option,
+    select optgroup {
+        background-color: #020617;
+        color: #f8fafc;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled,
+    input[readonly],
+    textarea[readonly] {
+        background-color: #0f172a !important;
+        color: #cbd5e1 !important;
+        border-color: #334155 !important;
+        opacity: 1;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        -webkit-text-fill-color: #f8fafc !important;
+        caret-color: #f8fafc;
+        -webkit-box-shadow: 0 0 0 1000px #020617 inset !important;
+        box-shadow: 0 0 0 1000px #020617 inset !important;
+        transition: background-color 9999s ease-out 0s;
     }
 
     [x-cloak] {
@@ -155,35 +198,35 @@
     }
 
     .accessibility-choice {
-        @apply focus-ring rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800;
+        @apply focus-ring rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-sm font-bold text-slate-200 transition hover:bg-slate-800;
     }
 
     .accessibility-choice-active {
-        @apply border-blue-600 bg-blue-600 text-white hover:bg-blue-700 dark:border-blue-400 dark:bg-blue-600 dark:text-white;
+        @apply border-blue-400 bg-blue-600 text-white hover:bg-blue-700;
     }
 
     .accessibility-profile {
-        @apply focus-ring flex min-h-16 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-left text-xs font-bold text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-950/40;
+        @apply focus-ring flex min-h-16 items-center gap-2 rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-left text-xs font-bold text-slate-200 transition hover:border-blue-500 hover:bg-blue-950/40;
     }
 
     .accessibility-profile i {
-        @apply text-base text-blue-600 dark:text-blue-400;
+        @apply text-base text-blue-400;
     }
 
     .accessibility-toggle {
-        @apply flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-slate-200 p-3 dark:border-slate-700;
+        @apply flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-950/40 p-3;
     }
 
     .accessibility-toggle-title {
-        @apply block text-sm font-bold text-slate-800 dark:text-slate-200;
+        @apply block text-sm font-bold text-slate-200;
     }
 
     .accessibility-toggle-help {
-        @apply mt-0.5 block text-xs leading-5 text-slate-500 dark:text-slate-400;
+        @apply mt-0.5 block text-xs leading-5 text-slate-400;
     }
 
     .panel {
-        @apply rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
+        @apply rounded-2xl border border-slate-800 bg-slate-900 text-slate-100 shadow-sm;
     }
 
     .nav-item {
@@ -211,7 +254,7 @@
     }
 
     .btn-secondary {
-        @apply focus-ring inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
+        @apply focus-ring inline-flex items-center justify-center rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-bold text-slate-200 shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-500;
     }
 
     .btn-danger {
@@ -219,11 +262,16 @@
     }
 
     .form-label {
-        @apply mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200;
+        @apply mb-2 block text-sm font-bold text-slate-200;
     }
 
     .form-input {
-        @apply focus-ring block w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:text-white;
+        @apply focus-ring block w-full rounded-xl border-slate-700 bg-slate-950 text-sm text-slate-100 shadow-sm placeholder:text-slate-500;
+    }
+
+    .form-input:disabled,
+    .form-input[readonly] {
+        @apply border-slate-700 bg-slate-900 text-slate-300;
     }
 
     .table-shell {
@@ -231,31 +279,31 @@
     }
 
     .data-table {
-        @apply min-w-full divide-y divide-slate-200 dark:divide-slate-800;
+        @apply min-w-full divide-y divide-slate-800;
     }
 
     .data-table thead {
-        @apply bg-slate-50 dark:bg-slate-950/40;
+        @apply bg-slate-950/50;
     }
 
     .data-table th {
-        @apply px-5 py-3 text-left text-[11px] font-black uppercase tracking-[.14em] text-slate-500;
+        @apply px-5 py-3 text-left text-[11px] font-black uppercase tracking-[.14em] text-slate-400;
     }
 
     .data-table td {
-        @apply whitespace-nowrap px-5 py-4 text-sm text-slate-600 dark:text-slate-300;
+        @apply whitespace-nowrap px-5 py-4 text-sm text-slate-300;
     }
 
     .data-table tbody {
-        @apply divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-900;
+        @apply divide-y divide-slate-800 bg-slate-900;
     }
 
     .data-table tbody tr {
-        @apply transition hover:bg-slate-50 dark:hover:bg-slate-800/60;
+        @apply transition hover:bg-slate-800/60;
     }
 
     .focus-ring {
-        @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#facc15] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#081a35];
+        @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#facc15] focus-visible:ring-offset-2 focus-visible:ring-offset-[#081a35];
     }
 
     .metric-icon {
@@ -267,43 +315,43 @@
     }
 
     .metric-icon-emerald {
-        @apply bg-emerald-500/10 text-emerald-500 dark:bg-emerald-400/10 dark:text-emerald-300;
+        @apply bg-emerald-400/10 text-emerald-300;
     }
 
     .metric-icon-violet {
-        @apply bg-violet-500/10 text-violet-500 dark:bg-violet-400/10 dark:text-violet-300;
+        @apply bg-violet-400/10 text-violet-300;
     }
 
     .metric-icon-blue {
-        @apply bg-blue-500/10 text-blue-500 dark:bg-blue-400/10 dark:text-blue-300;
+        @apply bg-blue-400/10 text-blue-300;
     }
 
     .metric-icon-amber {
-        @apply bg-amber-500/10 text-amber-500 dark:bg-amber-400/10 dark:text-amber-300;
+        @apply bg-amber-400/10 text-amber-300;
     }
 
     .metric-icon-rose {
-        @apply bg-rose-500/10 text-rose-500 dark:bg-rose-400/10 dark:text-rose-300;
+        @apply bg-rose-400/10 text-rose-300;
     }
 
     .metric-icon-cyan {
-        @apply bg-cyan-500/10 text-cyan-500 dark:bg-cyan-400/10 dark:text-cyan-300;
+        @apply bg-cyan-400/10 text-cyan-300;
     }
 
     .calendar-grid {
-        @apply grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800;
+        @apply grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-slate-800 bg-slate-800;
     }
 
     .calendar-weekday {
-        @apply bg-slate-50 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[.14em] text-slate-500 dark:bg-slate-950/70;
+        @apply bg-slate-950/70 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[.14em] text-slate-400;
     }
 
     .calendar-day {
-        @apply min-h-28 bg-white p-2.5 dark:bg-slate-900;
+        @apply min-h-28 bg-slate-900 p-2.5;
     }
 
     .calendar-day-muted {
-        @apply bg-slate-50 dark:bg-slate-950/30;
+        @apply bg-slate-950/30;
     }
 
     .calendar-day-today {
@@ -311,7 +359,7 @@
     }
 
     .calendar-number {
-        @apply inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black text-slate-700 dark:text-slate-200;
+        @apply inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black text-slate-200;
     }
 
     .calendar-day-today .calendar-number {
@@ -319,7 +367,7 @@
     }
 
     .calendar-event {
-        @apply block truncate rounded-lg bg-blue-50 px-2 py-1.5 text-[10px] text-blue-700 transition hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950;
+        @apply block truncate rounded-lg bg-blue-950/50 px-2 py-1.5 text-[10px] text-blue-300 transition hover:bg-blue-950;
     }
 
     .calendar-event span,
@@ -332,17 +380,17 @@
     }
 
     .toast-success {
-        @apply border-emerald-300/60 bg-emerald-50/95 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/95 dark:text-emerald-200;
+        @apply border-emerald-800 bg-emerald-950/95 text-emerald-200;
     }
 
     .toast-error {
-        @apply border-red-300/60 bg-red-50/95 text-red-900 dark:border-red-800 dark:bg-red-950/95 dark:text-red-200;
+        @apply border-red-800 bg-red-950/95 text-red-200;
     }
 
     .login-form-panel {
         background:
-            radial-gradient(circle at 100% 0%, rgb(5 104 245 / 10%), transparent 34%),
-            linear-gradient(145deg, #f8fbff 0%, #eef4fb 100%);
+            radial-gradient(circle at 100% 0%, rgb(5 104 245 / 16%), transparent 34%),
+            linear-gradient(145deg, #071a38 0%, #030914 100%);
     }
 
     .brand-lockup {
@@ -351,11 +399,5 @@
 
     .brand-lockup img {
         @apply h-auto w-full object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,.55)];
-    }
-
-    .dark .login-form-panel {
-        background:
-            radial-gradient(circle at 100% 0%, rgb(5 104 245 / 16%), transparent 34%),
-            linear-gradient(145deg, #071a38 0%, #030914 100%);
     }
 }
