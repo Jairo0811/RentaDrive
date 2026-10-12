@@ -31,7 +31,10 @@ final class HardeningConfigurationTest extends TestCase
         $application->detectEnvironment(fn (): string => 'production');
 
         try {
-            $this->seed(DatabaseSeeder::class);
+            $this->artisan('db:seed', [
+                '--class' => DatabaseSeeder::class,
+                '--force' => true,
+            ])->assertExitCode(0);
 
             $this->assertDatabaseCount('vehicle_categories', 0);
             $this->assertDatabaseCount('vehicles', 0);
