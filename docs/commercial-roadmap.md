@@ -65,12 +65,31 @@ Los límites se validan en backend. Los estados `suspended` y `cancelled` bloque
 
 ## Fase 2 — Booking Engine
 
-- Sitio público por empresa.
-- Disponibilidad por fechas/categoría/sucursal.
-- Cotización.
-- Extras y seguros.
-- Reserva online.
-- Confirmaciones y cancelaciones.
+- [x] Sitio público por empresa mediante slug propio (`/book/{empresa}`).
+- [x] Disponibilidad por fechas, categoría y sucursal.
+- [x] Capacidad compartida entre reservas públicas e internas para evitar sobreventa.
+- [x] Cotización server-side con días, tarifa diaria, subtotal y depósito.
+- [x] Extras y seguros configurables por tenant con precio fijo o por día.
+- [x] Reserva online sin cuenta de cliente.
+- [x] Token público privado para consulta de reserva.
+- [x] Confirmación web y cancelación autoservicio antes del retiro.
+- [x] Throttling en creación y cancelación públicas.
+- [x] Bloqueo transaccional por sucursal para serializar la toma del último cupo.
+- [x] Backoffice identifica reservas Online vs. Internas y muestra su desglose.
+- [x] Pruebas E2E de aislamiento, cotización, capacidad, creación y cancelación.
+
+### Modelo de cotización de 2.0
+
+La reserva pública se realiza por categoría. La unidad concreta puede asignarse después por el equipo operativo. El motor calcula la disponibilidad física de la sucursal, descuenta vehículos ya comprometidos y también reservas por categoría todavía sin vehículo asignado.
+
+Los extras/seguros admiten dos modos de precio:
+
+- `flat`: importe único por reserva.
+- `per_day`: precio multiplicado por la duración calculada de la reserva.
+
+El depósito se informa durante la cotización pero no se cobra todavía; el cobro online comienza en la Fase 3.
+
+**Criterio de cierre de Fase 2:** migración SQL Server, portal público, backoffice, npm audit, build, Pint y PHPUnit deben quedar verdes en CI.
 
 ## Fase 3 — Payments
 
