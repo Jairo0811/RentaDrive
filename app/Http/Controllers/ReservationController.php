@@ -129,9 +129,9 @@ final class ReservationController extends Controller
         $data = $request->validated();
         $startAt = Carbon::parse($data['start_at']);
         $endAt = Carbon::parse($data['end_at']);
-        $branch = $request->user()?->branch;
+        $branch = $reservation?->branch ?? $request->user()?->branch;
 
-        abort_unless($branch instanceof Branch, 403, 'Tu usuario no tiene una sucursal activa asignada.');
+        abort_unless($branch instanceof Branch, 403, 'La reserva no tiene una sucursal válida asignada.');
 
         /** @var VehicleCategory $category */
         $category = VehicleCategory::query()->findOrFail($data['vehicle_category_id']);
@@ -154,7 +154,7 @@ final class ReservationController extends Controller
 
             if ((int) $vehicle->branch_id !== (int) $branch->getKey()) {
                 throw ValidationException::withMessages([
-                    'vehicle_id' => 'El vehículo no pertenece a tu sucursal activa.',
+                    'vehicle_id' => 'El vehículo no pertenece a la sucursal de la reserva.',
                 ]);
             }
 
