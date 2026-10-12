@@ -2,6 +2,7 @@
 
 use App\Domain\Security\Enums\PermissionName;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BookingOptionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FleetCatalogController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Platform\PlatformBranchController;
 use App\Http\Controllers\Platform\PlatformCompanyController;
 use App\Http\Controllers\Platform\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicBookingController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
@@ -23,6 +25,22 @@ use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+Route::prefix('book/{company:slug}')
+    ->name('public-booking.')
+    ->middleware('public_company')
+    ->group(function (): void {
+        Route::get('/', [PublicBookingController::class, 'show'])->name('show');
+        Route::get('/availability', [PublicBookingController::class, 'availability'])->name('availability');
+        Route::get('/reserve', [PublicBookingController::class, 'create'])->name('create');
+        Route::post('/reserve', [PublicBookingController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('store');
+        Route::get('/reservation/{token}', [PublicBookingController::class, 'confirmation'])->name('confirmation');
+        Route::post('/reservation/{token}/cancel', [PublicBookingController::class, 'cancel'])
+            ->middleware('throttle:6,1')
+            ->name('cancel');
+    });
 
 Route::middleware(['auth'])->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -127,6 +145,19 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])
         ->middleware('permission:'.PermissionName::VIEW_REPORTS->value)
         ->name('reports.export.pdf');
+
+    Route::get('/booking-options', [BookingOptionController::class, 'index'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)
+        ->name('booking-options.index');
+    Route::post('/booking-options', [BookingOptionController::class, 'store'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)
+        ->name('booking-options.store');
+    Route::put('/booking-options/{booking_option}', [BookingOptionController::class, 'update'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)
+        ->name('booking-options.update');
+    Route::delete('/booking-options/{booking_option}', [BookingOptionController::class, 'destroy'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)
+        ->name('booking-options.destroy');
 
     Route::resource('users', UserController::class)->except(['show'])
         ->middleware('permission:'.PermissionName::MANAGE_USERS->value);
