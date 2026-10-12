@@ -44,6 +44,10 @@ class Reservation extends Model
         return [
             'company_id' => 'integer',
             'branch_id' => 'integer',
+            'customer_id' => 'integer',
+            'vehicle_category_id' => 'integer',
+            'vehicle_id' => 'integer',
+            'created_by' => 'integer',
             'start_at' => 'datetime',
             'end_at' => 'datetime',
             'cancelled_at' => 'datetime',
