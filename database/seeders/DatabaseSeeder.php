@@ -15,7 +15,12 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             PlatformAdminSeeder::class,
             AdminUserSeeder::class,
-            OperationalReferenceSeeder::class,
         ]);
+
+        if (app()->environment(['local', 'testing'])) {
+            $this->call(OperationalReferenceSeeder::class);
+        } else {
+            $this->command?->info('Datos operativos de demostración omitidos fuera de local/testing.');
+        }
     }
 }
