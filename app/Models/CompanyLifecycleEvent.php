@@ -18,7 +18,7 @@ final class CompanyLifecycleEvent extends Model
 
     protected function casts(): array
     {
-        return ['company_id' => 'integer', 'created_at' => 'datetime'];
+        return ['company_id' => 'integer', 'actor_id' => 'integer', 'created_at' => 'datetime'];
     }
 
     public function company(): BelongsTo
