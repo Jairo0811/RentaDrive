@@ -86,6 +86,11 @@ class Rental extends Model
         return $this->hasMany(Inspection::class);
     }
 
+    public function acceptances(): HasMany
+    {
+        return $this->hasMany(RentalAcceptance::class);
+    }
+
     public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
