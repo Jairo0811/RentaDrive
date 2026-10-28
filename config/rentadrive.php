@@ -5,6 +5,10 @@ declare(strict_types=1);
 return [
     'trial_days' => 14,
 
+    'automation' => [
+        'enabled' => (bool) env('RENTA_AUTOMATION_ENABLED', false),
+    ],
+
     'plans' => [
         'starter' => [
             'name' => 'Starter',
