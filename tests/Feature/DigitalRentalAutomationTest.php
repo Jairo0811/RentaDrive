@@ -7,6 +7,8 @@ namespace Tests\Feature;
 use App\Domain\Automation\Services\AutomationDispatcher;
 use App\Domain\Security\Enums\RoleName;
 use App\Models\AutomationDelivery;
+use App\Models\Branch;
+use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Inspection;
 use App\Models\Rental;
@@ -154,7 +156,18 @@ final class DigitalRentalAutomationTest extends TestCase
         $this->get(route('inspections.photo', ['inspection' => $inspection->getKey(), 'index' => 0]))
             ->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
 
-        $other = User::factory()->create();
+        $foreignCompany = Company::query()->create([
+            'name' => 'Otra Rentadora', 'slug' => 'otra-rentadora-f7',
+            'currency' => 'DOP', 'timezone' => 'America/Santo_Domingo', 'status' => 'active',
+        ]);
+        $foreignBranch = Branch::query()->create([
+            'company_id' => $foreignCompany->getKey(), 'name' => 'Principal',
+            'code' => 'PRINCIPAL', 'is_primary' => true, 'is_active' => true,
+        ]);
+        $other = User::factory()->create([
+            'company_id' => $foreignCompany->getKey(),
+            'branch_id' => $foreignBranch->getKey(),
+        ]);
         $other->assignRole(RoleName::ADMINISTRATOR->value);
         $this->actingAs($other)->get(route('inspections.photo', [
             'inspection' => $inspection->getKey(),
