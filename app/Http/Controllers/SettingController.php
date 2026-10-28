@@ -30,10 +30,12 @@ final class SettingController extends Controller
             'business_email' => ['nullable', 'email', 'max:255'],
             'business_address' => ['nullable', 'string', 'max:255'],
             'currency' => ['required', 'in:DOP,USD'],
+            'automation_email_opt_in' => ['nullable', 'boolean'],
             'default_pickup_location' => ['required', 'string', 'max:255'],
         ]);
 
         $data['tax_rate'] = self::FIXED_ITBIS_RATE;
+        $data['automation_email_opt_in'] = $request->boolean('automation_email_opt_in') ? '1' : '0';
 
         $map = [
             'business_name' => ['general', 'business.name'],
@@ -42,6 +44,7 @@ final class SettingController extends Controller
             'business_email' => ['general', 'business.email'],
             'business_address' => ['general', 'business.address'],
             'currency' => ['billing', 'billing.currency'],
+            'automation_email_opt_in' => ['automation', 'automation.email_opt_in'],
             'tax_rate' => ['billing', 'billing.tax_rate'],
             'default_pickup_location' => ['operations', 'operations.default_pickup_location'],
         ];

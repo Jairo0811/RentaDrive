@@ -24,6 +24,6 @@
     </div>
 
     @if (!empty($inspection->photos))
-        <section class="panel mt-6 p-5 sm:p-6"><h2 class="font-black text-slate-950 dark:text-white">Evidencias</h2><div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">@foreach ($inspection->photos as $photo)<a href="{{ Storage::url($photo) }}" target="_blank"><img src="{{ Storage::url($photo) }}" alt="Evidencia de inspección" class="aspect-video w-full rounded-xl object-cover"></a>@endforeach</div></section>
+        <section class="panel mt-6 p-5 sm:p-6"><h2 class="font-black text-slate-950 dark:text-white">Evidencias</h2><div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">@foreach ($inspection->photos as $index => $photo)<a href="{{ route('inspections.photo', ['inspection' => $inspection, 'index' => $index]) }}" target="_blank" rel="noopener noreferrer"><img src="{{ route('inspections.photo', ['inspection' => $inspection, 'index' => $index]) }}" alt="Evidencia de inspección" class="aspect-video w-full rounded-xl object-cover"></a>@endforeach</div></section>
     @endif
 </x-app-layout>

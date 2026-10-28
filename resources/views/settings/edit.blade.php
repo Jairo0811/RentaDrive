@@ -28,6 +28,14 @@
                 <div><label class="form-label" for="default_pickup_location">Ubicación predeterminada</label><input id="default_pickup_location" name="default_pickup_location" value="{{ old('default_pickup_location', $settings['operations.default_pickup_location'] ?? 'Oficina principal') }}" class="form-input" required></div>
             </div>
         </section>
+        <section class="panel p-5 sm:p-6">
+            <h2 class="font-black text-white">Avisos automáticos por correo</h2>
+            <label class="mt-3 flex items-start gap-3 text-sm text-slate-200">
+                <input type="checkbox" name="automation_email_opt_in" value="1" @checked(old('automation_email_opt_in', $settings['automation.email_opt_in'] ?? '0') === '1')>
+                Autorizo el envío de avisos operativos al correo de esta empresa. Requiere que el administrador del servidor habilite la automatización.
+            </label>
+            <p class="mt-2 text-xs text-slate-400">Las alertas se desactivan por defecto y no incluyen documentos personales.</p>
+        </section>
         <div class="flex justify-end"><button class="btn-primary">Guardar configuración</button></div>
     </form>
 </x-app-layout>

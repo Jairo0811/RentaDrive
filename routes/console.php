@@ -1,11 +1,22 @@
 <?php
 
+use App\Domain\Automation\Services\AutomationDispatcher;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Symfony\Component\Console\Command\Command;
+
+Artisan::command('rentadrive:automations', function (AutomationDispatcher $dispatcher): int {
+    $count = $dispatcher->run();
+    $this->info('Automatizaciones enviadas: '.$count);
+
+    return Command::SUCCESS;
+})->purpose('Envía avisos operativos multiempresa cuando la configuración lo permite.');
+
+Schedule::command('rentadrive:automations')->dailyAt('08:00')->withoutOverlapping();
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

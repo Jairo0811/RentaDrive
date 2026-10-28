@@ -32,7 +32,7 @@ final class InspectionRequest extends FormRequest
             'accessories' => ['nullable', 'string', 'max:2000'],
             'damages' => ['nullable', 'string', 'max:4000'],
             'photos' => ['nullable', 'array', 'max:12'],
-            'photos.*' => ['nullable', 'image', 'max:5120'],
+            'photos.*' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
         ];
     }
 }

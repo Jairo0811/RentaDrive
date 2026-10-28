@@ -366,6 +366,14 @@ SESSION_SECURE_COOKIE=true
 
 Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una estrategia de despliegue reproducible. Esos controles se completarán durante la Fase 7 — SaaS Production.
 
+## Fases 5 y 6: expediente y automatizaciones
+
+- Inspecciones con fotografías nuevas almacenadas en privado, acceso con autorización y aislamiento por empresa. Las fotos legacy requieren migración desde disco público.
+- Acuse interno del operador con hash SHA-256, nombre, fecha e IP; **no es firma digital certificada del cliente**.
+- Alertas de reserva, devolución y mantenimiento, desactivadas por defecto; activar `RENTA_AUTOMATION_ENABLED=true` únicamente con email autorizado y servicio SMTP funcional.
+- WhatsApp comercial, firma digital de clientes y almacenamiento externo de producción siguen pendientes de proveedores e infraestructura.
+- Ver [documentación de expedientes y automatizaciones](docs/digital-rental-automation.md).
+
 ## Fases 3 y 4: integración y límites
 
 - **Payments:** intentos sandbox solo en local/testing, HMAC SHA-256 e idempotencia de eventos; anulación lógica de pagos manuales. `captured` en sandbox **no representa dinero real**.
@@ -382,8 +390,8 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 | 2.1 — Hardening | ✅ Completa |
 | 3 — Payments | 🟡 Sandbox; pasarela real pendiente |
 | 4 — Dominican Edition | 🟡 Borradores; certificación pendiente |
-| 5 — Digital Rental | Pendiente |
-| 6 — Automation | Pendiente |
+| 5 — Digital Rental | 🟡 Expediente seguro y acuse interno; firma digital cliente pendiente |
+| 6 — Automation | 🟡 Email opt-in y deduplicación; WhatsApp pendiente |
 | 7 — SaaS Production | Pendiente |
 
 Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico.

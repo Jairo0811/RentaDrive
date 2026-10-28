@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class InspectionController extends Controller
 {
@@ -50,8 +51,23 @@ final class InspectionController extends Controller
 
         $data['vehicle_id'] = $rental->vehicle_id;
         $data['inspected_by'] = auth()->id();
-        $data['photos'] = $this->storePhotos($request);
+        $data['photos'] = [];
         $inspection = Inspection::query()->create($data);
+
+        $paths = [];
+        try {
+            foreach ($request->file('photos', []) as $photo) {
+                $paths[] = $photo->store('rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(), 'local');
+            }
+            $inspection->update(['photos' => $paths]);
+        } catch (\Throwable $exception) {
+            foreach ($paths as $path) {
+                Storage::disk('local')->delete($path);
+            }
+            $inspection->delete();
+
+            throw $exception;
+        }
 
         return redirect()->route('inspections.show', $inspection)->with('status', 'Inspección registrada.');
     }
@@ -63,28 +79,27 @@ final class InspectionController extends Controller
         return view('inspections.show', compact('inspection'));
     }
 
-    public function destroy(Inspection $inspection): RedirectResponse
+    public function photo(Inspection $inspection, int $index): StreamedResponse
     {
-        foreach ($inspection->photos ?? [] as $path) {
-            Storage::disk('public')->delete($path);
-        }
+        $photos = $inspection->photos ?? [];
+        abort_unless(array_key_exists($index, $photos), 404);
+        $path = $photos[$index];
+        abort_unless(is_string($path), 404);
 
-        $inspection->delete();
+        // Compatibilidad con registros legacy: su carpeta pública debe migrarse y depurarse.
+        $disk = str_starts_with($path, 'rentadrive-evidence/') ? 'local' : 'public';
+        abort_unless(Storage::disk($disk)->exists($path), 404);
 
-        return redirect()->route('inspections.index')->with('status', 'Inspección eliminada.');
+        return Storage::disk($disk)->response($path, null, [
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
-    /**
-     * @return array<int, string>
-     */
-    private function storePhotos(InspectionRequest $request): array
+    public function destroy(Inspection $inspection): RedirectResponse
     {
-        $paths = [];
-
-        foreach ($request->file('photos', []) as $photo) {
-            $paths[] = $photo->store('inspections', 'public');
-        }
-
-        return $paths;
+        throw ValidationException::withMessages([
+            'inspection' => 'Las inspecciones ya registradas forman parte del expediente auditable y no se eliminan.',
+        ]);
     }
 }

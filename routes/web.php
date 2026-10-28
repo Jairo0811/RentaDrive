@@ -17,6 +17,7 @@ use App\Http\Controllers\Platform\PlatformCompanyController;
 use App\Http\Controllers\Platform\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicBookingController;
+use App\Http\Controllers\RentalAcceptanceController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
@@ -117,6 +118,10 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_RESERVATIONS->value)
         ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:'.PermissionName::MANAGE_RESERVATIONS->value);
 
+    Route::post('/rentals/{rental}/acceptance', [RentalAcceptanceController::class, 'store'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONTRACTS->value)
+        ->name('rentals.acceptance');
+
     Route::get('/rentals/{rental}/contract', [RentalController::class, 'contract'])
         ->middleware('permission:'.PermissionName::MANAGE_CONTRACTS->value)
         ->name('rentals.contract');
@@ -126,6 +131,11 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::resource('rentals', RentalController::class)->only(['index', 'create', 'store', 'show'])
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_RENTALS->value)
         ->middlewareFor(['create', 'store'], 'permission:'.PermissionName::MANAGE_RENTALS->value);
+
+    Route::get('/inspections/{inspection}/photo/{index}', [InspectionController::class, 'photo'])
+        ->whereNumber('index')
+        ->middleware('permission:'.PermissionName::MANAGE_INSPECTIONS->value)
+        ->name('inspections.photo');
 
     Route::resource('inspections', InspectionController::class)->only(['index', 'create', 'store', 'show', 'destroy'])
         ->middleware('permission:'.PermissionName::MANAGE_INSPECTIONS->value);
