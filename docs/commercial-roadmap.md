@@ -140,7 +140,12 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] ITBIS y reglas fiscales configuradas con controles de integridad.
 - [ ] Integraciones locales cuando sean técnicamente y legalmente viables.
 
-## Fase 5 — Digital Rental
+## Fase 5 — Digital Rental (en desarrollo)
+
+- [x] Evidencia fotográfica nueva en almacenamiento privado por tenant con descargas autorizadas.
+- [x] Acuse de operador auditable sobre datos del contrato y hash SHA-256.
+- [ ] Firma digital certificada y consentimiento verificable del cliente.
+- [ ] Migración de fotografías públicas existentes y storage externo.
 
 - [ ] Firma de contratos.
 - [ ] Check-in y check-out móvil.
@@ -149,7 +154,13 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Combustible, kilometraje y accesorios.
 - [ ] Evidencia auditable del proceso de entrega/devolución.
 
-## Fase 6 — Automation
+## Fase 6 — Automation (en desarrollo)
+
+- [x] Alertas de reservas para mañana, devoluciones vencidas y mantenimientos próximos por correo.
+- [x] Opt-in de despliegue por variable de entorno (deshabilitado de fábrica).
+- [x] Historial idempotente multiempresa de entregas por evento/destinatario/canal.
+- [ ] Canal WhatsApp real, proveedor autorizado y opt-in del destinatario.
+- [ ] Reintentos supervisados, alertas, monitoreo de colas y rendimiento de producción.
 
 - [ ] Email y WhatsApp mediante proveedores desacoplados.
 - [ ] Recordatorios de reservas y devoluciones.
