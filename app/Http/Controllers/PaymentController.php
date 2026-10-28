@@ -69,6 +69,7 @@ final class PaymentController extends Controller
         DB::transaction(function () use ($payment): void {
             /** @var Invoice $invoice */
             $invoice = $payment->invoice()->lockForUpdate()->firstOrFail();
+            $payment = Payment::query()->lockForUpdate()->findOrFail($payment->getKey());
             if ($payment->voided_at !== null) {
                 throw ValidationException::withMessages(['payment' => 'El pago ya fue anulado.']);
             }
