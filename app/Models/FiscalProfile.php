@@ -14,6 +14,11 @@ final class FiscalProfile extends Model
 
     protected $fillable = ['company_id', 'legal_name', 'rnc', 'address', 'fiscal_mode'];
 
+    protected function casts(): array
+    {
+        return ['company_id' => 'integer'];
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
