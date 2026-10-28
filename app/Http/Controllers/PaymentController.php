@@ -69,8 +69,15 @@ final class PaymentController extends Controller
         DB::transaction(function () use ($payment): void {
             /** @var Invoice $invoice */
             $invoice = $payment->invoice()->lockForUpdate()->firstOrFail();
-            $payment->delete();
-            $paidAmount = (float) $invoice->payments()->sum('amount');
+            if ($payment->voided_at !== null) {
+                throw ValidationException::withMessages(['payment' => 'El pago ya fue anulado.']);
+            }
+            $payment->update([
+                'voided_at' => now(),
+                'voided_by' => auth()->id(),
+                'void_reason' => 'Anulación administrativa',
+            ]);
+            $paidAmount = (float) $invoice->payments()->whereNull('voided_at')->sum('amount');
             $balance = max(0, (float) $invoice->total - $paidAmount);
             $invoice->update([
                 'paid_amount' => $paidAmount,
