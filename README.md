@@ -36,7 +36,7 @@ Las siguientes etapas están cerradas:
 - **Fase 2 — Booking Engine**: disponibilidad, cotización, extras/seguros, reserva pública y autoservicio.
 - **Fase 2.1 — Hardening**: seguridad PWA, continuidad administrativa, validación documental, seeders seguros y CI reforzada.
 
-La próxima etapa del roadmap es **Fase 3 — Payments**.
+**Fases 3 y 4 en desarrollo:** infraestructura de pagos sandbox y borradores fiscales. No existen cobros online reales ni emisión de e-CF autorizada.
 
 Consulta el detalle completo en [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md).
 
@@ -366,6 +366,13 @@ SESSION_SECURE_COOKIE=true
 
 Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una estrategia de despliegue reproducible. Esos controles se completarán durante la Fase 7 — SaaS Production.
 
+## Fases 3 y 4: integración y límites
+
+- **Payments:** intentos sandbox solo en local/testing, HMAC SHA-256 e idempotencia de eventos; anulación lógica de pagos manuales. `captured` en sandbox **no representa dinero real**.
+- **Fiscal RD:** perfil por tenant, RNC validado por formato (NO consultado en DGII), borradores sin NCF/e-CF. No hay XML firmado, certificación, aprobación ni transmisión DGII.
+- El endpoint `POST /api/payments/sandbox/webhook` requiere `RENTA_PAYMENT_WEBHOOK_SECRET` y no está habilitado en producción.
+- Para la etapa real hacen falta credenciales, contratos con proveedor, certificación fiscal y pruebas de integración.
+
 ## Roadmap resumido
 
 | Fase | Estado |
@@ -373,8 +380,8 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 | 1 — Commercial Foundation | ✅ Completa |
 | 2 — Booking Engine | ✅ Completa |
 | 2.1 — Hardening | ✅ Completa |
-| 3 — Payments | ⏭️ Próxima |
-| 4 — Dominican Edition | Pendiente |
+| 3 — Payments | 🟡 Sandbox; pasarela real pendiente |
+| 4 — Dominican Edition | 🟡 Borradores; certificación pendiente |
 | 5 — Digital Rental | Pendiente |
 | 6 — Automation | Pendiente |
 | 7 — SaaS Production | Pendiente |
