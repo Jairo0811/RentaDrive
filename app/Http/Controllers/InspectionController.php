@@ -60,7 +60,11 @@ final class InspectionController extends Controller
         $paths = [];
         try {
             foreach ($request->file('photos', []) as $photo) {
-                $paths[] = $photo->store('rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(), $disk);
+                $stored = $photo->store('rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(), $disk);
+                if (! is_string($stored) || $stored === '') {
+                    throw new \RuntimeException('No fue posible guardar la evidencia de la inspección.');
+                }
+                $paths[] = $stored;
             }
             $inspection->update(['photos' => $paths]);
         } catch (\Throwable $exception) {
