@@ -82,6 +82,15 @@ final class PaymentIntentService
             $intent = PaymentIntent::query()->where('public_id', $event['intent_id'])
                 ->lockForUpdate()->firstOrFail();
 
+            // Segunda comprobación tras bloquear el intento: evita duplicados concurrentes.
+            $replayed = PaymentEvent::query()->where('gateway', $this->gateway->name())
+                ->where('event_id', $event['event_id'])->first();
+            if ($replayed !== null) {
+                abort_unless(hash_equals($replayed->payload_hash, $digest), 409, 'ID de evento reutilizado.');
+
+                return;
+            }
+
             if ($intent->gateway !== $this->gateway->name()
                 || $intent->currency !== $event['currency']
                 || (int) round(((float) $intent->amount) * 100) !== (int) round(((float) $event['amount']) * 100)) {
