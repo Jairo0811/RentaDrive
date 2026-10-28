@@ -22,12 +22,16 @@ class Payment extends Model
         'amount',
         'notes',
         'received_by',
+        'voided_at',
+        'voided_by',
+        'void_reason',
     ];
 
     protected function casts(): array
     {
         return [
             'paid_at' => 'datetime',
+            'voided_at' => 'datetime',
             'amount' => 'decimal:2',
         ];
     }
@@ -35,6 +39,11 @@ class Payment extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function voidedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'voided_by');
     }
 
     public function receiver(): BelongsTo
