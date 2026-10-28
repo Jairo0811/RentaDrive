@@ -187,7 +187,7 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         $customer = Customer::query()->create([
             'document_type' => 'passport', 'document_number' => 'P88111',
             'first_name' => 'Luis', 'last_name' => 'Díaz',
-            'status' => 'active',
+            'phone' => '8095553456', 'status' => 'active',
         ]);
         $category = VehicleCategory::query()->create([
             'code' => 'F4TEST', 'name' => 'Fase 4', 'daily_rate' => 1000, 'deposit_amount' => 0,
