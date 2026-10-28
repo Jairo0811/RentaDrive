@@ -7,6 +7,7 @@ namespace App\Domain\Automation\Services;
 use App\Models\AutomationDelivery;
 use App\Models\Company;
 use App\Models\Reservation;
+use App\Models\Setting;
 use App\Models\Rental;
 use App\Models\VehicleMaintenance;
 use App\Support\Tenancy\TenantContext;
@@ -33,6 +34,10 @@ final class AutomationDispatcher
             $tenant->set($company);
 
             try {
+                if (Setting::query()->where('key', 'automation.email_opt_in')->value('value') !== '1') {
+                    continue;
+                }
+
                 $starts = Reservation::query()->whereIn('status', ['pending', 'confirmed'])
                     ->whereDate('start_at', now()->addDay()->toDateString())->get();
 
