@@ -71,6 +71,7 @@ final class RentalController extends Controller
             'vehicle.category',
             'reservation',
             'inspections.inspector',
+            'acceptances',
             'invoice.payments',
             'opener',
             'closer',
