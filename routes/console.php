@@ -2,12 +2,39 @@
 
 use App\Domain\Automation\Services\AutomationDispatcher;
 use App\Models\User;
+use App\Support\Commercial\CompanyLifecycle;
+use App\Support\Operations\ProductionReadiness;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Symfony\Component\Console\Command\Command;
+
+Artisan::command('rentadrive:expire-trials', function (CompanyLifecycle $lifecycle): int {
+    $count = $lifecycle->expireTrials();
+    $this->info('Pruebas vencidas suspendidas: '.$count);
+
+    return Command::SUCCESS;
+})->purpose('Suspende de forma idempotente los tenants con prueba vencida.');
+
+Schedule::command('rentadrive:expire-trials')->hourly()->withoutOverlapping();
+
+Artisan::command('rentadrive:production-check', function (ProductionReadiness $readiness): int {
+    $problems = [...$readiness->configurationProblems(), ...$readiness->infrastructureProblems()];
+
+    if ($problems !== []) {
+        foreach ($problems as $problem) {
+            $this->error($problem);
+        }
+
+        return Command::FAILURE;
+    }
+
+    $this->info('Configuración básica y conexión SQL Server verificadas. No sustituye auditoría ni prueba de restauración.');
+
+    return Command::SUCCESS;
+})->purpose('Valida configuración crítica y conectividad antes de un despliegue.');
 
 Artisan::command('rentadrive:automations', function (AutomationDispatcher $dispatcher): int {
     $count = $dispatcher->run();

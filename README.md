@@ -36,7 +36,7 @@ Las siguientes etapas están cerradas:
 - **Fase 2 — Booking Engine**: disponibilidad, cotización, extras/seguros, reserva pública y autoservicio.
 - **Fase 2.1 — Hardening**: seguridad PWA, continuidad administrativa, validación documental, seeders seguros y CI reforzada.
 
-**Fases 3 y 4 en desarrollo:** infraestructura de pagos sandbox y borradores fiscales. No existen cobros online reales ni emisión de e-CF autorizada.
+**Fases 3–7 en evolución comercial:** infraestructura de pagos sandbox, borradores fiscales, expedientes digitales privados, automatizaciones opt-in y controles de preparación SaaS. **No hay cobros online reales, e-CF certificado ni despliegue de producción habilitado.**
 
 Consulta el detalle completo en [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md).
 
@@ -366,6 +366,16 @@ SESSION_SECURE_COOKIE=true
 
 Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una estrategia de despliegue reproducible. Esos controles se completarán durante la Fase 7 — SaaS Production.
 
+## Fase 7: preparación SaaS y operación
+
+- Historial de cambios de estado y plan comercial, sin atribuir pagos inexistentes.
+- Expiración automática e idempotente de pruebas y bloqueo del tenant.
+- Comando `php artisan rentadrive:production-check` para validar configuración, SQL Server, cache y evidencias.
+- Cabeceras HTTP de seguridad y política de no-cache para páginas autenticadas y tokens de reserva.
+- Disco privado configurable por inspección (`RENTA_EVIDENCE_DISK=local` o `s3`), con migración de evidencias antiguas pendiente.
+- Empaquetado de releases auditadas con SHA-256 y manual de backup, restauración y despliegue. **No despliega automáticamente**.
+- Ver [manual de producción](docs/production-operations.md).
+
 ## Fases 5 y 6: expediente y automatizaciones
 
 - Inspecciones con fotografías nuevas almacenadas en privado, acceso con autorización y aislamiento por empresa. Las fotos legacy requieren migración desde disco público.
@@ -392,7 +402,7 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 | 4 — Dominican Edition | 🟡 Borradores; certificación pendiente |
 | 5 — Digital Rental | 🟡 Expediente seguro y acuse interno; firma digital cliente pendiente |
 | 6 — Automation | 🟡 Email opt-in y deduplicación; WhatsApp pendiente |
-| 7 — SaaS Production | Pendiente |
+| 7 — SaaS Production | 🟡 Preparación y preflight; infraestructura real pendiente |
 
 Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico.
 

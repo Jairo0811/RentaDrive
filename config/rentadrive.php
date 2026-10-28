@@ -5,6 +5,10 @@ declare(strict_types=1);
 return [
     'trial_days' => 14,
 
+    'evidence' => [
+        'disk' => env('RENTA_EVIDENCE_DISK', 'local'),
+    ],
+
     'automation' => [
         'enabled' => (bool) env('RENTA_AUTOMATION_ENABLED', false),
     ],

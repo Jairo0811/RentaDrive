@@ -40,6 +40,11 @@ final class Company extends Model
         return $this->hasMany(Branch::class);
     }
 
+    public function lifecycleEvents(): HasMany
+    {
+        return $this->hasMany(CompanyLifecycleEvent::class);
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

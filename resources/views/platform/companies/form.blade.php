@@ -87,6 +87,30 @@
             </section>
         @endunless
 
+        @if ($company->exists)
+            <section class="panel p-5 sm:p-6">
+                <h2 class="font-black text-white">Historial de estado y plan</h2>
+                <p class="mt-1 text-sm text-slate-400">Registro interno de cambios comerciales. No acredita pagos de suscripción.</p>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="data-table">
+                        <thead><tr><th>Fecha</th><th>Evento</th><th>Estado anterior → nuevo</th><th>Plan anterior → nuevo</th><th>Operador</th></tr></thead>
+                        <tbody>
+                            @forelse ($events as $event)
+                                <tr>
+                                    <td>{{ $event->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $event->reason }}</td>
+                                    <td>{{ $event->previous_status ?? '—' }} → {{ $event->new_status }}</td>
+                                    <td>{{ $event->previous_plan ?? '—' }} → {{ $event->new_plan }}</td>
+                                    <td>{{ $event->actor?->name ?? 'Sistema' }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5">Todavía no hay eventos de ciclo de vida registrados.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        @endif
         <div class="flex justify-end">
             <button class="btn-primary">{{ $company->exists ? 'Guardar cambios' : 'Provisionar empresa' }}</button>
         </div>
