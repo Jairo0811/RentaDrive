@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'rentadrive_gateway' => [
+        'webhook_secret' => env('RENTA_PAYMENT_WEBHOOK_SECRET'),
+    ],
 
     /*
     |--------------------------------------------------------------------------
