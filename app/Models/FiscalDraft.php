@@ -19,7 +19,7 @@ final class FiscalDraft extends Model
 
     protected function casts(): array
     {
-        return ['subtotal' => 'decimal:2', 'tax' => 'decimal:2', 'total' => 'decimal:2', 'snapshot' => 'array'];
+        return ['company_id' => 'integer', 'subtotal' => 'decimal:2', 'tax' => 'decimal:2', 'total' => 'decimal:2', 'snapshot' => 'array'];
     }
 
     public function invoice(): BelongsTo
