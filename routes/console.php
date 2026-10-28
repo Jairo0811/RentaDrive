@@ -1,9 +1,9 @@
 <?php
 
 use App\Domain\Automation\Services\AutomationDispatcher;
+use App\Models\User;
 use App\Support\Commercial\CompanyLifecycle;
 use App\Support\Operations\ProductionReadiness;
-use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;

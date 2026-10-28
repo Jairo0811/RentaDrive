@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Platform;
 
 use App\Domain\Security\Enums\RoleName;
-use App\Support\Commercial\CompanyLifecycle;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\CompanyStoreRequest;
 use App\Http\Requests\Platform\CompanyUpdateRequest;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\Commercial\CompanyLifecycle;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
