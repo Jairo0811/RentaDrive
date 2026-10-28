@@ -9,6 +9,8 @@ use App\Models\BookingOption;
 use App\Models\Customer;
 use App\Models\FiscalDraft;
 use App\Models\FiscalProfile;
+use App\Models\RentalAcceptance;
+use App\Models\AutomationDelivery;
 use App\Models\Inspection;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -50,6 +52,8 @@ final class TenantModelRegistry
             PaymentEvent::class,
             FiscalProfile::class,
             FiscalDraft::class,
+            RentalAcceptance::class,
+            AutomationDelivery::class,
             Setting::class,
             AuditLog::class,
         ];
