@@ -79,6 +79,7 @@
                     @endcan
                     @can('manage configuration')
                         <a href="{{ route('booking-options.index') }}" class="nav-item {{ request()->routeIs('booking-options.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>Reserva online</a>
+                        <a href="{{ route('fiscal.edit') }}" class="nav-item {{ request()->routeIs('fiscal.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i></span>Fiscal RD</a>
                         <a href="{{ route('settings.edit') }}" class="nav-item {{ request()->routeIs('settings.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></span>Configuración</a>
                     @endcan
                     @can('view audit log')
