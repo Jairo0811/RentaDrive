@@ -211,7 +211,7 @@ final class PublicBookingController extends Controller
         $reservation = Reservation::query()
             ->where('source', 'public')
             ->where('public_token', $token)
-            ->with(['customer', 'category', 'branch', 'bookingOptions.option'])
+            ->with(['customer', 'category', 'branch', 'bookingOptions.option', 'paymentIntents'])
             ->firstOrFail();
 
         return view('public-booking.confirmation', compact('company', 'reservation'));
