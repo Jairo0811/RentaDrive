@@ -26,6 +26,7 @@ class Inspection extends Model
         'accessories',
         'damages',
         'photos',
+        'photo_disk',
         'inspected_by',
     ];
 
