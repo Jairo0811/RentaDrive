@@ -32,6 +32,25 @@
                 </div>
             </section>
 
+            @can('manage contracts')
+                <section class="panel p-5 sm:p-6">
+                    <h2 class="font-bold text-white">Acuse de contrato (operador)</h2>
+                    <p class="mt-2 text-sm text-slate-400">Registro interno auditable. No sustituye la firma electrónica legal del cliente.</p>
+                    @if($rental->acceptances->isNotEmpty())
+                        @foreach($rental->acceptances as $acceptance)
+                            <p class="mt-3 text-sm text-emerald-300">{{ $acceptance->signer_name }} · {{ $acceptance->accepted_at->format('d/m/Y H:i') }} · Hash SHA-256: {{ $acceptance->document_hash }}</p>
+                        @endforeach
+                    @elseif($rental->status === 'open')
+                        <form method="POST" action="{{ route('rentals.acceptance', $rental) }}" class="mt-4 space-y-3">
+                            @csrf
+                            <label class="form-label" for="signer_name">Nombre del operador</label>
+                            <input class="form-input" id="signer_name" name="signer_name" required maxlength="255" value="{{ Auth::user()->name }}">
+                            <label class="flex items-center gap-3 text-sm"><input type="checkbox" name="acknowledge" value="1" required> Confirmo que revisé los datos del contrato.</label>
+                            <button class="btn-secondary">Registrar acuse interno</button>
+                        </form>
+                    @endif
+                </section>
+            @endcan
             <section class="table-shell">
                 <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Inspecciones</h2>@if ($rental->status === 'open')<span class="text-xs text-slate-500">Entrega y devolución</span>@endif</div>
                 @if ($rental->inspections->isEmpty())
