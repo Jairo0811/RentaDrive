@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\FiscalDraft;
 use App\Models\FiscalProfile;
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\PaymentEvent;
 use App\Models\PaymentIntent;
 use App\Models\Rental;
@@ -219,5 +220,59 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         $this->assertSame('draft', $draft->fresh()->status);
         $this->assertSame('101000001', $draft->issuer_rnc);
         $this->assertSame(1, FiscalDraft::query()->count());
+    }
+
+    public function test_manual_payment_void_preserves_receipt_and_recalculates_invoice(): void
+    {
+        $user = $this->administrator();
+        $reservation = $this->reservation($user);
+
+        $brand = VehicleBrand::query()->create(['name' => 'Toyota']);
+        $model = VehicleModel::query()->create([
+            'vehicle_brand_id' => $brand->id, 'name' => 'Yaris', 'year' => 2025,
+        ]);
+        $vehicle = Vehicle::query()->create([
+            'vehicle_model_id' => $model->id,
+            'vehicle_category_id' => $reservation->vehicle_category_id,
+            'code' => 'F3-VEH', 'plate' => 'F3-0002',
+            'color' => 'Azul', 'mileage' => 20, 'status' => 'rented',
+        ]);
+        $rental = Rental::query()->create([
+            'code' => 'F3-RENT', 'customer_id' => $reservation->customer_id,
+            'vehicle_id' => $vehicle->id, 'start_at' => now(),
+            'expected_return_at' => now()->addDay(), 'opening_mileage' => 20,
+            'daily_rate' => 1000, 'deposit_amount' => 0,
+            'subtotal' => 1000, 'fees' => 0, 'taxes' => 180,
+            'total' => 1180, 'status' => 'open',
+        ]);
+        $invoice = Invoice::query()->create([
+            'number' => 'F3-FAC', 'rental_id' => $rental->id,
+            'customer_id' => $reservation->customer_id,
+            'issued_at' => now(), 'subtotal' => 1000,
+            'tax' => 180, 'discount' => 0, 'total' => 1180,
+            'paid_amount' => 0, 'balance' => 1180, 'status' => 'pending',
+        ]);
+
+        $this->post(route('payments.store'), [
+            'invoice_id' => $invoice->id,
+            'paid_at' => now()->toDateTimeString(),
+            'method' => 'cash',
+            'amount' => 500,
+        ])->assertRedirect();
+
+        $this->assertSame('500.00', $invoice->fresh()->paid_amount);
+        $this->put(route('invoices.update', $invoice), [
+            'discount' => 900,
+        ])->assertSessionHasErrors('discount');
+
+        $receipt = Payment::query()->firstOrFail();
+        $this->delete(route('payments.destroy', $receipt))->assertRedirect();
+        $this->assertNotNull($receipt->fresh()->voided_at);
+        $this->assertSame(1, Payment::query()->count());
+        $this->assertSame('0.00', $invoice->fresh()->paid_amount);
+        $this->assertSame('1180.00', $invoice->fresh()->balance);
+
+        $this->delete(route('payments.destroy', $receipt))
+            ->assertSessionHasErrors('payment');
     }
 }
