@@ -44,6 +44,11 @@ class Invoice extends Model
         ];
     }
 
+    public function fiscalDraft(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(FiscalDraft::class);
+    }
+
     public function rental(): BelongsTo
     {
         return $this->belongsTo(Rental::class);
