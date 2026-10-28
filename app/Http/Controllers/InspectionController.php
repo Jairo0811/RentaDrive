@@ -54,11 +54,14 @@ final class InspectionController extends Controller
         $data['photos'] = [];
         $inspection = Inspection::query()->create($data);
 
+        $paths = [];
         try {
-            $paths = $this->storePhotos($request, $inspection);
+            foreach ($request->file('photos', []) as $photo) {
+                $paths[] = $photo->store('rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(), 'local');
+            }
             $inspection->update(['photos' => $paths]);
         } catch (\Throwable $exception) {
-            foreach ($paths ?? [] as $path) {
+            foreach ($paths as $path) {
                 Storage::disk('local')->delete($path);
             }
             $inspection->delete();
@@ -100,20 +103,4 @@ final class InspectionController extends Controller
         ]);
     }
 
-    /**
-     * @return array<int, string>
-     */
-    private function storePhotos(InspectionRequest $request, Inspection $inspection): array
-    {
-        $paths = [];
-
-        foreach ($request->file('photos', []) as $photo) {
-            $paths[] = $photo->store(
-                'rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(),
-                'local',
-            );
-        }
-
-        return $paths;
-    }
 }
