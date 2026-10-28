@@ -20,6 +20,10 @@ final class RentalAcceptanceController extends Controller
             'acknowledge' => ['required', 'accepted'],
         ]);
 
+        if (trim($data['signer_name']) !== auth()->user()->name) {
+            throw ValidationException::withMessages(['signer_name' => 'El firmante debe coincidir con el operador autenticado.']);
+        }
+
         DB::transaction(function () use ($data, $rental, $request): void {
             $rental = Rental::query()->lockForUpdate()->findOrFail($rental->getKey());
             if ($rental->status !== 'open') {
