@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Platform;
 
 use App\Domain\Security\Enums\RoleName;
+use App\Support\Commercial\CompanyLifecycle;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Platform\CompanyStoreRequest;
 use App\Http\Requests\Platform\CompanyUpdateRequest;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 
 final class PlatformCompanyController extends Controller
 {
+    public function __construct(private readonly CompanyLifecycle $lifecycle) {}
+
     public function index(Request $request): View
     {
         $statuses = ['trial', 'active', 'suspended', 'cancelled'];
@@ -96,6 +99,7 @@ final class PlatformCompanyController extends Controller
             ]);
 
             $administrator->syncRoles([RoleName::ADMINISTRATOR->value]);
+            $this->lifecycle->record($company, null, null, 'onboarded', (int) auth()->id());
 
             return $company;
         });
@@ -107,7 +111,9 @@ final class PlatformCompanyController extends Controller
 
     public function edit(Company $company): View
     {
-        return view('platform.companies.form', compact('company'));
+        $events = $company->lifecycleEvents()->with('actor')->latest('id')->limit(20)->get();
+
+        return view('platform.companies.form', compact('company', 'events'));
     }
 
     public function update(CompanyUpdateRequest $request, Company $company): RedirectResponse
@@ -118,7 +124,13 @@ final class PlatformCompanyController extends Controller
             $data['trial_ends_at'] = null;
         }
 
-        $company->update($data);
+        DB::transaction(function () use ($company, $data): void {
+            $company = Company::query()->lockForUpdate()->findOrFail($company->getKey());
+            $previousStatus = $company->status;
+            $previousPlan = $company->plan_code;
+            $company->update($data);
+            $this->lifecycle->record($company, $previousStatus, $previousPlan, 'platform_update', (int) auth()->id());
+        });
 
         return redirect()
             ->route('platform.companies.edit', $company)
@@ -127,17 +139,26 @@ final class PlatformCompanyController extends Controller
 
     public function suspend(Company $company): RedirectResponse
     {
-        $company->update(['status' => 'suspended']);
+        DB::transaction(function () use ($company): void {
+            $company = Company::query()->lockForUpdate()->findOrFail($company->getKey());
+            $previousStatus = $company->status;
+            $previousPlan = $company->plan_code;
+            $company->update(['status' => 'suspended']);
+            $this->lifecycle->record($company, $previousStatus, $previousPlan, 'manual_suspension', (int) auth()->id());
+        });
 
         return back()->with('status', 'Empresa suspendida. Sus usuarios ya no pueden entrar al tenant.');
     }
 
     public function activate(Company $company): RedirectResponse
     {
-        $company->update([
-            'status' => 'active',
-            'trial_ends_at' => null,
-        ]);
+        DB::transaction(function () use ($company): void {
+            $company = Company::query()->lockForUpdate()->findOrFail($company->getKey());
+            $previousStatus = $company->status;
+            $previousPlan = $company->plan_code;
+            $company->update(['status' => 'active', 'trial_ends_at' => null]);
+            $this->lifecycle->record($company, $previousStatus, $previousPlan, 'manual_activation', (int) auth()->id());
+        });
 
         return back()->with('status', 'Empresa reactivada.');
     }
