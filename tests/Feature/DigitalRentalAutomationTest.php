@@ -8,6 +8,7 @@ use App\Domain\Automation\Services\AutomationDispatcher;
 use App\Domain\Security\Enums\RoleName;
 use App\Models\AutomationDelivery;
 use App\Models\Customer;
+use App\Models\Inspection;
 use App\Models\Rental;
 use App\Models\RentalAcceptance;
 use App\Models\Setting;
@@ -18,7 +19,9 @@ use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 final class DigitalRentalAutomationTest extends TestCase
@@ -116,5 +119,46 @@ final class DigitalRentalAutomationTest extends TestCase
         $this->assertSame(0, app(AutomationDispatcher::class)->run());
         $this->assertSame(1, AutomationDelivery::query()->count());
         $this->assertSame('sent', AutomationDelivery::query()->firstOrFail()->status);
+    }
+
+    public function test_inspection_evidence_is_private_and_cannot_be_read_by_another_tenant(): void
+    {
+        $this->administrator();
+        $rental = $this->rental();
+        Storage::fake('local');
+
+        $photo = UploadedFile::fake()->createWithContent('evidence.png', base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/9YcAAAAASUVORK5CYII='
+        ));
+
+        $this->post(route('inspections.store'), [
+            'rental_id' => $rental->getKey(),
+            'type' => 'delivery',
+            'inspected_at' => now()->format('Y-m-d H:i:s'),
+            'mileage' => 100,
+            'fuel_level' => 100,
+            'body_condition' => 'good',
+            'interior_condition' => 'good',
+            'tires_condition' => 'good',
+            'photos' => [$photo],
+        ])->assertRedirect();
+
+        $inspection = Inspection::query()->firstOrFail();
+        $this->assertSame('local', $inspection->photo_disk);
+        $this->assertCount(1, $inspection->photos);
+        $path = $inspection->photos[0];
+        $this->assertStringStartsWith('rentadrive-evidence/', $path);
+        Storage::disk('local')->assertExists($path);
+        Storage::disk('public')->assertMissing($path);
+
+        $this->get(route('inspections.photo', ['inspection' => $inspection->getKey(), 'index' => 0]))
+            ->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
+
+        $other = User::factory()->create();
+        $other->assignRole(RoleName::ADMINISTRATOR->value);
+        $this->actingAs($other)->get(route('inspections.photo', [
+            'inspection' => $inspection->getKey(),
+            'index' => 0,
+        ]))->assertNotFound();
     }
 }
