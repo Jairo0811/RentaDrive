@@ -6,9 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Payments\Services\PaymentIntentService;
 use App\Models\Company;
-use App\Models\PaymentIntent;
 use App\Models\Reservation;
-use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -24,7 +23,7 @@ final class DepositController extends Controller
         return back()->with('status', 'Depósito registrado en modo de prueba. No se ha cobrado dinero real.');
     }
 
-    public function webhook(Request $request, PaymentIntentService $payments): \Illuminate\Http\JsonResponse
+    public function webhook(Request $request, PaymentIntentService $payments): JsonResponse
     {
         $data = $request->validate([
             'event_id' => ['required', 'string', 'max:120'],

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Invoice extends Model
 {
@@ -44,7 +45,7 @@ class Invoice extends Model
         ];
     }
 
-    public function fiscalDraft(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function fiscalDraft(): HasOne
     {
         return $this->hasOne(FiscalDraft::class);
     }

@@ -60,7 +60,7 @@ final class PaymentIntentService
     /**
      * Aplica eventos firmados de la pasarela; la página pública nunca puede acreditar dinero.
      *
-     * @param array{event_id:string,intent_id:string,event_type:string,amount:numeric-string|int|float,currency:string,reference?:string} $event
+     * @param  array{event_id:string,intent_id:string,event_type:string,amount:numeric-string|int|float,currency:string,reference?:string}  $event
      */
     public function receive(array $event, string $rawBody, ?string $signature): void
     {
@@ -75,6 +75,7 @@ final class PaymentIntentService
 
             if ($existing !== null) {
                 abort_unless(hash_equals($existing->payload_hash, $digest), 409, 'ID de evento reutilizado.');
+
                 return;
             }
 

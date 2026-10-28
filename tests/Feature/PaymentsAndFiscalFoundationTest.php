@@ -22,6 +22,7 @@ use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 final class PaymentsAndFiscalFoundationTest extends TestCase
@@ -69,7 +70,7 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         ]);
     }
 
-    private function sendWebhook(array $event, bool $signed = true): \Illuminate\Testing\TestResponse
+    private function sendWebhook(array $event, bool $signed = true): TestResponse
     {
         $payload = json_encode($event, JSON_THROW_ON_ERROR);
         $signature = $signed ? hash_hmac('sha256', $payload, 'test-webhook-secret') : 'bad-signature';

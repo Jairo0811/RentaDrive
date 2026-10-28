@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Support\Tenancy\TenantContext;
 use App\Domain\Payments\Contracts\PaymentGateway;
 use App\Domain\Payments\Gateways\SandboxGateway;
+use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantModelRegistry;
 use App\Support\Tenancy\TenantResolver;
 use App\Support\Tenancy\TenantScope;

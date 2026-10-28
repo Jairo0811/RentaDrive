@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 final class InvoiceController extends Controller
@@ -51,7 +52,7 @@ final class InvoiceController extends Controller
 
         $total = max(0, (float) $invoice->subtotal + (float) $invoice->tax - (float) $data['discount']);
         if (round($total, 2) < round((float) $invoice->paid_amount, 2)) {
-            throw \Illuminate\Validation\ValidationException::withMessages(['discount' => 'El total no puede ser menor a los pagos ya aplicados.']);
+            throw ValidationException::withMessages(['discount' => 'El total no puede ser menor a los pagos ya aplicados.']);
         }
         $balance = max(0, $total - (float) $invoice->paid_amount);
 
