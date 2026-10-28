@@ -18,6 +18,7 @@ use App\Http\Controllers\Platform\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicBookingController;
 use App\Http\Controllers\RentalController;
+use App\Http\Controllers\RentalAcceptanceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SettingController;
@@ -116,6 +117,10 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::resource('reservations', ReservationController::class)
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_RESERVATIONS->value)
         ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:'.PermissionName::MANAGE_RESERVATIONS->value);
+
+    Route::post('/rentals/{rental}/acceptance', [RentalAcceptanceController::class, 'store'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONTRACTS->value)
+        ->name('rentals.acceptance');
 
     Route::get('/rentals/{rental}/contract', [RentalController::class, 'contract'])
         ->middleware('permission:'.PermissionName::MANAGE_CONTRACTS->value)
