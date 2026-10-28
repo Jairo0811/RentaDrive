@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support\Operations;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Throwable;
 
 final class ProductionReadiness
@@ -57,12 +60,50 @@ final class ProductionReadiness
     /** @return list<string> */
     public function infrastructureProblems(): array
     {
+        $problems = [];
+
         try {
             DB::connection()->select('SELECT 1 AS ready');
         } catch (Throwable) {
-            return ['No se pudo verificar la conexión a la base de datos.'];
+            $problems[] = 'No se pudo verificar la conexión a la base de datos.';
         }
 
-        return [];
+        $key = 'rentadrive:readiness:'.Str::uuid();
+        try {
+            Cache::put($key, 'ok', 30);
+            if (Cache::get($key) !== 'ok') {
+                $problems[] = 'El caché no permite lectura/escritura.';
+            }
+        } catch (Throwable) {
+            $problems[] = 'El caché no está disponible.';
+        } finally {
+            try {
+                Cache::forget($key);
+            } catch (Throwable) {
+                // La disponibilidad ya se registró.
+            }
+        }
+
+        $disk = (string) config('rentadrive.evidence.disk', 'local');
+        if (! in_array($disk, ['local', 's3'], true)) {
+            $problems[] = 'El disco privado de evidencias debe ser local o s3.';
+        } else {
+            $path = 'rentadrive-health/'.Str::uuid().'.txt';
+            try {
+                if (! Storage::disk($disk)->put($path, 'ok') || Storage::disk($disk)->get($path) !== 'ok') {
+                    $problems[] = 'El disco privado de evidencias no permite lectura/escritura.';
+                }
+            } catch (Throwable) {
+                $problems[] = 'El disco privado de evidencias no está disponible.';
+            } finally {
+                try {
+                    Storage::disk($disk)->delete($path);
+                } catch (Throwable) {
+                    // El estado de disponibilidad ya se registró.
+                }
+            }
+        }
+
+        return $problems;
     }
 }
