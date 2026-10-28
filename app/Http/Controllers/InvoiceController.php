@@ -36,7 +36,7 @@ final class InvoiceController extends Controller
 
     public function show(Invoice $invoice): View
     {
-        $invoice->load(['customer', 'rental.vehicle.model.brand', 'payments.receiver']);
+        $invoice->load(['customer', 'rental.vehicle.model.brand', 'payments.receiver', 'fiscalDraft']);
 
         return view('invoices.show', compact('invoice'));
     }
@@ -50,6 +50,9 @@ final class InvoiceController extends Controller
         ]);
 
         $total = max(0, (float) $invoice->subtotal + (float) $invoice->tax - (float) $data['discount']);
+        if (round($total, 2) < round((float) $invoice->paid_amount, 2)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['discount' => 'El total no puede ser menor a los pagos ya aplicados.']);
+        }
         $balance = max(0, $total - (float) $invoice->paid_amount);
 
         $invoice->update([
