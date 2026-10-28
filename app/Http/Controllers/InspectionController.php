@@ -52,17 +52,20 @@ final class InspectionController extends Controller
         $data['vehicle_id'] = $rental->vehicle_id;
         $data['inspected_by'] = auth()->id();
         $data['photos'] = [];
+        $disk = (string) config('rentadrive.evidence.disk', 'local');
+        abort_unless(in_array($disk, ['local', 's3'], true), 503, 'Almacenamiento privado no configurado.');
+        $data['photo_disk'] = $disk;
         $inspection = Inspection::query()->create($data);
 
         $paths = [];
         try {
             foreach ($request->file('photos', []) as $photo) {
-                $paths[] = $photo->store('rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(), 'local');
+                $paths[] = $photo->store('rentadrive-evidence/'.$inspection->company_id.'/'.$inspection->getKey(), $disk);
             }
             $inspection->update(['photos' => $paths]);
         } catch (\Throwable $exception) {
             foreach ($paths as $path) {
-                Storage::disk('local')->delete($path);
+                Storage::disk($disk)->delete($path);
             }
             $inspection->delete();
 
@@ -87,7 +90,10 @@ final class InspectionController extends Controller
         abort_unless(is_string($path), 404);
 
         // Compatibilidad con registros legacy: su carpeta pública debe migrarse y depurarse.
-        $disk = str_starts_with($path, 'rentadrive-evidence/') ? 'local' : 'public';
+        $disk = str_starts_with($path, 'rentadrive-evidence/')
+            ? ($inspection->photo_disk ?: 'local')
+            : 'public';
+        abort_unless(in_array($disk, ['local', 's3', 'public'], true), 404);
         abort_unless(Storage::disk($disk)->exists($path), 404);
 
         return Storage::disk($disk)->response($path, null, [
