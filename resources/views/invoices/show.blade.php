@@ -26,10 +26,25 @@
                 </dl>
             </section>
 
+            @can('manage invoices')
+                <section class="panel p-5 sm:p-6">
+                    <h2 class="font-black text-white">Documento fiscal (República Dominicana)</h2>
+                    <p class="mt-2 text-sm text-slate-400">Borrador de referencia. No es NCF/e-CF y no se transmite a DGII.</p>
+                    @if($invoice->fiscalDraft)
+                        <p class="mt-2 text-sm text-amber-300">Borrador {{ $invoice->fiscalDraft->kind }} · Sin emitir · RD$ {{ number_format((float) $invoice->fiscalDraft->total, 2) }}</p>
+                    @endif
+                    <form class="mt-4 flex flex-wrap gap-3" method="POST" action="{{ route('invoices.fiscal-draft', $invoice) }}">
+                        @csrf
+                        <select name="kind" class="form-input max-w-xs"><option value="consumer">Consumidor final</option><option value="credit">Crédito fiscal</option></select>
+                        <button class="btn-secondary">Preparar borrador</button>
+                    </form>
+                    <a href="{{ route('fiscal.edit') }}" class="mt-3 inline-block text-sm text-blue-400 underline">Configurar perfil fiscal</a>
+                </section>
+            @endcan
             <section class="table-shell">
                 <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Pagos aplicados</h2></div>
                 @if ($invoice->payments->isEmpty())<x-empty-state title="Sin pagos" message="La factura todavía no ha recibido pagos." />
-                @else<div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Recibo</th><th>Fecha</th><th>Método</th><th>Referencia</th><th>Monto</th></tr></thead><tbody>@foreach ($invoice->payments as $payment)<tr><td class="font-bold">{{ $payment->receipt_number }}</td><td>{{ $payment->paid_at->format('d/m/Y h:i A') }}</td><td>{{ ucfirst($payment->method) }}</td><td>{{ $payment->reference ?: '—' }}</td><td>RD$ {{ number_format((float) $payment->amount, 2) }}</td></tr>@endforeach</tbody></table></div>@endif
+                @else<div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Recibo</th><th>Fecha</th><th>Método</th><th>Referencia</th><th>Monto</th></tr></thead><tbody>@foreach ($invoice->payments as $payment)<tr><td class="font-bold">{{ $payment->receipt_number }}</td><td>{{ $payment->paid_at->format('d/m/Y h:i A') }}</td><td>{{ ucfirst($payment->method) }} @if($payment->voided_at) (Anulado) @endif</td><td>{{ $payment->reference ?: '—' }}</td><td>RD$ {{ number_format((float) $payment->amount, 2) }}</td></tr>@endforeach</tbody></table></div>@endif
             </section>
         </div>
 

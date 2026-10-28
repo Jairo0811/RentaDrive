@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Invoice extends Model
 {
@@ -42,6 +43,11 @@ class Invoice extends Model
             'paid_amount' => 'decimal:2',
             'balance' => 'decimal:2',
         ];
+    }
+
+    public function fiscalDraft(): HasOne
+    {
+        return $this->hasOne(FiscalDraft::class);
     }
 
     public function rental(): BelongsTo

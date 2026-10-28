@@ -108,7 +108,15 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 
 **Criterio de cierre de Fase 2.1:** Composer y npm sin vulnerabilidades conocidas que rompan los gates definidos, metadata reproducible, build de producción, Pint y suite completa verdes sobre SQL Server 2022.
 
-## Fase 3 — Payments
+## Fase 3 — Payments (en desarrollo; sandbox)
+
+- [x] Intentos multi-tenant de depósito y eventos firmados.
+- [x] Contrato de proveedor desacoplado; adaptador solo sandbox (local/testing).
+- [x] Callback HMAC, validación de importes y eventos idempotentes.
+- [x] Captura/reembolso simulado y trazabilidad.
+- [x] Anulación lógica de pagos manuales.
+- [ ] Integrar pasarela real, credenciales, cobros, reembolsos y conciliación.
+- [ ] Liquidación segura del depósito al alquiler/factura.
 
 - [ ] Abstracción de pasarela de pagos.
 - [ ] Depósitos de reserva.
@@ -117,7 +125,14 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Webhooks idempotentes.
 - [ ] Conciliación y auditoría.
 
-## Fase 4 — Dominican Edition
+## Fase 4 — Dominican Edition (en desarrollo; borradores)
+
+- [x] Perfil fiscal multiempresa (razón social, RNC, dirección).
+- [x] Borradores fiscales vinculados a facturas; NO se emiten NCF/e-CF.
+- [x] Formato RNC y presentación administrativa dark-only.
+- [ ] Verificación tributaria de datos en fuentes autorizadas.
+- [ ] Proveedor e-CF certificado, firma digital, XML, acuses y DGII.
+- [ ] Gestión de rangos NCF, notas de crédito y certificación.
 
 - [ ] Perfil fiscal dominicano.
 - [ ] NCF/e-CF mediante integración compatible.
@@ -154,4 +169,4 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 
 ## Meta de salida comercial
 
-RentaDrive se considerará listo para pilotos pagados cuando tenga completadas las fases 1, 2, 2.1, 3 y los controles de producción esenciales de la fase 7. La integración fiscal dominicana puede desplegarse de forma incremental según el proveedor y el proceso de certificación elegido.
+RentaDrive no considera intentos sandbox ni borradores fiscales como cobros o comprobantes reales. Se considerará listo para pilotos pagados cuando tenga completadas las fases 1, 2, 2.1, 3 y los controles de producción esenciales de la fase 7. La integración fiscal dominicana puede desplegarse de forma incremental según el proveedor y el proceso de certificación elegido.

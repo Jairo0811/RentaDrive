@@ -7,9 +7,13 @@ namespace App\Support\Tenancy;
 use App\Models\AuditLog;
 use App\Models\BookingOption;
 use App\Models\Customer;
+use App\Models\FiscalDraft;
+use App\Models\FiscalProfile;
 use App\Models\Inspection;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentEvent;
+use App\Models\PaymentIntent;
 use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\ReservationBookingOption;
@@ -42,6 +46,10 @@ final class TenantModelRegistry
             Inspection::class,
             Invoice::class,
             Payment::class,
+            PaymentIntent::class,
+            PaymentEvent::class,
+            FiscalProfile::class,
+            FiscalDraft::class,
             Setting::class,
             AuditLog::class,
         ];

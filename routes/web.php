@@ -5,6 +5,8 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BookingOptionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepositController;
+use App\Http\Controllers\FiscalController;
 use App\Http\Controllers\FleetCatalogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
@@ -37,6 +39,9 @@ Route::prefix('book/{company:slug}')
             ->middleware('throttle:10,1')
             ->name('store');
         Route::get('/reservation/{token}', [PublicBookingController::class, 'confirmation'])->name('confirmation');
+        Route::post('/reservation/{token}/deposit', [DepositController::class, 'store'])
+            ->middleware('throttle:5,1')
+            ->name('deposit.store');
         Route::post('/reservation/{token}/cancel', [PublicBookingController::class, 'cancel'])
             ->middleware('throttle:6,1')
             ->name('cancel');
@@ -161,6 +166,16 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
 
     Route::resource('users', UserController::class)->except(['show'])
         ->middleware('permission:'.PermissionName::MANAGE_USERS->value);
+
+    Route::get('/fiscal', [FiscalController::class, 'edit'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)
+        ->name('fiscal.edit');
+    Route::put('/fiscal', [FiscalController::class, 'update'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)
+        ->name('fiscal.update');
+    Route::post('/invoices/{invoice}/fiscal-draft', [FiscalController::class, 'prepare'])
+        ->middleware('permission:'.PermissionName::MANAGE_INVOICES->value)
+        ->name('invoices.fiscal-draft');
 
     Route::get('/settings', [SettingController::class, 'edit'])
         ->middleware('permission:'.PermissionName::MANAGE_CONFIGURATION->value)

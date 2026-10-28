@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Domain\Payments\Contracts\PaymentGateway;
+use App\Domain\Payments\Gateways\SandboxGateway;
 use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantModelRegistry;
 use App\Support\Tenancy\TenantResolver;
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(TenantContext::class);
+        $this->app->bind(PaymentGateway::class, SandboxGateway::class);
         $this->app->singleton(TenantResolver::class);
     }
 

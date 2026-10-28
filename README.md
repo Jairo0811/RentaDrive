@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/PHP-8.4.1+-777BB4?logo=php&logoColor=white" alt="PHP 8.4.1+">
+  <img src="https://img.shields.io/badge/PHP-8.4.27+-777BB4?logo=php&logoColor=white" alt="PHP 8.4.27+">
   <img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13">
   <img src="https://img.shields.io/badge/SQL%20Server-2022%20CI-CC2927?logo=microsoftsqlserver&logoColor=white" alt="SQL Server 2022 CI">
   <img src="https://img.shields.io/badge/Tailwind-4.x-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
@@ -36,7 +36,7 @@ Las siguientes etapas están cerradas:
 - **Fase 2 — Booking Engine**: disponibilidad, cotización, extras/seguros, reserva pública y autoservicio.
 - **Fase 2.1 — Hardening**: seguridad PWA, continuidad administrativa, validación documental, seeders seguros y CI reforzada.
 
-La próxima etapa del roadmap es **Fase 3 — Payments**.
+**Fases 3 y 4 en desarrollo:** infraestructura de pagos sandbox y borradores fiscales. No existen cobros online reales ni emisión de e-CF autorizada.
 
 Consulta el detalle completo en [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md).
 
@@ -179,12 +179,12 @@ Consulta [`docs/accessibility.md`](docs/accessibility.md).
 ### ⚙️ Backend
 
 <p>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.4.1+" width="44" height="44">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" title="PHP 8.4.27+" width="44" height="44">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" title="Laravel 13" width="44" height="44">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" title="Composer" width="44" height="44">
 </p>
 
-- PHP **8.4.1+**
+- PHP **8.4.27+**
 - Laravel **13.x**
 - Eloquent ORM
 - Spatie Laravel Permission
@@ -274,7 +274,7 @@ Estos límites son actualmente reglas de producto. La facturación recurrente de
 
 ### Requisitos
 
-- PHP 8.4.1+
+- PHP 8.4.27+
 - Composer 2
 - Node.js 24 recomendado
 - npm
@@ -366,6 +366,13 @@ SESSION_SECURE_COOKIE=true
 
 Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una estrategia de despliegue reproducible. Esos controles se completarán durante la Fase 7 — SaaS Production.
 
+## Fases 3 y 4: integración y límites
+
+- **Payments:** intentos sandbox solo en local/testing, HMAC SHA-256 e idempotencia de eventos; anulación lógica de pagos manuales. `captured` en sandbox **no representa dinero real**.
+- **Fiscal RD:** perfil por tenant, RNC validado por formato (NO consultado en DGII), borradores sin NCF/e-CF. No hay XML firmado, certificación, aprobación ni transmisión DGII.
+- El endpoint `POST /api/payments/sandbox/webhook` requiere `RENTA_PAYMENT_WEBHOOK_SECRET` y no está habilitado en producción.
+- Para la etapa real hacen falta credenciales, contratos con proveedor, certificación fiscal y pruebas de integración.
+
 ## Roadmap resumido
 
 | Fase | Estado |
@@ -373,8 +380,8 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 | 1 — Commercial Foundation | ✅ Completa |
 | 2 — Booking Engine | ✅ Completa |
 | 2.1 — Hardening | ✅ Completa |
-| 3 — Payments | ⏭️ Próxima |
-| 4 — Dominican Edition | Pendiente |
+| 3 — Payments | 🟡 Sandbox; pasarela real pendiente |
+| 4 — Dominican Edition | 🟡 Borradores; certificación pendiente |
 | 5 — Digital Rental | Pendiente |
 | 6 — Automation | Pendiente |
 | 7 — SaaS Production | Pendiente |

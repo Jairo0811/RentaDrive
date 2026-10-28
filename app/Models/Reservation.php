@@ -89,6 +89,11 @@ class Reservation extends Model
         return $this->hasMany(ReservationBookingOption::class);
     }
 
+    public function paymentIntents(): HasMany
+    {
+        return $this->hasMany(PaymentIntent::class);
+    }
+
     public function rental(): HasOne
     {
         return $this->hasOne(Rental::class);
