@@ -63,6 +63,19 @@
                 <div class="flex justify-between gap-4"><dt class="text-slate-500">Depósito requerido</dt><dd class="font-bold">RD$ {{ number_format((float) $reservation->deposit_amount, 2) }}</dd></div>
             </dl>
 
+            @if(app()->environment(['local', 'testing']) && (float) $reservation->deposit_amount > 0 && in_array($reservation->status, ['pending', 'confirmed'], true))
+                <div class="mt-5 rounded-xl border border-blue-800 bg-blue-950/40 p-4">
+                    <p class="font-bold text-blue-200">Depósito: ambiente de pruebas</p>
+                    <p class="mt-1 text-sm text-slate-300">Este botón solo genera un intento de cobro de prueba; NO cobra dinero real.</p>
+                    <form class="mt-3" method="POST" action="{{ route('public-booking.deposit.store', ['company' => $company->slug, 'token' => $reservation->public_token]) }}">
+                        @csrf
+                        <button class="btn-secondary">Preparar depósito de prueba</button>
+                    </form>
+                    @foreach($reservation->paymentIntents as $intent)
+                        <p class="mt-2 text-xs text-slate-300">Intento {{ $intent->public_id }} · {{ $intent->status }} · RD$ {{ number_format((float) $intent->amount, 2) }}</p>
+                    @endforeach
+                </div>
+            @endif
             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <a href="{{ route('public-booking.show', $company->slug) }}" class="btn-secondary justify-center">Nueva búsqueda</a>
 
