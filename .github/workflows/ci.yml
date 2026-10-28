@@ -51,6 +51,9 @@ jobs:
           extensions: dom, fileinfo, mbstring, pdo_sqlsrv, sqlsrv, xml, zip
           coverage: none
 
+      - name: Require patched PHP 8.4.27+
+        run: php -r 'if (version_compare(PHP_VERSION, "8.4.27", "<")) { fwrite(STDERR, "PHP 8.4.27+ requerido por seguridad\\n"); exit(1); }'
+
       - name: Node.js
         uses: actions/setup-node@v7
         with:
