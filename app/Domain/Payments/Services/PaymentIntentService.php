@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Payments\Services;
 
 use App\Domain\Payments\Contracts\PaymentGateway;
+use App\Models\Company;
 use App\Models\PaymentEvent;
 use App\Models\PaymentIntent;
 use App\Models\Reservation;
@@ -26,6 +27,10 @@ final class PaymentIntentService
 
             if (! in_array($reservation->status, ['pending', 'confirmed'], true) || $reservation->start_at->isPast()) {
                 throw ValidationException::withMessages(['reservation' => 'La reserva ya no admite depósitos.']);
+            }
+
+            if (Company::query()->findOrFail($reservation->company_id)->currency !== 'DOP') {
+                throw ValidationException::withMessages(['currency' => 'Solo se admiten depósitos DOP en esta integración de prueba.']);
             }
 
             $amount = (float) $reservation->deposit_amount;
