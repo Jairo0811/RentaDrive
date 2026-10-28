@@ -41,6 +41,15 @@ final class ProductionReadiness
             $problems[] = 'La base de datos de producción debe ser SQL Server.';
         }
 
+        if (! in_array(strtolower((string) config('database.connections.sqlsrv.encrypt')), ['yes', 'true', '1'], true)
+            || in_array(strtolower((string) config('database.connections.sqlsrv.trust_server_certificate')), ['yes', 'true', '1'], true)) {
+            $problems[] = 'SQL Server debe usar TLS con verificación de certificado.';
+        }
+
+        if (config('session.encrypt') !== true || config('session.http_only') !== true) {
+            $problems[] = 'La sesión debe estar cifrada y la cookie debe ser HttpOnly.';
+        }
+
         if (in_array(config('queue.default'), ['sync', 'null', 'deferred', 'background'], true)) {
             $problems[] = 'QUEUE_CONNECTION debe utilizar un backend de trabajos persistente.';
         }
