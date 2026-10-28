@@ -167,16 +167,22 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Alertas de mantenimiento y documentos.
 - [ ] Jobs y colas de producción.
 
-## Fase 7 — SaaS Production
+## Fase 7 — SaaS Production (preparación técnica)
 
-- [ ] Suscripciones y planes.
-- [ ] Trial y onboarding.
-- [ ] Backups y recuperación.
-- [ ] Observabilidad y alertas.
-- [ ] Storage externo.
-- [ ] Rate limiting y hardening adicional de producción.
-- [ ] Pruebas E2E y de seguridad multi-tenant.
-- [ ] Pipeline de despliegue reproducible.
+- [x] Planes y límites manuales; historial de cambios comerciales por empresa y operador.
+- [x] Onboarding existente y expiración idempotente de trials con scheduler.
+- [x] Comando de preflight (entorno, TLS, cookies, SQL Server, cache, evidencias).
+- [x] Cabeceras HTTP de seguridad y no-cache para datos privados.
+- [x] Disco privado configurable por inspección; adaptador S3 para almacenamiento compartido.
+- [x] Pipeline para empaquetar release reproducible con checksum (sin desplegar).
+- [x] Manual de operaciones, backups, restauración, monitoreo y rollback.
+- [ ] Suscripciones cobradas mediante proveedor y conciliación real.
+- [ ] Provisionamiento real de infraestructura, secretos, TLS, DNS, storage, backups y alertas.
+- [ ] Migración de fotografías públicas legacy a almacenamiento privado.
+- [ ] Simulacro real de recuperación, E2E y auditoría de seguridad/carga en producción.
+- [ ] Despliegue controlado y verificación posterior.
+
+La Fase 7 no se considera terminada comercialmente hasta verificar estos puntos externos en infraestructura real.
 
 ## Meta de salida comercial
 
