@@ -129,7 +129,7 @@ final class SaaSProductionReadinessTest extends TestCase
 
     public function test_security_headers_are_added_to_public_web_responses(): void
     {
-        $this->get('/')->assertOk()
+        $this->get(route('login'))->assertOk()
             ->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('X-Frame-Options', 'DENY')
             ->assertHeader('Referrer-Policy', 'no-referrer');
