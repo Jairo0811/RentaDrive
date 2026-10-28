@@ -132,6 +132,11 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionName::VIEW_RENTALS->value)
         ->middlewareFor(['create', 'store'], 'permission:'.PermissionName::MANAGE_RENTALS->value);
 
+    Route::get('/inspections/{inspection}/photo/{index}', [InspectionController::class, 'photo'])
+        ->whereNumber('index')
+        ->middleware('permission:'.PermissionName::MANAGE_INSPECTIONS->value)
+        ->name('inspections.photo');
+
     Route::resource('inspections', InspectionController::class)->only(['index', 'create', 'store', 'show', 'destroy'])
         ->middleware('permission:'.PermissionName::MANAGE_INSPECTIONS->value);
 
