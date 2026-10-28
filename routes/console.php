@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\User;
 use App\Domain\Automation\Services\AutomationDispatcher;
-use Illuminate\Support\Facades\Schedule;
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Symfony\Component\Console\Command\Command;

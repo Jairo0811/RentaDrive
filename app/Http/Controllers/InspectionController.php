@@ -11,8 +11,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class InspectionController extends Controller
 {
@@ -102,5 +102,4 @@ final class InspectionController extends Controller
             'inspection' => 'Las inspecciones ya registradas forman parte del expediente auditable y no se eliminan.',
         ]);
     }
-
 }

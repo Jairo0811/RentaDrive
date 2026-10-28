@@ -6,9 +6,9 @@ namespace App\Domain\Automation\Services;
 
 use App\Models\AutomationDelivery;
 use App\Models\Company;
+use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\Setting;
-use App\Models\Rental;
 use App\Models\VehicleMaintenance;
 use App\Support\Tenancy\TenantContext;
 use Illuminate\Support\Facades\Log;
