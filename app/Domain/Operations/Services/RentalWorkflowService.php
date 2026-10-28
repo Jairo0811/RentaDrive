@@ -104,6 +104,11 @@ final class RentalWorkflowService
             $taxes = round(($subtotal + $fees) * ($taxRate / 100), 2);
             $total = $subtotal + $fees + $taxes;
 
+            $invoice = $rental->invoice;
+            if ($invoice !== null && round($total, 2) < round((float) $invoice->paid_amount, 2)) {
+                throw ValidationException::withMessages(['fees' => 'El nuevo total no puede ser inferior a los pagos registrados.']);
+            }
+
             $rental->update([
                 ...$data,
                 'subtotal' => $subtotal,
@@ -119,7 +124,6 @@ final class RentalWorkflowService
                 'mileage' => $data['closing_mileage'],
             ]);
 
-            $invoice = $rental->invoice;
             if ($invoice !== null) {
                 $balance = max(0, $total - (float) $invoice->paid_amount);
                 $invoice->update([
