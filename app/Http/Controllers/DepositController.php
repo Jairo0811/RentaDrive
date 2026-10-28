@@ -29,7 +29,7 @@ final class DepositController extends Controller
             'event_id' => ['required', 'string', 'max:120'],
             'intent_id' => ['required', 'uuid'],
             'event_type' => ['required', 'in:captured,refunded'],
-            'amount' => ['required', 'numeric', 'gt:0'],
+            'amount' => ['required', 'numeric', 'gt:0', 'decimal:0,2'],
             'currency' => ['required', 'in:DOP'],
             'reference' => ['nullable', 'string', 'max:120'],
         ]);
