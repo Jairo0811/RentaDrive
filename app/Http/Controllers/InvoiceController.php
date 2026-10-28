@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -50,18 +51,21 @@ final class InvoiceController extends Controller
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $total = max(0, (float) $invoice->subtotal + (float) $invoice->tax - (float) $data['discount']);
-        if (round($total, 2) < round((float) $invoice->paid_amount, 2)) {
-            throw ValidationException::withMessages(['discount' => 'El total no puede ser menor a los pagos ya aplicados.']);
-        }
-        $balance = max(0, $total - (float) $invoice->paid_amount);
+        DB::transaction(function () use ($invoice, $data): void {
+            $invoice = Invoice::query()->lockForUpdate()->findOrFail($invoice->getKey());
+            $total = max(0, (float) $invoice->subtotal + (float) $invoice->tax - (float) $data['discount']);
+            if (round($total, 2) < round((float) $invoice->paid_amount, 2)) {
+                throw ValidationException::withMessages(['discount' => 'El total no puede ser menor a los pagos ya aplicados.']);
+            }
+            $balance = max(0, $total - (float) $invoice->paid_amount);
 
-        $invoice->update([
-            ...$data,
-            'total' => $total,
-            'balance' => $balance,
-            'status' => $balance <= 0 ? 'paid' : ((float) $invoice->paid_amount > 0 ? 'partial' : 'pending'),
-        ]);
+            $invoice->update([
+                ...$data,
+                'total' => $total,
+                'balance' => $balance,
+                'status' => $balance <= 0 ? 'paid' : ((float) $invoice->paid_amount > 0 ? 'partial' : 'pending'),
+            ]);
+        });
 
         return back()->with('status', 'Factura actualizada.');
     }
