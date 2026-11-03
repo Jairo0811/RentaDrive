@@ -48,8 +48,29 @@ final class DashboardController extends Controller
                 'status' => $reservation->status,
             ]);
 
+        $fleetStatus = Vehicle::query()
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $operableFleet = (int) $fleetStatus->sum() - (int) ($fleetStatus['inactive'] ?? 0);
+
+        $topCategories = Rental::query()
+            ->with('vehicle.category')
+            ->whereBetween('start_at', [now()->subDays(90)->startOfDay(), now()])
+            ->get()
+            ->map(fn (Rental $rental): ?string => $rental->vehicle?->category?->name)
+            ->filter()
+            ->countBy()
+            ->sortDesc()
+            ->take(5);
+
         return view('dashboard', [
             'metrics' => [
+                'maintenance_vehicles' => (int) ($fleetStatus['maintenance'] ?? 0),
+                'occupancy' => $operableFleet > 0 ? round(((int) ($fleetStatus['rented'] ?? 0) / $operableFleet) * 100) : null,
+                'returns_today' => Rental::query()->where('status', 'open')->whereDate('expected_return_at', today())->count(),
+                'overdue_returns' => Rental::query()->where('status', 'open')->where('expected_return_at', '<', now())->count(),
+                'pending_reservations' => Reservation::query()->where('status', 'pending')->count(),
                 'available_vehicles' => Vehicle::query()->where('status', 'available')->count(),
                 'open_rentals' => Rental::query()->where('status', 'open')->count(),
                 'today_reservations' => Reservation::query()
@@ -62,10 +83,20 @@ final class DashboardController extends Controller
                 'outstanding' => Invoice::query()->where('balance', '>', 0)->sum('balance'),
                 'active_customers' => Customer::query()->where('status', 'active')->count(),
             ],
-            'fleetStatus' => Vehicle::query()
+            'fleetStatus' => $fleetStatus,
+            'reservationStatus' => Reservation::query()
                 ->selectRaw('status, COUNT(*) as total')
+                ->whereBetween('start_at', [$monthStart, $monthEnd])
                 ->groupBy('status')
                 ->pluck('total', 'status'),
+            'topCategories' => $topCategories,
+            'overdueRentals' => Rental::query()
+                ->with(['customer', 'vehicle.model.brand'])
+                ->where('status', 'open')
+                ->where('expected_return_at', '<', now())
+                ->orderBy('expected_return_at')
+                ->limit(5)
+                ->get(),
             'upcomingReservations' => Reservation::query()
                 ->with(['customer', 'vehicle.model.brand', 'category'])
                 ->whereIn('status', ['pending', 'confirmed'])

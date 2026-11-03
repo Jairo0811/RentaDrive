@@ -251,6 +251,34 @@ const buildDashboardCharts = () => {
     }
 };
 
+const buildBarChart = (canvas, horizontal, color) => {
+    if (! canvas) return;
+
+    charts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: parseData(canvas, 'labels'),
+            datasets: [{ data: parseData(canvas, 'values'), backgroundColor: color, borderRadius: 6, maxBarThickness: 28 }],
+        },
+        options: {
+            indexAxis: horizontal ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: ! Alpine.store('accessibility').reducedMotion,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: chartTextColor(), precision: 0 }, grid: { display: horizontal, color: chartGridColor() }, beginAtZero: true },
+                y: { ticks: { color: chartTextColor(), precision: 0 }, grid: { display: ! horizontal, color: chartGridColor() }, beginAtZero: true },
+            },
+        },
+    }));
+};
+
+const buildOperationCharts = () => {
+    buildBarChart(document.querySelector('#reservationStatusChart'), false, '#3b82f6');
+    buildBarChart(document.querySelector('#categoryChart'), true, '#10b981');
+};
+
 const refreshCharts = () => {
     charts.forEach((chart) => {
         chart.options.animation = ! Alpine.store('accessibility').reducedMotion;
@@ -359,6 +387,7 @@ document.addEventListener('submit', (event) => {
 
 window.addEventListener('rentadrive:accessibility-changed', refreshCharts);
 window.addEventListener('DOMContentLoaded', buildDashboardCharts);
+window.addEventListener('DOMContentLoaded', buildOperationCharts);
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
     window.addEventListener('load', () => {
