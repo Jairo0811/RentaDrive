@@ -56,7 +56,7 @@
                             <td>
                                 <div class="flex flex-wrap items-center justify-end gap-3">
                                     <a href="{{ route('platform.companies.branches.index', $company) }}" class="font-bold text-slate-600 dark:text-slate-300">Sucursales</a>
-                                    <a href="{{ route('platform.companies.edit', $company) }}" class="font-bold text-blue-600">Editar</a>
+                                    <a href="{{ route('platform.companies.edit', $company) }}" class="font-bold text-blue-400">Editar</a>
                                     @if (in_array($company->status, ['active', 'trial'], true))
                                         <form method="POST" action="{{ route('platform.companies.suspend', $company) }}">@csrf @method('PATCH')<button class="font-bold text-amber-600">Suspender</button></form>
                                     @elseif ($company->status === 'suspended')

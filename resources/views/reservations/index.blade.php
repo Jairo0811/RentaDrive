@@ -35,7 +35,7 @@
                                 <td><p>{{ $reservation->start_at->format('d/m/Y h:i A') }}</p><p class="mt-1 text-xs text-slate-500">a {{ $reservation->end_at->format('d/m/Y h:i A') }}</p></td>
                                 <td>RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</td>
                                 <td><x-status-badge :status="$reservation->status" /></td>
-                                <td class="text-right"><a href="{{ route('reservations.show', $reservation) }}" class="font-bold text-blue-600">Ver</a></td>
+                                <td class="text-right"><a href="{{ route('reservations.show', $reservation) }}" class="font-bold text-blue-400">Ver</a></td>
                             </tr>
                         @endforeach
                     </tbody>

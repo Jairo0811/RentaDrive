@@ -15,7 +15,7 @@
                             <td><x-status-badge :status="$user->is_active ? 'active' : 'inactive'" /></td>
                             <td>{{ $user->email_verified_at ? 'Verificado' : 'Pendiente' }}</td>
                             <td>{{ $user->created_at->format('d/m/Y') }}</td>
-                            <td><a href="{{ route('users.edit', $user) }}" class="font-bold text-blue-600">Editar</a></td>
+                            <td><a href="{{ route('users.edit', $user) }}" class="font-bold text-blue-400">Editar</a></td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -19,7 +19,7 @@
                     <thead><tr><th>Tipo</th><th>Alquiler</th><th>Vehículo</th><th>Cliente</th><th>Fecha</th><th>Condición</th><th></th></tr></thead>
                     <tbody>
                         @foreach ($inspections as $inspection)
-                            <tr><td><x-status-badge :status="$inspection->type" /></td><td class="font-bold">{{ $inspection->rental->code }}</td><td>{{ $inspection->vehicle->display_name }}</td><td>{{ $inspection->rental->customer->full_name }}</td><td>{{ $inspection->inspected_at->format('d/m/Y h:i A') }}</td><td>{{ ucfirst($inspection->body_condition) }}</td><td><a href="{{ route('inspections.show', $inspection) }}" class="font-bold text-blue-600">Ver</a></td></tr>
+                            <tr><td><x-status-badge :status="$inspection->type" /></td><td class="font-bold">{{ $inspection->rental->code }}</td><td>{{ $inspection->vehicle->display_name }}</td><td>{{ $inspection->rental->customer->full_name }}</td><td>{{ $inspection->inspected_at->format('d/m/Y h:i A') }}</td><td>{{ ucfirst($inspection->body_condition) }}</td><td><a href="{{ route('inspections.show', $inspection) }}" class="font-bold text-blue-400">Ver</a></td></tr>
                         @endforeach
                     </tbody>
                 </table>

@@ -39,9 +39,9 @@
                     </form>
 
                     <div class="mt-3 flex justify-end border-t border-slate-200 pt-3 dark:border-slate-800">
-                        <form method="POST" action="{{ route('booking-options.destroy', $option) }}" onsubmit="return confirm('¿Eliminar esta opción?')">
+                        <form method="POST" action="{{ route('booking-options.destroy', $option) }}" data-confirm="¿Eliminar esta opción?" data-confirm-label="Eliminar">
                             @csrf @method('DELETE')
-                            <button class="btn-secondary text-red-600">Eliminar</button>
+                            <button class="btn-secondary text-red-400">Eliminar</button>
                         </form>
                     </div>
                 </article>

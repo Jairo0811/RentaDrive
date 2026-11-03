@@ -8,7 +8,7 @@
     <div class="grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
         <div class="space-y-6">
             <section class="panel p-5 sm:p-6">
-                <div class="flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-blue-600">RentaDrive</p><h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">{{ $invoice->number }}</h2></div><x-status-badge :status="$invoice->status" /></div>
+                <div class="flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-blue-400">RentaDrive</p><h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">{{ $invoice->number }}</h2></div><x-status-badge :status="$invoice->status" /></div>
                 <div class="mt-6 grid gap-5 sm:grid-cols-2">
                     <div><p class="text-xs font-bold uppercase text-slate-400">Facturado a</p><p class="mt-2 font-bold text-slate-900 dark:text-white">{{ $invoice->customer->full_name }}</p><p class="mt-1 text-sm text-slate-500">{{ $invoice->customer->document_number }}</p></div>
                     <div class="sm:text-right"><p class="text-sm text-slate-500">Emitida: <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->issued_at->format('d/m/Y') }}</strong></p><p class="mt-1 text-sm text-slate-500">Vence: <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->due_at?->format('d/m/Y') ?: 'Sin vencimiento' }}</strong></p></div>
@@ -22,7 +22,7 @@
                     <div class="flex justify-between"><dt class="text-slate-500">Descuento</dt><dd>- RD$ {{ number_format((float) $invoice->discount, 2) }}</dd></div>
                     <div class="flex justify-between border-t border-slate-200 pt-4 text-lg font-black dark:border-slate-800"><dt>Total</dt><dd>RD$ {{ number_format((float) $invoice->total, 2) }}</dd></div>
                     <div class="flex justify-between text-emerald-600"><dt>Pagado</dt><dd>RD$ {{ number_format((float) $invoice->paid_amount, 2) }}</dd></div>
-                    <div class="flex justify-between text-xl font-black text-blue-600"><dt>Balance</dt><dd>RD$ {{ number_format((float) $invoice->balance, 2) }}</dd></div>
+                    <div class="flex justify-between text-xl font-black text-blue-400"><dt>Balance</dt><dd>RD$ {{ number_format((float) $invoice->balance, 2) }}</dd></div>
                 </dl>
             </section>
 

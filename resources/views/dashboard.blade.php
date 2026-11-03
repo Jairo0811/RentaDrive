@@ -96,7 +96,7 @@
         <article class="panel p-5 sm:p-6">
             <div class="flex items-center justify-between gap-4">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600 dark:text-blue-400">Rendimiento financiero</p>
+                    <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Rendimiento financiero</p>
                     <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">Ingresos de los últimos 6 meses</h2>
                 </div>
                 <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 dark:border-slate-700">RD$</span>
@@ -108,7 +108,7 @@
 
         <article class="panel p-5 sm:p-6">
             <div>
-                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600 dark:text-blue-400">Estado de flota</p>
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Estado de flota</p>
                 <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">Distribución operativa</h2>
             </div>
             <div class="mt-6 h-72">
@@ -124,7 +124,7 @@
                     <h2 class="font-bold text-slate-950 dark:text-white">Calendario de reservas</h2>
                     <p class="mt-1 text-sm text-slate-500">{{ $calendar['title'] }}</p>
                 </div>
-                <a href="{{ route('reservations.index') }}" class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400">Ver todas</a>
+                <a href="{{ route('reservations.index') }}" class="text-sm font-bold text-blue-400 hover:text-blue-300 dark:text-blue-400">Ver todas</a>
             </div>
         </div>
         <div class="overflow-x-auto p-4 sm:p-6">

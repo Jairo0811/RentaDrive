@@ -53,7 +53,7 @@
             @endif
         </section>
         <aside class="panel p-5 sm:p-6">
-            <p class="text-xs font-bold uppercase tracking-[.16em] text-blue-600">Estimado</p>
+            <p class="text-xs font-bold uppercase tracking-[.16em] text-blue-400">Estimado</p>
             <p class="mt-3 text-4xl font-black text-slate-950 dark:text-white">RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</p>
             <dl class="mt-5 space-y-2 text-sm">
                 <div class="flex justify-between gap-3"><dt class="text-slate-500">Tarifa diaria</dt><dd class="font-bold">RD$ {{ number_format((float) $reservation->daily_rate, 2) }}</dd></div>

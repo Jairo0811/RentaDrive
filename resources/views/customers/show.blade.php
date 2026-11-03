@@ -56,7 +56,7 @@
                                         <td>{{ $rental->vehicle->display_name }}</td>
                                         <td>{{ $rental->start_at->format('d/m/Y') }}</td>
                                         <td><x-status-badge :status="$rental->status" /></td>
-                                        <td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-600">Ver</a></td>
+                                        <td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-400">Ver</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -80,7 +80,7 @@
                                         <td>RD$ {{ number_format((float) $invoice->total, 2) }}</td>
                                         <td>RD$ {{ number_format((float) $invoice->balance, 2) }}</td>
                                         <td><x-status-badge :status="$invoice->status" /></td>
-                                        <td><a href="{{ route('invoices.show', $invoice) }}" class="font-bold text-blue-600">Ver</a></td>
+                                        <td><a href="{{ route('invoices.show', $invoice) }}" class="font-bold text-blue-400">Ver</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -54,7 +54,7 @@
                                 </td>
                                 <td>{{ $customer->rentals_count }} alquileres · {{ $customer->reservations_count }} reservas</td>
                                 <td><x-status-badge :status="$customer->status" /></td>
-                                <td class="text-right"><a href="{{ route('customers.show', $customer) }}" class="font-bold text-blue-600 hover:text-blue-500">Ver</a></td>
+                                <td class="text-right"><a href="{{ route('customers.show', $customer) }}" class="font-bold text-blue-400 hover:text-blue-500">Ver</a></td>
                             </tr>
                         @endforeach
                     </tbody>

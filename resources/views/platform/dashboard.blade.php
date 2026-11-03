@@ -30,7 +30,7 @@
                         <p class="text-xs font-bold uppercase tracking-[.16em] text-slate-400">{{ $card['label'] }}</p>
                         <p class="mt-3 text-3xl font-black text-slate-950 dark:text-white">{{ $card['value'] }}</p>
                     </div>
-                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-400 dark:bg-blue-950/40 dark:text-blue-300">
                         <i class="fa-solid {{ $card['icon'] }}" aria-hidden="true"></i>
                     </span>
                 </div>
@@ -44,7 +44,7 @@
                 <h2 class="font-bold text-slate-950 dark:text-white">Empresas recientes</h2>
                 <p class="mt-1 text-sm text-slate-500">Últimos tenants incorporados a RentaDrive.</p>
             </div>
-            <a href="{{ route('platform.companies.index') }}" class="text-sm font-bold text-blue-600 dark:text-blue-400">Ver todas</a>
+            <a href="{{ route('platform.companies.index') }}" class="text-sm font-bold text-blue-400 dark:text-blue-400">Ver todas</a>
         </div>
 
         <div class="overflow-x-auto">
@@ -87,7 +87,7 @@
                             <td>{{ $plan['name'] ?? $company->plan_code }}</td>
                             <td>{{ $company->branches_count }}</td>
                             <td>{{ $company->users_count }}</td>
-                            <td><a href="{{ route('platform.companies.edit', $company) }}" class="font-bold text-blue-600">Administrar</a></td>
+                            <td><a href="{{ route('platform.companies.edit', $company) }}" class="font-bold text-blue-400">Administrar</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="6"><x-empty-state title="Sin empresas" message="Crea el primer tenant comercial de RentaDrive." /></td></tr>

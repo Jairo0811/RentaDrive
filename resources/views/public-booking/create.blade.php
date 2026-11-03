@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="mb-6">
-        <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600 dark:text-blue-400">Cotización</p>
+        <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Cotización</p>
         <h1 class="mt-2 text-3xl font-black tracking-tight">Completa tu reserva</h1>
         <p class="mt-2 text-sm text-slate-500">{{ $branch->name }} · {{ $category->name }} · {{ $startAt->format('d/m/Y h:i A') }} → {{ $endAt->format('d/m/Y h:i A') }}</p>
     </div>
@@ -25,7 +25,7 @@
                     @forelse ($options as $option)
                         @php($optionTotal = $option->pricing_mode === 'per_day' ? (float) $option->price * $quote['days'] : (float) $option->price)
                         <label class="flex cursor-pointer items-start gap-4 rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 dark:border-slate-700 dark:hover:border-blue-700">
-                            <input type="checkbox" name="booking_option_ids[]" value="{{ $option->id }}" data-booking-option data-total="{{ number_format($optionTotal, 2, '.', '') }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" @checked(in_array($option->id, old('booking_option_ids', [])))>
+                            <input type="checkbox" name="booking_option_ids[]" value="{{ $option->id }}" data-booking-option data-total="{{ number_format($optionTotal, 2, '.', '') }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-400 focus:ring-blue-500" @checked(in_array($option->id, old('booking_option_ids', [])))>
                             <span class="min-w-0 flex-1">
                                 <span class="flex flex-wrap items-center gap-2">
                                     <strong>{{ $option->name }}</strong>
@@ -34,7 +34,7 @@
                                 @if ($option->description)
                                     <span class="mt-1 block text-sm text-slate-500">{{ $option->description }}</span>
                                 @endif
-                                <span class="mt-2 block text-sm font-bold text-blue-600 dark:text-blue-400">
+                                <span class="mt-2 block text-sm font-bold text-blue-400 dark:text-blue-400">
                                     RD$ {{ number_format((float) $option->price, 2) }} {{ $option->pricing_mode === 'per_day' ? '/ día' : 'único' }}
                                 </span>
                             </span>
@@ -75,7 +75,7 @@
                 <div class="flex justify-between gap-4"><dt class="text-slate-500">Tarifa diaria</dt><dd class="font-bold">RD$ {{ number_format($quote['daily_rate'], 2) }}</dd></div>
                 <div class="flex justify-between gap-4"><dt class="text-slate-500">Alquiler</dt><dd class="font-bold">RD$ {{ number_format($quote['subtotal'], 2) }}</dd></div>
                 <div class="flex justify-between gap-4"><dt class="text-slate-500">Extras/seguros</dt><dd id="extras-total" class="font-bold">RD$ 0.00</dd></div>
-                <div class="border-t border-slate-200 pt-3 dark:border-slate-700"><div class="flex justify-between gap-4"><dt class="font-black">Total estimado</dt><dd id="estimated-total" class="text-lg font-black text-blue-600 dark:text-blue-400">RD$ {{ number_format($quote['subtotal'], 2) }}</dd></div></div>
+                <div class="border-t border-slate-200 pt-3 dark:border-slate-700"><div class="flex justify-between gap-4"><dt class="font-black">Total estimado</dt><dd id="estimated-total" class="text-lg font-black text-blue-400 dark:text-blue-400">RD$ {{ number_format($quote['subtotal'], 2) }}</dd></div></div>
                 <div class="flex justify-between gap-4"><dt class="text-slate-500">Depósito requerido</dt><dd class="font-bold">RD$ {{ number_format($quote['deposit_amount'], 2) }}</dd></div>
             </dl>
 

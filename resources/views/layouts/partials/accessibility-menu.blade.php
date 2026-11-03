@@ -90,22 +90,22 @@
         <div class="mt-5 space-y-3">
             <label class="accessibility-toggle">
                 <span><span class="accessibility-toggle-title">Alto contraste</span><span class="accessibility-toggle-help">Aumenta la diferenciación entre fondos, texto y controles.</span></span>
-                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-600" :checked="$store.accessibility.highContrast" @change="$store.accessibility.toggleHighContrast()">
+                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-400" :checked="$store.accessibility.highContrast" @change="$store.accessibility.toggleHighContrast()">
             </label>
 
             <label class="accessibility-toggle">
                 <span><span class="accessibility-toggle-title">Resaltar foco</span><span class="accessibility-toggle-help">Hace más evidente el elemento activo al navegar con teclado.</span></span>
-                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-600" :checked="$store.accessibility.enhancedFocus" @change="$store.accessibility.toggleEnhancedFocus()">
+                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-400" :checked="$store.accessibility.enhancedFocus" @change="$store.accessibility.toggleEnhancedFocus()">
             </label>
 
             <label class="accessibility-toggle">
                 <span><span class="accessibility-toggle-title">Cursor grande</span><span class="accessibility-toggle-help">Amplía el cursor sobre botones, enlaces y formularios.</span></span>
-                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-600" :checked="$store.accessibility.largeCursor" @change="$store.accessibility.toggleLargeCursor()">
+                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-400" :checked="$store.accessibility.largeCursor" @change="$store.accessibility.toggleLargeCursor()">
             </label>
 
             <label class="accessibility-toggle">
                 <span><span class="accessibility-toggle-title">Reducir movimiento</span><span class="accessibility-toggle-help">Desactiva animaciones y transiciones no esenciales.</span></span>
-                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-600" :checked="$store.accessibility.reducedMotion" @change="$store.accessibility.toggleReducedMotion()">
+                <input type="checkbox" class="focus-ring h-5 w-5 rounded border-slate-300 text-blue-400" :checked="$store.accessibility.reducedMotion" @change="$store.accessibility.toggleReducedMotion()">
             </label>
         </div>
 

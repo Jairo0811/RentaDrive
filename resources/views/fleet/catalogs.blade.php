@@ -17,9 +17,9 @@
                 @foreach ($brands as $brand)
                     <div class="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
                         @can('manage vehicles')
-                            <form method="POST" action="{{ route('fleet.brands.update', $brand) }}" class="flex items-center gap-2">@csrf @method('PUT')<input name="name" value="{{ $brand->name }}" class="form-input"><select name="is_active" class="form-input max-w-28"><option value="1" @selected($brand->is_active)>Activo</option><option value="0" @selected(!$brand->is_active)>Inactivo</option></select><button class="font-bold text-blue-600">Guardar</button></form>
+                            <form method="POST" action="{{ route('fleet.brands.update', $brand) }}" class="flex items-center gap-2">@csrf @method('PUT')<input name="name" value="{{ $brand->name }}" class="form-input"><select name="is_active" class="form-input max-w-28"><option value="1" @selected($brand->is_active)>Activo</option><option value="0" @selected(!$brand->is_active)>Inactivo</option></select><button class="font-bold text-blue-400">Guardar</button></form>
                             @if ($brand->models_count === 0)
-                                <form method="POST" action="{{ route('fleet.brands.destroy', $brand) }}" class="mt-2 text-right" onsubmit="return confirm('¿Eliminar esta marca?')">@csrf @method('DELETE')<button class="text-xs font-bold text-red-600">Eliminar</button></form>
+                                <form method="POST" action="{{ route('fleet.brands.destroy', $brand) }}" class="mt-2 text-right" data-confirm="¿Eliminar esta marca?" data-confirm-label="Eliminar">@csrf @method('DELETE')<button class="text-xs font-bold text-red-400">Eliminar</button></form>
                             @endif
                         @else
                             <div class="flex justify-between"><span class="font-bold">{{ $brand->name }}</span><span class="text-xs text-slate-500">{{ $brand->models_count }} modelos</span></div>
@@ -52,7 +52,7 @@
                                 <td>
                                     @can('manage vehicles')
                                         <details class="relative">
-                                            <summary class="cursor-pointer font-bold text-blue-600">Editar</summary>
+                                            <summary class="cursor-pointer font-bold text-blue-400">Editar</summary>
                                             <form method="POST" action="{{ route('fleet.categories.update', $category) }}" class="absolute right-0 z-20 mt-2 w-80 space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                                                 @csrf @method('PUT')
                                                 <input name="code" value="{{ $category->code }}" class="form-input" required>
@@ -64,7 +64,7 @@
                                                 <button class="btn-primary w-full">Guardar</button>
                                             </form>
                                             @if ($category->vehicles_count === 0)
-                                                <form method="POST" action="{{ route('fleet.categories.destroy', $category) }}" class="mt-2" onsubmit="return confirm('¿Eliminar esta categoría?')">@csrf @method('DELETE')<button class="text-xs font-bold text-red-600">Eliminar</button></form>
+                                                <form method="POST" action="{{ route('fleet.categories.destroy', $category) }}" class="mt-2" data-confirm="¿Eliminar esta categoría?" data-confirm-label="Eliminar">@csrf @method('DELETE')<button class="text-xs font-bold text-red-400">Eliminar</button></form>
                                             @endif
                                         </details>
                                     @endcan
@@ -98,7 +98,7 @@
                             <td>
                                 @can('manage vehicles')
                                     <details class="relative">
-                                        <summary class="cursor-pointer font-bold text-blue-600">Editar</summary>
+                                        <summary class="cursor-pointer font-bold text-blue-400">Editar</summary>
                                         <form method="POST" action="{{ route('fleet.models.update', $model) }}" class="absolute right-0 z-20 mt-2 w-72 space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                                             @csrf @method('PUT')
                                             <select name="vehicle_brand_id" class="form-input">@foreach ($brands as $brand)<option value="{{ $brand->id }}" @selected($model->vehicle_brand_id === $brand->id)>{{ $brand->name }}</option>@endforeach</select>
@@ -108,7 +108,7 @@
                                             <button class="btn-primary w-full">Guardar</button>
                                         </form>
                                         @if ($model->vehicles_count === 0)
-                                            <form method="POST" action="{{ route('fleet.models.destroy', $model) }}" class="mt-2" onsubmit="return confirm('¿Eliminar este modelo?')">@csrf @method('DELETE')<button class="text-xs font-bold text-red-600">Eliminar</button></form>
+                                            <form method="POST" action="{{ route('fleet.models.destroy', $model) }}" class="mt-2" data-confirm="¿Eliminar este modelo?" data-confirm-label="Eliminar">@csrf @method('DELETE')<button class="text-xs font-bold text-red-400">Eliminar</button></form>
                                         @endif
                                     </details>
                                 @endcan

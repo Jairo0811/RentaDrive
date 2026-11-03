@@ -23,14 +23,14 @@
                             <td><x-status-badge :status="$branch->is_active ? 'active' : 'inactive'" /></td>
                             <td>
                                 <div class="flex items-center justify-end gap-3">
-                                    <a href="{{ route('platform.companies.branches.edit', [$company, $branch]) }}" class="font-bold text-blue-600">Editar</a>
+                                    <a href="{{ route('platform.companies.branches.edit', [$company, $branch]) }}" class="font-bold text-blue-400">Editar</a>
                                     <form method="POST" action="{{ route('platform.companies.branches.status', [$company, $branch]) }}">@csrf @method('PATCH')
                                         <button class="font-bold {{ $branch->is_active ? 'text-amber-600' : 'text-emerald-600' }}">{{ $branch->is_active ? 'Desactivar' : 'Activar' }}</button>
                                     </form>
                                     @unless ($branch->is_primary)
-                                        <form method="POST" action="{{ route('platform.companies.branches.destroy', [$company, $branch]) }}" onsubmit="return confirm('¿Eliminar esta sucursal? Solo es posible si no tiene información relacionada.')">
+                                        <form method="POST" action="{{ route('platform.companies.branches.destroy', [$company, $branch]) }}" data-confirm="¿Eliminar esta sucursal? Solo es posible si no tiene información relacionada." data-confirm-label="Eliminar">
                                             @csrf @method('DELETE')
-                                            <button class="font-bold text-red-600">Eliminar</button>
+                                            <button class="font-bold text-red-400">Eliminar</button>
                                         </form>
                                     @endunless
                                 </div>
