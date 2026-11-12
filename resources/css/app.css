@@ -400,4 +400,85 @@
     .brand-lockup img {
         @apply h-auto w-full object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,.55)];
     }
+
+    .link-action {
+        @apply focus-ring rounded font-bold text-blue-400 transition hover:text-blue-300 hover:underline;
+    }
+
+    .link-danger {
+        @apply focus-ring rounded text-xs font-bold text-red-400 transition hover:text-red-300 hover:underline;
+    }
+
+    .chip {
+        @apply focus-ring inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-300 transition hover:border-slate-500 hover:bg-slate-800;
+    }
+
+    .chip-active {
+        @apply border-blue-400/50 bg-blue-500/15 text-blue-200;
+    }
+
+    .chip-count {
+        @apply rounded-full bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-200;
+    }
+
+    .sort-link {
+        @apply focus-ring inline-flex items-center gap-1 rounded transition hover:text-white;
+    }
+
+    .confirm-dialog {
+        @apply m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-0 text-slate-100 shadow-2xl;
+    }
+
+    .confirm-dialog::backdrop {
+        background: rgb(2 6 23 / 0.75);
+        backdrop-filter: blur(2px);
+    }
+}
+
+
+/*
+ * Dark-only form controls. Keep these rules unlayered so legacy/unlayered
+ * @tailwindcss/forms defaults cannot paint native fields white on dark panels.
+ * The high-contrast accessibility profile retains its own black/white palette.
+ */
+html:not(.high-contrast) :is(input, select, textarea).form-input {
+    background-color: #020617;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    color-scheme: dark;
+}
+
+html:not(.high-contrast) :is(input, select, textarea).form-input::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+html:not(.high-contrast) :is(input, select, textarea).form-input:focus {
+    border-color: #60a5fa;
+}
+
+html:not(.high-contrast) :is(input, select, textarea).form-input:disabled,
+html:not(.high-contrast) :is(input, textarea).form-input[readonly] {
+    background-color: #0f172a;
+    color: #cbd5e1;
+    border-color: #475569;
+}
+
+html:not(.high-contrast) select.form-input :is(option, optgroup) {
+    background-color: #020617;
+    color: #f8fafc;
+}
+
+html:not(.high-contrast) :is(input, textarea).form-input:-webkit-autofill,
+html:not(.high-contrast) :is(input, textarea).form-input:-webkit-autofill:hover,
+html:not(.high-contrast) :is(input, textarea).form-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f8fafc;
+    -webkit-box-shadow: 0 0 0 1000px #020617 inset;
+    box-shadow: 0 0 0 1000px #020617 inset;
+    caret-color: #f8fafc;
+}
+
+html:not(.high-contrast) input.form-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.85;
 }

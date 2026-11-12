@@ -251,6 +251,34 @@ const buildDashboardCharts = () => {
     }
 };
 
+const buildBarChart = (canvas, horizontal, color) => {
+    if (! canvas) return;
+
+    charts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: parseData(canvas, 'labels'),
+            datasets: [{ data: parseData(canvas, 'values'), backgroundColor: color, borderRadius: 6, maxBarThickness: 28 }],
+        },
+        options: {
+            indexAxis: horizontal ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: ! Alpine.store('accessibility').reducedMotion,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: chartTextColor(), precision: 0 }, grid: { display: horizontal, color: chartGridColor() }, beginAtZero: true },
+                y: { ticks: { color: chartTextColor(), precision: 0 }, grid: { display: ! horizontal, color: chartGridColor() }, beginAtZero: true },
+            },
+        },
+    }));
+};
+
+const buildOperationCharts = () => {
+    buildBarChart(document.querySelector('#reservationStatusChart'), false, '#3b82f6');
+    buildBarChart(document.querySelector('#categoryChart'), true, '#10b981');
+};
+
 const refreshCharts = () => {
     charts.forEach((chart) => {
         chart.options.animation = ! Alpine.store('accessibility').reducedMotion;
@@ -305,8 +333,61 @@ document.querySelector('#vehicle_id')?.addEventListener('change', () => {
     populateRentalVehicle();
 });
 
+const askConfirmation = (message, confirmLabel) => new Promise((resolve) => {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'confirm-dialog';
+    dialog.setAttribute('aria-labelledby', 'confirm-dialog-message');
+
+    const body = document.createElement('div');
+    body.className = 'p-6';
+    const text = document.createElement('p');
+    text.id = 'confirm-dialog-message';
+    text.className = 'text-base font-bold text-white';
+    text.textContent = message;
+    const note = document.createElement('p');
+    note.className = 'mt-2 text-sm text-slate-400';
+    note.textContent = 'Esta acción quedará registrada.';
+    body.append(text, note);
+
+    const actions = document.createElement('div');
+    actions.className = 'flex justify-end gap-3 border-t border-slate-800 px-6 py-4';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'btn-secondary';
+    cancel.textContent = 'Cancelar';
+    const accept = document.createElement('button');
+    accept.type = 'button';
+    accept.className = 'btn-danger';
+    accept.textContent = confirmLabel;
+    actions.append(cancel, accept);
+
+    dialog.append(body, actions);
+    document.body.append(dialog);
+
+    let result = false;
+    cancel.addEventListener('click', () => dialog.close());
+    accept.addEventListener('click', () => { result = true; dialog.close(); });
+    dialog.addEventListener('close', () => { dialog.remove(); resolve(result); });
+    dialog.showModal();
+    cancel.focus();
+});
+
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (! (form instanceof HTMLFormElement) || ! form.dataset.confirm || form.dataset.confirmed === '1') return;
+
+    event.preventDefault();
+    const submitter = event.submitter;
+    askConfirmation(form.dataset.confirm, form.dataset.confirmLabel || 'Confirmar').then((accepted) => {
+        if (! accepted) return;
+        form.dataset.confirmed = '1';
+        form.requestSubmit(submitter ?? undefined);
+    });
+});
+
 window.addEventListener('rentadrive:accessibility-changed', refreshCharts);
 window.addEventListener('DOMContentLoaded', buildDashboardCharts);
+window.addEventListener('DOMContentLoaded', buildOperationCharts);
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
     window.addEventListener('load', () => {

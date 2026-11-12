@@ -16,10 +16,16 @@ use Illuminate\Validation\ValidationException;
 
 final class VehicleController extends Controller
 {
+    private const SORTABLE = ['created_at', 'code', 'plate', 'mileage', 'status'];
+
     public function __construct(private readonly PlanLimits $planLimits) {}
 
     public function index(Request $request): View
     {
+        $sort = in_array($request->query('sort'), self::SORTABLE, true) ? $request->query('sort') : 'created_at';
+        $direction = $request->query('dir') === 'asc' ? 'asc' : 'desc';
+        $viewMode = $request->query('view') === 'cards' ? 'cards' : 'table';
+
         $vehicles = Vehicle::query()
             ->with(['model.brand', 'category'])
             ->withCount(['rentals', 'maintenances'])
@@ -35,13 +41,24 @@ final class VehicleController extends Controller
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->filled('category'), fn ($query) => $query->where('vehicle_category_id', $request->integer('category')))
-            ->latest()
-            ->paginate(15)
+            ->when(
+                $sort === 'created_at',
+                fn ($query) => $query->orderBy('created_at', $direction)->orderBy('id', $direction),
+                fn ($query) => $query->orderBy($sort, $direction)->orderBy('id'),
+            )
+            ->paginate($viewMode === 'cards' ? 12 : 15)
             ->withQueryString();
 
         return view('vehicles.index', [
             'vehicles' => $vehicles,
             'categories' => VehicleCategory::query()->orderBy('name')->get(),
+            'statusCounts' => Vehicle::query()
+                ->selectRaw('status, COUNT(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status'),
+            'sort' => $sort,
+            'direction' => $direction,
+            'viewMode' => $viewMode,
         ]);
     }
 

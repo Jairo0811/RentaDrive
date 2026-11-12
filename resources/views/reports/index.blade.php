@@ -77,7 +77,7 @@
                         <tbody>
                             @foreach ($rentals as $rental)
                                 <tr>
-                                    <td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-600">{{ $rental->code }}</a></td>
+                                    <td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-400">{{ $rental->code }}</a></td>
                                     <td>{{ $rental->customer->full_name }}</td>
                                     <td>{{ $rental->vehicle->display_name }}</td>
                                     <td>{{ $rental->start_at->format('d/m/Y') }}</td>

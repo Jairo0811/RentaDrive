@@ -61,7 +61,7 @@
                             <thead><tr><th>Tipo</th><th>Fecha</th><th>Kilometraje</th><th>Carrocería</th><th>Inspector</th><th></th></tr></thead>
                             <tbody>
                                 @foreach ($rental->inspections as $inspection)
-                                    <tr><td><x-status-badge :status="$inspection->type" /></td><td>{{ $inspection->inspected_at->format('d/m/Y h:i A') }}</td><td>{{ number_format($inspection->mileage) }} km</td><td>{{ ucfirst($inspection->body_condition) }}</td><td>{{ $inspection->inspector?->name ?: 'Sistema' }}</td><td><a href="{{ route('inspections.show', $inspection) }}" class="font-bold text-blue-600">Ver</a></td></tr>
+                                    <tr><td><x-status-badge :status="$inspection->type" /></td><td>{{ $inspection->inspected_at->format('d/m/Y h:i A') }}</td><td>{{ number_format($inspection->mileage) }} km</td><td>{{ ucfirst($inspection->body_condition) }}</td><td>{{ $inspection->inspector?->name ?: 'Sistema' }}</td><td><a href="{{ route('inspections.show', $inspection) }}" class="font-bold text-blue-400">Ver</a></td></tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -91,17 +91,17 @@
 
         <aside class="space-y-6">
             <section class="panel p-5 sm:p-6">
-                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600">Resumen financiero</p>
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400">Resumen financiero</p>
                 <dl class="mt-5 space-y-3 text-sm">
                     @foreach (['Subtotal' => $rental->subtotal, 'Cargos' => $rental->fees, 'Impuestos' => $rental->taxes] as $label => $value)
                         <div class="flex justify-between"><dt class="text-slate-500">{{ $label }}</dt><dd class="font-semibold text-slate-800 dark:text-slate-200">RD$ {{ number_format((float) $value, 2) }}</dd></div>
                     @endforeach
-                    <div class="flex justify-between border-t border-slate-200 pt-4 dark:border-slate-800"><dt class="font-black text-slate-950 dark:text-white">Total</dt><dd class="text-xl font-black text-blue-600">RD$ {{ number_format((float) $rental->total, 2) }}</dd></div>
+                    <div class="flex justify-between border-t border-slate-200 pt-4 dark:border-slate-800"><dt class="font-black text-slate-950 dark:text-white">Total</dt><dd class="text-xl font-black text-blue-400">RD$ {{ number_format((float) $rental->total, 2) }}</dd></div>
                 </dl>
             </section>
             <section class="panel p-5 sm:p-6">
                 <h2 class="font-black text-slate-950 dark:text-white">Responsables</h2>
-                <div class="mt-4 space-y-3 text-sm"><p><span class="text-slate-500">Abierto por:</span> <strong>{{ $rental->opener?->name ?: 'Sistema' }}</strong></p><p><span class="text-slate-500">Cerrado por:</span> <strong>{{ $rental->closer?->name ?: 'Pendiente' }}</strong></p>@if ($rental->reservation)<p><span class="text-slate-500">Reserva:</span> <a href="{{ route('reservations.show', $rental->reservation) }}" class="font-bold text-blue-600">{{ $rental->reservation->code }}</a></p>@endif</div>
+                <div class="mt-4 space-y-3 text-sm"><p><span class="text-slate-500">Abierto por:</span> <strong>{{ $rental->opener?->name ?: 'Sistema' }}</strong></p><p><span class="text-slate-500">Cerrado por:</span> <strong>{{ $rental->closer?->name ?: 'Pendiente' }}</strong></p>@if ($rental->reservation)<p><span class="text-slate-500">Reserva:</span> <a href="{{ route('reservations.show', $rental->reservation) }}" class="font-bold text-blue-400">{{ $rental->reservation->code }}</a></p>@endif</div>
             </section>
         </aside>
     </div>

@@ -86,45 +86,57 @@ final class SaaSProductionReadinessTest extends TestCase
 
     public function test_production_preflight_detects_insecure_configuration(): void
     {
-        config()->set([
-            'app.env' => 'local',
-            'app.debug' => true,
-            'app.url' => 'http://example.test',
-            'app.key' => '',
-            'session.secure' => false,
-            'session.encrypt' => false,
-            'database.default' => 'sqlsrv',
-            'database.connections.sqlsrv.encrypt' => 'no',
-            'database.connections.sqlsrv.trust_server_certificate' => 'true',
-            'queue.default' => 'sync',
-            'cache.default' => 'array',
-            'rentadrive.automation.enabled' => true,
-            'mail.default' => 'log',
-        ]);
+        $originalConnection = config('database.default');
 
-        $problems = app(ProductionReadiness::class)->configurationProblems();
-        $this->assertGreaterThanOrEqual(8, count($problems));
+        try {
+            config()->set([
+                'app.env' => 'local',
+                'app.debug' => true,
+                'app.url' => 'http://example.test',
+                'app.key' => '',
+                'session.secure' => false,
+                'session.encrypt' => false,
+                'database.default' => 'sqlsrv',
+                'database.connections.sqlsrv.encrypt' => 'no',
+                'database.connections.sqlsrv.trust_server_certificate' => 'true',
+                'queue.default' => 'sync',
+                'cache.default' => 'array',
+                'rentadrive.automation.enabled' => true,
+                'mail.default' => 'log',
+            ]);
+
+            $problems = app(ProductionReadiness::class)->configurationProblems();
+            $this->assertGreaterThanOrEqual(8, count($problems));
+        } finally {
+            config()->set('database.default', $originalConnection);
+        }
     }
 
     public function test_production_preflight_accepts_hardened_configuration(): void
     {
-        config()->set([
-            'app.env' => 'production',
-            'app.debug' => false,
-            'app.url' => 'https://rentadrive.example.test',
-            'app.key' => 'base64:'.base64_encode(random_bytes(32)),
-            'session.secure' => true,
-            'session.encrypt' => true,
-            'session.http_only' => true,
-            'database.default' => 'sqlsrv',
-            'database.connections.sqlsrv.encrypt' => 'yes',
-            'database.connections.sqlsrv.trust_server_certificate' => 'false',
-            'queue.default' => 'database',
-            'cache.default' => 'database',
-            'rentadrive.automation.enabled' => false,
-        ]);
+        $originalConnection = config('database.default');
 
-        $this->assertSame([], app(ProductionReadiness::class)->configurationProblems());
+        try {
+            config()->set([
+                'app.env' => 'production',
+                'app.debug' => false,
+                'app.url' => 'https://rentadrive.example.test',
+                'app.key' => 'base64:'.base64_encode(random_bytes(32)),
+                'session.secure' => true,
+                'session.encrypt' => true,
+                'session.http_only' => true,
+                'database.default' => 'sqlsrv',
+                'database.connections.sqlsrv.encrypt' => 'yes',
+                'database.connections.sqlsrv.trust_server_certificate' => 'false',
+                'queue.default' => 'database',
+                'cache.default' => 'database',
+                'rentadrive.automation.enabled' => false,
+            ]);
+
+            $this->assertSame([], app(ProductionReadiness::class)->configurationProblems());
+        } finally {
+            config()->set('database.default', $originalConnection);
+        }
     }
 
     public function test_security_headers_are_added_to_public_web_responses(): void

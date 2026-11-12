@@ -41,7 +41,7 @@
                             <tbody>
                                 @foreach ($vehicle->rentals as $rental)
                                     <tr>
-                                        <td class="font-bold">{{ $rental->code }}</td><td>{{ $rental->customer->full_name }}</td><td>{{ $rental->start_at->format('d/m/Y') }}</td><td>RD$ {{ number_format((float) $rental->total, 2) }}</td><td><x-status-badge :status="$rental->status" /></td><td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-600">Ver</a></td>
+                                        <td class="font-bold">{{ $rental->code }}</td><td>{{ $rental->customer->full_name }}</td><td>{{ $rental->start_at->format('d/m/Y') }}</td><td>RD$ {{ number_format((float) $rental->total, 2) }}</td><td><x-status-badge :status="$rental->status" /></td><td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-400">Ver</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -8,13 +8,24 @@
 
     @php
         $cards = [
-            ['label' => 'Disponibles', 'value' => $metrics['available_vehicles'], 'note' => 'Vehículos listos', 'tone' => 'emerald', 'icon' => 'car'],
-            ['label' => 'Alquileres', 'value' => $metrics['open_rentals'], 'note' => 'Actualmente abiertos', 'tone' => 'violet', 'icon' => 'car'],
-            ['label' => 'Reservas hoy', 'value' => $metrics['today_reservations'], 'note' => 'Entregas programadas', 'tone' => 'blue', 'icon' => 'calendar'],
-            ['label' => 'Cobrado mes', 'value' => 'RD$ '.number_format((float) $metrics['month_collected'], 2), 'note' => 'Pagos recibidos', 'tone' => 'amber', 'icon' => 'cash'],
-            ['label' => 'Por cobrar', 'value' => 'RD$ '.number_format((float) $metrics['outstanding'], 2), 'note' => 'Balance pendiente', 'tone' => 'rose', 'icon' => 'wallet'],
-            ['label' => 'Clientes', 'value' => $metrics['active_customers'], 'note' => 'Clientes activos', 'tone' => 'cyan', 'icon' => 'users'],
+            ['label' => 'Reservas hoy', 'value' => $metrics['today_reservations'], 'note' => 'Entregas programadas', 'tone' => 'blue', 'icon' => 'calendar', 'url' => route('reservations.index'), 'perm' => 'view reservations'],
+            ['label' => 'Devoluciones hoy', 'value' => $metrics['returns_today'], 'note' => 'Alquileres que vencen hoy', 'tone' => 'cyan', 'icon' => 'car', 'url' => route('rentals.index', ['status' => 'open']), 'perm' => 'view rentals'],
+            ['label' => 'Devoluciones atrasadas', 'value' => $metrics['overdue_returns'], 'note' => 'Pasaron la fecha prevista', 'tone' => 'rose', 'icon' => 'car', 'url' => route('rentals.index', ['status' => 'open']), 'perm' => 'view rentals'],
+            ['label' => 'Por confirmar', 'value' => $metrics['pending_reservations'], 'note' => 'Reservas pendientes', 'tone' => 'amber', 'icon' => 'calendar', 'url' => route('reservations.index', ['status' => 'pending']), 'perm' => 'view reservations'],
+            ['label' => 'Disponibles', 'value' => $metrics['available_vehicles'], 'note' => 'Vehículos listos', 'tone' => 'emerald', 'icon' => 'car', 'url' => route('vehicles.index', ['status' => 'available']), 'perm' => 'view vehicles'],
+            ['label' => 'Alquileres', 'value' => $metrics['open_rentals'], 'note' => 'Actualmente abiertos', 'tone' => 'violet', 'icon' => 'car', 'url' => route('rentals.index', ['status' => 'open']), 'perm' => 'view rentals'],
+            ['label' => 'En mantenimiento', 'value' => $metrics['maintenance_vehicles'], 'note' => 'Fuera de servicio', 'tone' => 'amber', 'icon' => 'car', 'url' => route('vehicles.index', ['status' => 'maintenance']), 'perm' => 'view vehicles'],
+            ['label' => 'Ocupación', 'value' => $metrics['occupancy'] === null ? '—' : $metrics['occupancy'].'%', 'note' => 'Alquilados sobre flota activa', 'tone' => 'blue', 'icon' => 'car', 'url' => route('vehicles.index', ['status' => 'rented']), 'perm' => 'view vehicles'],
+            ['label' => 'Cobrado mes', 'value' => 'RD$ '.number_format((float) $metrics['month_collected'], 2), 'note' => 'Pagos recibidos', 'tone' => 'amber', 'icon' => 'cash', 'url' => route('payments.index'), 'perm' => 'view payments'],
+            ['label' => 'Por cobrar', 'value' => 'RD$ '.number_format((float) $metrics['outstanding'], 2), 'note' => 'Balance pendiente', 'tone' => 'rose', 'icon' => 'wallet', 'url' => route('invoices.index'), 'perm' => 'view invoices'],
+            ['label' => 'Clientes', 'value' => $metrics['active_customers'], 'note' => 'Clientes activos', 'tone' => 'cyan', 'icon' => 'users', 'url' => route('customers.index'), 'perm' => 'view customers'],
         ];
+
+        $reservationLabelMap = ['pending' => 'Pendiente', 'confirmed' => 'Confirmada', 'converted' => 'Convertida', 'cancelled' => 'Cancelada'];
+        $reservationLabels = $reservationStatus->keys()->map(fn ($status) => $reservationLabelMap[$status] ?? ucfirst((string) $status))->values()->all();
+        $reservationValues = $reservationStatus->values()->map(fn ($total) => (int) $total)->all();
+        $categoryLabels = $topCategories->keys()->values()->all();
+        $categoryValues = $topCategories->values()->all();
 
         $incomeLabels = $monthlyIncome->pluck('label')->values()->all();
         $incomeValues = $monthlyIncome->pluck('value')->values()->all();
@@ -60,7 +71,7 @@
         </div>
     </section>
 
-    <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6" aria-label="Resumen operativo">
+    <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumen operativo">
         @foreach ($cards as $card)
             <article class="panel p-5">
                 <div class="flex items-start justify-between gap-3">
@@ -87,7 +98,10 @@
                         @endswitch
                     </span>
                 </div>
-                <p class="mt-2 text-xs text-slate-500">{{ $card['note'] }}</p>
+                <p class="mt-2 text-xs text-slate-400">{{ $card['note'] }}</p>
+                @can($card['perm'])
+                    <a href="{{ $card['url'] }}" class="link-action mt-3 inline-block text-xs" aria-label="Ver detalle de {{ $card['label'] }}">Ver detalle →</a>
+                @endcan
             </article>
         @endforeach
     </section>
@@ -96,7 +110,7 @@
         <article class="panel p-5 sm:p-6">
             <div class="flex items-center justify-between gap-4">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600 dark:text-blue-400">Rendimiento financiero</p>
+                    <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Rendimiento financiero</p>
                     <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">Ingresos de los últimos 6 meses</h2>
                 </div>
                 <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 dark:border-slate-700">RD$</span>
@@ -108,13 +122,58 @@
 
         <article class="panel p-5 sm:p-6">
             <div>
-                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600 dark:text-blue-400">Estado de flota</p>
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Estado de flota</p>
                 <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">Distribución operativa</h2>
             </div>
             <div class="mt-6 h-72">
                 <canvas id="fleetChart" data-labels='@json($fleetLabels)' data-values='@json($fleetValues)'></canvas>
             </div>
         </article>
+    </section>
+
+    <section class="mt-6 grid gap-6 xl:grid-cols-[.85fr_1.15fr]" aria-label="Alertas y análisis">
+        <article class="panel p-5 sm:p-6">
+            <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400">Alertas operativas</p>
+            <h2 class="mt-2 text-xl font-black text-white">Requieren atención</h2>
+            <ul class="mt-4 space-y-3">
+                @forelse ($overdueRentals as $rental)
+                    <li class="rounded-xl border border-red-900/60 bg-red-950/30 p-3 text-sm">
+                        <a href="{{ route('rentals.show', $rental) }}" class="link-action">{{ $rental->code }}</a>
+                        <span class="text-slate-200"> · {{ $rental->customer->full_name }}</span>
+                        <p class="mt-1 text-xs text-slate-400">{{ $rental->vehicle->display_name }} — debía regresar el {{ $rental->expected_return_at->format('d/m/Y h:i A') }}</p>
+                    </li>
+                @empty
+                    <li class="text-sm text-slate-400">No hay devoluciones atrasadas.</li>
+                @endforelse
+                @if ($metrics['pending_reservations'] > 0)
+                    <li class="rounded-xl border border-amber-900/60 bg-amber-950/30 p-3 text-sm text-slate-200">
+                        {{ $metrics['pending_reservations'] }} {{ $metrics['pending_reservations'] === 1 ? 'reserva pendiente' : 'reservas pendientes' }} de confirmación.
+                        <a href="{{ route('reservations.index', ['status' => 'pending']) }}" class="link-action ml-1">Revisar</a>
+                    </li>
+                @endif
+            </ul>
+        </article>
+
+        <div class="grid gap-6 sm:grid-cols-2">
+            <article class="panel p-5 sm:p-6">
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400">Reservas del mes</p>
+                <h2 class="mt-2 text-lg font-black text-white">Por estado</h2>
+                @if (array_sum($reservationValues) > 0)
+                    <div class="mt-4 h-56"><canvas id="reservationStatusChart" role="img" aria-label="Reservas del mes por estado" data-labels='@json($reservationLabels)' data-values='@json($reservationValues)'></canvas></div>
+                @else
+                    <p class="mt-4 text-sm text-slate-400">Sin reservas este mes.</p>
+                @endif
+            </article>
+            <article class="panel p-5 sm:p-6">
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400">Últimos 90 días</p>
+                <h2 class="mt-2 text-lg font-black text-white">Categorías más alquiladas</h2>
+                @if (count($categoryValues) > 0)
+                    <div class="mt-4 h-56"><canvas id="categoryChart" role="img" aria-label="Categorías más alquiladas" data-labels='@json($categoryLabels)' data-values='@json($categoryValues)'></canvas></div>
+                @else
+                    <p class="mt-4 text-sm text-slate-400">Sin alquileres en el período.</p>
+                @endif
+            </article>
+        </div>
     </section>
 
     <section class="mt-6 panel overflow-hidden">
@@ -124,7 +183,7 @@
                     <h2 class="font-bold text-slate-950 dark:text-white">Calendario de reservas</h2>
                     <p class="mt-1 text-sm text-slate-500">{{ $calendar['title'] }}</p>
                 </div>
-                <a href="{{ route('reservations.index') }}" class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400">Ver todas</a>
+                <a href="{{ route('reservations.index') }}" class="text-sm font-bold text-blue-400 hover:text-blue-300 dark:text-blue-400">Ver todas</a>
             </div>
         </div>
         <div class="overflow-x-auto p-4 sm:p-6">

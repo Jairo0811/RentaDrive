@@ -5,11 +5,11 @@
 @section('content')
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-600 dark:text-blue-400">Disponibilidad</p>
+            <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Disponibilidad</p>
             <h1 class="mt-2 text-3xl font-black tracking-tight">Elige una categoría</h1>
             <p class="mt-2 text-sm text-slate-500">{{ $branch->name }} · {{ $startAt->format('d/m/Y h:i A') }} → {{ $endAt->format('d/m/Y h:i A') }} · {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
         </div>
-        <a href="{{ route('public-booking.show', $company->slug) }}" class="font-bold text-blue-600 dark:text-blue-400">Cambiar búsqueda</a>
+        <a href="{{ route('public-booking.show', $company->slug) }}" class="font-bold text-blue-400 dark:text-blue-400">Cambiar búsqueda</a>
     </div>
 
     <div class="grid gap-5 lg:grid-cols-2">

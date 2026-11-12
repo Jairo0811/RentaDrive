@@ -15,7 +15,7 @@
                 </div>
                 <div class="rounded-2xl bg-slate-50 px-4 py-3 text-right dark:bg-slate-950/60">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Total estimado</p>
-                    <p class="mt-1 text-2xl font-black text-blue-600 dark:text-blue-400">RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</p>
+                    <p class="mt-1 text-2xl font-black text-blue-400 dark:text-blue-400">RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</p>
                 </div>
             </div>
 
@@ -80,9 +80,9 @@
                 <a href="{{ route('public-booking.show', $company->slug) }}" class="btn-secondary justify-center">Nueva búsqueda</a>
 
                 @if (in_array($reservation->status, ['pending', 'confirmed'], true) && $reservation->start_at->isFuture())
-                    <form method="POST" action="{{ route('public-booking.cancel', ['company' => $company->slug, 'token' => $reservation->public_token]) }}" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva?')">
+                    <form method="POST" action="{{ route('public-booking.cancel', ['company' => $company->slug, 'token' => $reservation->public_token]) }}" data-confirm="¿Seguro que deseas cancelar esta reserva?" data-confirm-label="Cancelar reserva">
                         @csrf
-                        <button class="inline-flex w-full items-center justify-center rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40">Cancelar reserva</button>
+                        <button class="inline-flex w-full items-center justify-center rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-400 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40">Cancelar reserva</button>
                     </form>
                 @endif
             </div>
