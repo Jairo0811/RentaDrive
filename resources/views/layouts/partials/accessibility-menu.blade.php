@@ -25,7 +25,7 @@
                 <h2 id="accessibility-menu-title" class="text-base font-black text-slate-900 dark:text-white">Centro de accesibilidad</h2>
                 <p class="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">Personaliza la interfaz. Las preferencias se guardan en este navegador.</p>
             </div>
-            <button type="button" class="focus-ring rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" @click="open = false" aria-label="Cerrar centro de accesibilidad">
+            <button type="button" class="focus-ring rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" @click="open = false" aria-label="Cerrar centro de accesibilidad">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
         </div>

@@ -7,7 +7,7 @@
         <div>
             <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Disponibilidad</p>
             <h1 class="mt-2 text-3xl font-black tracking-tight">Elige una categoría</h1>
-            <p class="mt-2 text-sm text-slate-500">{{ $branch->name }} · {{ $startAt->format('d/m/Y h:i A') }} → {{ $endAt->format('d/m/Y h:i A') }} · {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
+            <p class="mt-2 text-sm text-slate-400">{{ $branch->name }} · {{ $startAt->format('d/m/Y h:i A') }} → {{ $endAt->format('d/m/Y h:i A') }} · {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
         </div>
         <a href="{{ route('public-booking.show', $company->slug) }}" class="font-bold text-blue-400 dark:text-blue-400">Cambiar búsqueda</a>
     </div>
@@ -23,7 +23,7 @@
                         </span>
                         <h2 class="mt-3 text-xl font-black">{{ $category->name }}</h2>
                         @if ($category->description)
-                            <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ $category->description }}</p>
+                            <p class="mt-2 text-sm leading-relaxed text-slate-400">{{ $category->description }}</p>
                         @endif
                     </div>
                     <div class="text-right">
@@ -34,11 +34,11 @@
 
                 <div class="mt-6 grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-4 text-sm dark:bg-slate-950/60">
                     <div>
-                        <p class="text-xs text-slate-500">Subtotal {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
+                        <p class="text-xs text-slate-400">Subtotal {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
                         <p class="mt-1 font-black">RD$ {{ number_format((float) $category->getAttribute('quote_subtotal'), 2) }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-500">Depósito</p>
+                        <p class="text-xs text-slate-400">Depósito</p>
                         <p class="mt-1 font-black">RD$ {{ number_format((float) $category->deposit_amount, 2) }}</p>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
         @empty
             <div class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center dark:border-slate-700 dark:bg-slate-900 lg:col-span-2">
                 <h2 class="text-xl font-black">No encontramos categorías disponibles</h2>
-                <p class="mt-2 text-sm text-slate-500">Prueba con otra sucursal o un período diferente.</p>
+                <p class="mt-2 text-sm text-slate-400">Prueba con otra sucursal o un período diferente.</p>
             </div>
         @endforelse
     </div>

@@ -21,7 +21,7 @@
                 <div>
                     <label class="form-label" for="vehicle_id">Vehículo específico</label>
                     <select id="vehicle_id" name="vehicle_id" class="form-input"><option value="">Asignar después</option>@foreach ($vehicles as $vehicle)<option value="{{ $vehicle->id }}" data-category="{{ $vehicle->vehicle_category_id }}" data-rate="{{ $vehicle->effective_daily_rate }}" @selected((string) old('vehicle_id', $reservation->vehicle_id) === (string) $vehicle->id)>{{ $vehicle->display_name }} · {{ $vehicle->category->name }}</option>@endforeach</select>
-                    <p class="mt-2 text-xs text-slate-500">La disponibilidad se valida antes de guardar.</p>
+                    <p class="mt-2 text-xs text-slate-400">La disponibilidad se valida antes de guardar.</p>
                 </div>
                 <div><label class="form-label" for="start_at">Inicio</label><input id="start_at" type="datetime-local" name="start_at" value="{{ old('start_at', $reservation->start_at?->format('Y-m-d\TH:i') ?? now()->addDay()->format('Y-m-d\T09:00')) }}" class="form-input" required></div>
                 <div><label class="form-label" for="end_at">Fin</label><input id="end_at" type="datetime-local" name="end_at" value="{{ old('end_at', $reservation->end_at?->format('Y-m-d\TH:i') ?? now()->addDays(2)->format('Y-m-d\T09:00')) }}" class="form-input" required></div>

@@ -8,7 +8,7 @@
             </svg>
         </span>
         <h2 class="mt-4 font-bold text-slate-900 dark:text-white">{{ $title }}</h2>
-        <p class="mt-1 max-w-md text-sm text-slate-500">{{ $message }}</p>
+        <p class="mt-1 max-w-md text-sm text-slate-400">{{ $message }}</p>
         @if ($action && $href && ($ability === null || auth()->user()?->can($ability)))
             <a href="{{ $href }}" class="btn-primary mt-5">{{ $action }}</a>
         @endif

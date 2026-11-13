@@ -19,7 +19,7 @@
     <nav class="mt-5 flex-1 space-y-6 overflow-y-auto px-1" aria-label="Navegación principal">
         @if ($isPlatformAdmin)
             <div>
-                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-600">Plataforma</p>
+                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">Plataforma</p>
                 <a href="{{ route('platform.dashboard') }}" class="nav-item {{ request()->routeIs('platform.dashboard') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}">
                     <span class="nav-icon"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i></span>
                     Dashboard SaaS
@@ -31,7 +31,7 @@
             </div>
         @else
             <div>
-                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-600">General</p>
+                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">General</p>
                 <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}">
                     <span class="nav-icon"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
                     Dashboard
@@ -39,7 +39,7 @@
             </div>
 
             <div>
-                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-600">Operaciones</p>
+                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">Operaciones</p>
                 @can('view customers')
                     <a href="{{ route('customers.index') }}" class="nav-item {{ request()->routeIs('customers.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>Clientes</a>
                 @endcan
@@ -59,7 +59,7 @@
             </div>
 
             <div>
-                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-600">Finanzas</p>
+                <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">Finanzas</p>
                 @can('view invoices')
                     <a href="{{ route('invoices.index') }}" class="nav-item {{ request()->routeIs('invoices.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></span>Facturación</a>
                 @endcan
@@ -73,7 +73,7 @@
 
             @canany(['manage users', 'manage configuration', 'view audit log'])
                 <div>
-                    <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-600">Administración</p>
+                    <p class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">Administración</p>
                     @can('manage users')
                         <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'nav-item-active' : 'hover:bg-slate-900 hover:text-white' }}"><span class="nav-icon"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></span>Usuarios</a>
                     @endcan

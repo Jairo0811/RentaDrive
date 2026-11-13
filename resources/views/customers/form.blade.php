@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">{{ $customer->exists ? 'Editar cliente' : 'Nuevo cliente' }}</p>
-            <p class="text-xs text-slate-500">Expediente del arrendatario</p>
+            <p class="text-xs text-slate-400">Expediente del arrendatario</p>
         </div>
     </x-slot>
 

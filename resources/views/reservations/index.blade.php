@@ -33,8 +33,8 @@
                                     </span>
                                 </td>
                                 <td>{{ $reservation->customer->full_name }}</td>
-                                <td><p>{{ $reservation->vehicle?->display_name ?? $reservation->category->name }}</p><p class="mt-1 text-xs text-slate-500">{{ $reservation->pickup_location }}</p></td>
-                                <td><p>{{ $reservation->start_at->format('d/m/Y h:i A') }}</p><p class="mt-1 text-xs text-slate-500">a {{ $reservation->end_at->format('d/m/Y h:i A') }}</p></td>
+                                <td><p>{{ $reservation->vehicle?->display_name ?? $reservation->category->name }}</p><p class="mt-1 text-xs text-slate-400">{{ $reservation->pickup_location }}</p></td>
+                                <td><p>{{ $reservation->start_at->format('d/m/Y h:i A') }}</p><p class="mt-1 text-xs text-slate-400">a {{ $reservation->end_at->format('d/m/Y h:i A') }}</p></td>
                                 <td>RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</td>
                                 <td><x-status-badge :status="$reservation->status" /></td>
                                 <td class="text-right"><a href="{{ route('reservations.show', $reservation) }}" class="font-bold text-blue-400">Ver</a></td>

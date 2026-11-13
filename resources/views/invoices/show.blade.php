@@ -17,9 +17,9 @@
                     <div class="flex justify-between gap-4"><div><p class="font-bold text-slate-900 dark:text-white">Alquiler {{ $invoice->rental->code }}</p><p class="mt-1 text-sm text-slate-500">{{ $invoice->rental->vehicle->display_name }} · {{ $invoice->rental->start_at->format('d/m/Y') }} a {{ $invoice->rental->expected_return_at->format('d/m/Y') }}</p></div><p class="font-bold">RD$ {{ number_format((float) $invoice->subtotal, 2) }}</p></div>
                 </div>
                 <dl class="ml-auto mt-6 max-w-sm space-y-3 text-sm">
-                    <div class="flex justify-between"><dt class="text-slate-500">Subtotal</dt><dd>RD$ {{ number_format((float) $invoice->subtotal, 2) }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-slate-500">Impuesto</dt><dd>RD$ {{ number_format((float) $invoice->tax, 2) }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-slate-500">Descuento</dt><dd>- RD$ {{ number_format((float) $invoice->discount, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-400">Subtotal</dt><dd>RD$ {{ number_format((float) $invoice->subtotal, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-400">Impuesto</dt><dd>RD$ {{ number_format((float) $invoice->tax, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-400">Descuento</dt><dd>- RD$ {{ number_format((float) $invoice->discount, 2) }}</dd></div>
                     <div class="flex justify-between border-t border-slate-200 pt-4 text-lg font-black dark:border-slate-800"><dt>Total</dt><dd>RD$ {{ number_format((float) $invoice->total, 2) }}</dd></div>
                     <div class="flex justify-between text-emerald-600"><dt>Pagado</dt><dd>RD$ {{ number_format((float) $invoice->paid_amount, 2) }}</dd></div>
                     <div class="flex justify-between text-xl font-black text-blue-400"><dt>Balance</dt><dd>RD$ {{ number_format((float) $invoice->balance, 2) }}</dd></div>
