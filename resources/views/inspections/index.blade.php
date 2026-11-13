@@ -12,7 +12,7 @@
 
     <div class="table-shell">
         @if ($inspections->isEmpty())
-            <x-empty-state title="No hay inspecciones" message="Registra el estado de una unidad asociada a un alquiler." action="Nueva inspección" :href="route('inspections.create')" />
+            <x-empty-state title="No hay inspecciones" message="Registra el estado de una unidad asociada a un alquiler." action="Nueva inspección" :href="route('inspections.create')" ability="manage inspections" />
         @else
             <div class="overflow-x-auto">
                 <table class="data-table">

@@ -21,6 +21,7 @@ jobs:
       DB_PASSWORD: CI_RentaDrive_2026!
       DB_ENCRYPT: 'no'
       DB_TRUST_SERVER_CERTIFICATE: 'true'
+      EXPECT_DB_DRIVER: sqlsrv
 
     services:
       sqlserver:

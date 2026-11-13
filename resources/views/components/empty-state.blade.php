@@ -1,4 +1,4 @@
-@props(['title', 'message', 'action' => null, 'href' => null])
+@props(['title', 'message', 'action' => null, 'href' => null, 'ability' => null])
 
 <div class="grid min-h-56 place-items-center px-6 py-12 text-center">
     <div>
@@ -9,7 +9,7 @@
         </span>
         <h2 class="mt-4 font-bold text-slate-900 dark:text-white">{{ $title }}</h2>
         <p class="mt-1 max-w-md text-sm text-slate-500">{{ $message }}</p>
-        @if ($action && $href)
+        @if ($action && $href && ($ability === null || auth()->user()?->can($ability)))
             <a href="{{ $href }}" class="btn-primary mt-5">{{ $action }}</a>
         @endif
     </div>
