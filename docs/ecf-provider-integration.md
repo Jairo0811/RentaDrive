@@ -51,12 +51,12 @@ Fuentes verificables:
 Se verificó el portal de desarrolladores para República Dominicana:
 https://documentacion.digifact.com/do/api
 
-- Entorno **sandbox/test**: \`https://testnucdo.digifact.com/api\`; producción: \`https://nucdo.digifact.com/api\` (solo referencia, no conectado).
-- Autenticación POST \`/login/get_token\` con JSON \`Username: DO.<RNC>.<USUARIO>\` y \`Password\`, respuesta \`Token\`. El token **nunca debe registrarse en logs**.
-- Consulta informativa GET \`/SHAREDINFO\`, \`DATA1=SHARED_GETDTEINFO\`, \`DATA2=AUTHNUMBER|<e-NCF>\`, \`TAXID=<RNC>\`, \`USERNAME=<usuario>\`. La respuesta incluye RNC emisor, secuencia, estado y seguimiento.
-- Certificación API \`POST /v2/transform/nuc_json\` (o \`/nuc\` para XML), con esquema NUC y requisitos de firma. **NO llamar desde RentaDrive** hasta tener onboarding, autorización, validación de payload, idempotencia y credenciales con consentimiento.
+- Entorno **sandbox/test**: `https://testnucdo.digifact.com/api`; producción: `https://nucdo.digifact.com/api` (solo referencia, no conectado).
+- Autenticación POST `/login/get_token` con JSON `Username: DO.<RNC>.<USUARIO>` y `Password`, respuesta `Token`. El token **nunca debe registrarse en logs**.
+- Consulta informativa GET `/SHAREDINFO`, `DATA1=SHARED_GETDTEINFO`, `DATA2=AUTHNUMBER|<e-NCF>`, `TAXID=<RNC>`, `USERNAME=<usuario>`. La respuesta incluye RNC emisor, secuencia, estado y seguimiento.
+- Certificación API `POST /v2/transform/nuc_json` (o `/nuc` para XML), con esquema NUC y requisitos de firma. **NO llamar desde RentaDrive** hasta tener onboarding, autorización, validación de payload, idempotencia y credenciales con consentimiento.
 
-Se añadió \`DigifactSandboxApi\` como **cliente exclusivamente de consulta y autenticación en el entorno test**. No implementa el contrato de emisión \`EcfProvider\`, no cambia el adaptador bloqueado, no se puede invocar desde rutas web y **no usa endpoints de producción**. Los tests usan HTTP simulado y comprueban coincidencia de RNC y e-NCF; nunca contactan la API real.
+Se añadió `DigifactSandboxApi` como **cliente exclusivamente de consulta y autenticación en el entorno test**. No implementa el contrato de emisión `EcfProvider`, no cambia el adaptador bloqueado, no se puede invocar desde rutas web y **no usa endpoints de producción**. Los tests usan HTTP simulado y comprueban coincidencia de RNC y e-NCF; nunca contactan la API real.
 
 **Nota de seguridad:** no introducir credenciales de prueba/proveedor en GitHub ni enviarlas en chats. Su almacenamiento por tenant requiere gestor de secretos y protocolo de autorización, aún pendiente.
 
@@ -74,7 +74,7 @@ Se añadió \`DigifactSandboxApi\` como **cliente exclusivamente de consulta y a
 
 ### Estado de preparación interna
 
-La vista \`/fiscal\` ahora muestra cinco hitos de preparación por empresa. Solo marca **datos fiscales presentes** cuando existe razón social y RNC con formato válido. Todos los hitos de habilitación DGII, integración, firma y acuses permanecen **pendientes** mientras no exista evidencia y código de emisión certificado.
+La vista `/fiscal` ahora muestra cinco hitos de preparación por empresa. Solo marca **datos fiscales presentes** cuando existe razón social y RNC con formato válido. Todos los hitos de habilitación DGII, integración, firma y acuses permanecen **pendientes** mientras no exista evidencia y código de emisión certificado.
 
 El contador del panel **no** representa porcentaje de cumplimiento jurídico ni certificación; la transmisión real continúa bloqueada.
 
