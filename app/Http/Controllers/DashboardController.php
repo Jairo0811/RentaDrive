@@ -54,15 +54,18 @@ final class DashboardController extends Controller
             ->pluck('total', 'status');
         $operableFleet = (int) $fleetStatus->sum() - (int) ($fleetStatus['inactive'] ?? 0);
 
+        // Agregación en SQL: el volumen de alquileres no se carga en memoria.
+        // TenantScope califica rentals.company_id, por lo que los joins no generan ambigüedad.
         $topCategories = Rental::query()
-            ->with('vehicle.category')
-            ->whereBetween('start_at', [now()->subDays(90)->startOfDay(), now()])
-            ->get()
-            ->map(fn (Rental $rental): ?string => $rental->vehicle?->category?->name)
-            ->filter()
-            ->countBy()
-            ->sortDesc()
-            ->take(5);
+            ->join('vehicles', 'vehicles.id', '=', 'rentals.vehicle_id')
+            ->join('vehicle_categories', 'vehicle_categories.id', '=', 'vehicles.vehicle_category_id')
+            ->whereBetween('rentals.start_at', [now()->subDays(90)->startOfDay(), now()])
+            ->groupBy('vehicle_categories.name')
+            ->selectRaw('vehicle_categories.name as category_name, COUNT(*) as total')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->pluck('total', 'category_name')
+            ->map(fn ($total): int => (int) $total);
 
         return view('dashboard', [
             'metrics' => [
