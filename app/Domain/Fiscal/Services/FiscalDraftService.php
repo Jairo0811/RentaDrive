@@ -28,9 +28,6 @@ final class FiscalDraftService
                 ]);
             }
 
-            if ($profile->ecf_status !== 'not_certified') {
-                throw ValidationException::withMessages(['fiscal' => 'La emisión electrónica necesita una integración certificada.']);
-            }
 
             $snapshot = [
                 'invoice_number' => $invoice->number,

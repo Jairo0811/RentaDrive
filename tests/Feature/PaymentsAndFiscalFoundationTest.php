@@ -222,6 +222,14 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         $this->assertSame('E32', $draft->snapshot['ecf_candidate_type']);
         $this->assertSame(1, $draft->snapshot['ecf_preparation_version']);
         $this->assertFalse($draft->snapshot['ecf_issued']);
+        // Un emisor autorizado sigue pudiendo PREPARAR borradores:
+        // la autorización no activa por sí sola el envío a DGII.
+        $profile->ecf_status = 'certified';
+        $profile->save();
+        $credit = app(FiscalDraftService::class)->prepare($invoice, 'credit');
+        $this->assertSame('draft', $credit->status);
+        $this->assertSame('E31', $credit->snapshot['ecf_candidate_type']);
+        $this->assertFalse($credit->snapshot['ecf_issued']);
         $this->assertSame(1, FiscalDraft::query()->count());
     }
 

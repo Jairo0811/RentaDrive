@@ -16,12 +16,12 @@ Fuentes primarias:
 
 ## Implementación inicial — no transmite ni firma
 
-- \`App\Domain\Fiscal\Contracts\EcfProvider\`: puerto de proveedor, diseñado para sustituir el adaptador.
-- \`DisabledEcfProvider\`: implementación fail-closed, vinculada en \`AppServiceProvider\`; rechaza cualquier transmisión.
-- \`EcfDraftType\`: mapea \`consumer\` a **E32** y \`credit\` a **E31**, como tipos **candidatos** para preparación.
-- \`FiscalDraftService\`: añade \`ecf_candidate_type\`, \`ecf_preparation_version\` y \`ecf_issued=false\` al snapshot existente; no asigna e-NCF ni cambia estados.
-- \`EcfReadinessService\`: presenta disponibilidad de integración, estado de emisor y **emisión deshabilitada**.
-- Vista \`/fiscal\` informa al administrador por empresa; el detalle de factura explica el tipo candidato.
+- `App\Domain\Fiscal\Contracts\EcfProvider`: puerto de proveedor, diseñado para sustituir el adaptador.
+- `DisabledEcfProvider`: implementación fail-closed, vinculada en `AppServiceProvider`; rechaza cualquier transmisión.
+- `EcfDraftType`: mapea `consumer` a **E32** y `credit` a **E31**, como tipos **candidatos** para preparación.
+- `FiscalDraftService`: añade `ecf_candidate_type`, `ecf_preparation_version` y `ecf_issued=false` al snapshot existente; no asigna e-NCF ni cambia estados.
+- `EcfReadinessService`: presenta disponibilidad de integración, estado de emisor y **emisión deshabilitada**.
+- Vista `/fiscal` informa al administrador por empresa; el detalle de factura explica el tipo candidato.
 - Suite de pruebas: adaptador bloqueado, tipos soportados, estado de emisión y snapshot.
 
 **Límite funcional**: el snapshot no es un XML válido según DGII, no contiene firma digital ni sirve como comprobante tributario. Los PDF actuales continúan siendo documentos internos sin e-NCF.
@@ -29,7 +29,7 @@ Fuentes primarias:
 ## Próxima implementación (requiere elegir proveedor y habilitación)
 
 1. Comparar 2–3 **proveedores actualmente autorizados** en listado DGII: API, sandbox, precios por emisión, volumen, modalidad de empresa, E31/E32/E33/E34, soporte, contingencias, seguridad, manejo de XML/QR, política de retención y exportación de datos.
-2. Incorporar onboarding de cada tenant con su RNC verificado, habilitación de emisor, autorización de secuencias, certificados y credenciales en gestor de secretos; nunca en \`.env.example\`, base de datos en claro ni repositorio.
+2. Incorporar onboarding de cada tenant con su RNC verificado, habilitación de emisor, autorización de secuencias, certificados y credenciales en gestor de secretos; nunca en `.env.example`, base de datos en claro ni repositorio.
 3. Modelar documentos e-CF inmutables (ID tenant, factura, tipo, e-NCF asignado por flujo autorizado, estado, hash XML, referencia de proveedor, eventos), unicidad por emisor/tipo/secuencia y política de retención.
 4. Implementar mapeo completo y validación contra **versión oficial vigente** de XML/XSD: impuestos, ITBIS, exenciones, descuentos, tipo de cliente, referencias, datos obligatorios y particularidades de alquiler.
 5. Adaptador real con HTTPS/TLS, credenciales segregadas por tenant, timeouts, idempotencia, reintentos controlados, seguimiento de estado DGII/proveedor y webhook autenticado. **Nunca marcar una factura como e-CF aceptado solo por HTTP 200 o por una solicitud enviada.**
