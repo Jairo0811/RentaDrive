@@ -43,6 +43,29 @@ class Customer extends Model
         return Attribute::get(fn (): string => trim($this->first_name.' '.$this->last_name));
     }
 
+    /**
+     * Documento con todos los caracteres ocultos salvo los últimos cuatro; para listados.
+     * Los de cuatro caracteres o menos se ocultan por completo.
+     */
+    public function maskedDocumentNumber(): string
+    {
+        $number = (string) $this->document_number;
+        $length = mb_strlen($number);
+
+        if ($length <= 4) {
+            return str_repeat('•', $length);
+        }
+
+        return str_repeat('•', $length - 4).mb_substr($number, -4);
+    }
+
+    public function documentLastDigits(): string
+    {
+        $number = (string) $this->document_number;
+
+        return mb_strlen($number) > 4 ? mb_substr($number, -4) : '';
+    }
+
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);

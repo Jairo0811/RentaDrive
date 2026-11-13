@@ -49,7 +49,10 @@
                                     <p class="font-bold text-slate-900 dark:text-white">{{ $customer->full_name }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ $customer->city ?: 'Ciudad no indicada' }}</p>
                                 </td>
-                                <td>{{ $customer->document_number }}</td>
+                                <td>
+                                    <span aria-hidden="true">{{ $customer->maskedDocumentNumber() }}</span>
+                                    <span class="sr-only">{{ $customer->documentLastDigits() !== '' ? 'Documento terminado en '.$customer->documentLastDigits() : 'Documento oculto' }}</span>
+                                </td>
                                 <td>
                                     <p>{{ $customer->phone }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ $customer->email ?: 'Sin correo' }}</p>
