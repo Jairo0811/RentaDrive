@@ -23,7 +23,7 @@
                         <input id="tax_rate_display" type="text" value="18%" class="form-input cursor-not-allowed bg-slate-100 pr-12 text-slate-500 dark:bg-slate-800 dark:text-slate-400" readonly aria-readonly="true">
                         <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Fijo</span>
                     </div>
-                    <p class="mt-2 text-xs text-slate-500">La tasa no puede modificarse desde la interfaz.</p>
+                    <p class="mt-2 text-xs text-slate-400">La tasa no puede modificarse desde la interfaz.</p>
                 </div>
                 <div><label class="form-label" for="default_pickup_location">Ubicación predeterminada</label><input id="default_pickup_location" name="default_pickup_location" value="{{ old('default_pickup_location', $settings['operations.default_pickup_location'] ?? 'Oficina principal') }}" class="form-input" required></div>
             </div>

@@ -22,7 +22,7 @@
                                 <form method="POST" action="{{ route('fleet.brands.destroy', $brand) }}" class="mt-2 text-right" data-confirm="¿Eliminar esta marca?" data-confirm-label="Eliminar">@csrf @method('DELETE')<button class="text-xs font-bold text-red-400">Eliminar</button></form>
                             @endif
                         @else
-                            <div class="flex justify-between"><span class="font-bold">{{ $brand->name }}</span><span class="text-xs text-slate-500">{{ $brand->models_count }} modelos</span></div>
+                            <div class="flex justify-between"><span class="font-bold">{{ $brand->name }}</span><span class="text-xs text-slate-400">{{ $brand->models_count }} modelos</span></div>
                         @endcan
                     </div>
                 @endforeach

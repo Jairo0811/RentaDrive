@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">RentaDrive SaaS</p>
-            <p class="text-xs text-slate-500">Administración global de plataforma</p>
+            <p class="text-xs text-slate-400">Administración global de plataforma</p>
         </div>
     </x-slot>
 
@@ -42,7 +42,7 @@
         <div class="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h2 class="font-bold text-slate-950 dark:text-white">Empresas recientes</h2>
-                <p class="mt-1 text-sm text-slate-500">Últimos tenants incorporados a RentaDrive.</p>
+                <p class="mt-1 text-sm text-slate-400">Últimos tenants incorporados a RentaDrive.</p>
             </div>
             <a href="{{ route('platform.companies.index') }}" class="text-sm font-bold text-blue-400 dark:text-blue-400">Ver todas</a>
         </div>
@@ -81,7 +81,7 @@
                         <tr>
                             <td>
                                 <p class="font-bold text-slate-900 dark:text-white">{{ $company->name }}</p>
-                                <p class="mt-1 text-xs text-slate-500">{{ $company->slug }}</p>
+                                <p class="mt-1 text-xs text-slate-400">{{ $company->slug }}</p>
                             </td>
                             <td><span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $statusLabel }}</span></td>
                             <td>{{ $plan['name'] ?? $company->plan_code }}</td>

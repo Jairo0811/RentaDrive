@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">Reportes</p>
-            <p class="text-xs text-slate-500">Indicadores de operación y cobro</p>
+            <p class="text-xs text-slate-400">Indicadores de operación y cobro</p>
         </div>
     </x-slot>
 
@@ -49,7 +49,7 @@
             <article class="panel p-5">
                 <p class="text-xs font-bold uppercase tracking-[.14em] text-slate-400">{{ $label }}</p>
                 <p class="mt-3 text-2xl font-black text-slate-950 dark:text-white">{{ $value }}</p>
-                <p class="mt-1 text-xs text-slate-500">{{ $note }}</p>
+                <p class="mt-1 text-xs text-slate-400">{{ $note }}</p>
             </article>
         @endforeach
     </section>

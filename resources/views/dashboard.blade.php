@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">Dashboard</p>
-            <p class="text-xs text-slate-500">Panorama operativo de RentaDrive</p>
+            <p class="text-xs text-slate-400">Panorama operativo de RentaDrive</p>
         </div>
     </x-slot>
 
@@ -113,7 +113,7 @@
                     <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400 dark:text-blue-400">Rendimiento financiero</p>
                     <h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">Ingresos de los últimos 6 meses</h2>
                 </div>
-                <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 dark:border-slate-700">RD$</span>
+                <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-400 dark:border-slate-700">RD$</span>
             </div>
             <div class="mt-6 h-72">
                 <canvas id="incomeChart" data-labels='@json($incomeLabels)' data-values='@json($incomeValues)'></canvas>
@@ -181,7 +181,7 @@
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 class="font-bold text-slate-950 dark:text-white">Calendario de reservas</h2>
-                    <p class="mt-1 text-sm text-slate-500">{{ $calendar['title'] }}</p>
+                    <p class="mt-1 text-sm text-slate-400">{{ $calendar['title'] }}</p>
                 </div>
                 <a href="{{ route('reservations.index') }}" class="text-sm font-bold text-blue-400 hover:text-blue-300 dark:text-blue-400">Ver todas</a>
             </div>
@@ -223,18 +223,18 @@
         <section class="panel overflow-hidden">
             <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-6">
                 <h2 class="font-bold text-slate-950 dark:text-white">Próximas reservas</h2>
-                <p class="mt-1 text-sm text-slate-500">Entregas pendientes y confirmadas.</p>
+                <p class="mt-1 text-sm text-slate-400">Entregas pendientes y confirmadas.</p>
             </div>
             <div class="divide-y divide-slate-100 dark:divide-slate-800">
                 @forelse ($upcomingReservations as $reservation)
                     <a href="{{ route('reservations.show', $reservation) }}" class="flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-slate-50 dark:hover:bg-slate-800/50 sm:px-6">
                         <div>
                             <p class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ $reservation->customer->full_name }}</p>
-                            <p class="mt-1 text-xs text-slate-500">{{ $reservation->code }} · {{ $reservation->vehicle?->display_name ?? $reservation->category->name }}</p>
+                            <p class="mt-1 text-xs text-slate-400">{{ $reservation->code }} · {{ $reservation->vehicle?->display_name ?? $reservation->category->name }}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $reservation->start_at->format('d/m/Y') }}</p>
-                            <p class="text-xs text-slate-500">{{ $reservation->start_at->format('h:i A') }}</p>
+                            <p class="text-xs text-slate-400">{{ $reservation->start_at->format('h:i A') }}</p>
                         </div>
                     </a>
                 @empty
@@ -246,14 +246,14 @@
         <section class="panel overflow-hidden">
             <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-6">
                 <h2 class="font-bold text-slate-950 dark:text-white">Alquileres activos</h2>
-                <p class="mt-1 text-sm text-slate-500">Unidades actualmente fuera.</p>
+                <p class="mt-1 text-sm text-slate-400">Unidades actualmente fuera.</p>
             </div>
             <div class="divide-y divide-slate-100 dark:divide-slate-800">
                 @forelse ($activeRentals as $rental)
                     <a href="{{ route('rentals.show', $rental) }}" class="flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-slate-50 dark:hover:bg-slate-800/50 sm:px-6">
                         <div>
                             <p class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ $rental->vehicle->display_name }}</p>
-                            <p class="mt-1 text-xs text-slate-500">{{ $rental->customer->full_name }} · {{ $rental->code }}</p>
+                            <p class="mt-1 text-xs text-slate-400">{{ $rental->customer->full_name }} · {{ $rental->code }}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Retorno</p>

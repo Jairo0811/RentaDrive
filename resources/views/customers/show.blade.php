@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">{{ $customer->full_name }}</p>
-            <p class="text-xs text-slate-500">Expediente del cliente</p>
+            <p class="text-xs text-slate-400">Expediente del cliente</p>
         </div>
     </x-slot>
 
@@ -33,7 +33,7 @@
                     'Dirección' => collect([$customer->address, $customer->city])->filter()->join(', ') ?: 'No indicada',
                 ] as $label => $value)
                     <div class="flex justify-between gap-5 border-b border-slate-100 pb-3 last:border-0 dark:border-slate-800">
-                        <dt class="font-semibold text-slate-500">{{ $label }}</dt>
+                        <dt class="font-semibold text-slate-400">{{ $label }}</dt>
                         <dd class="text-right text-slate-800 dark:text-slate-200">{{ $value }}</dd>
                     </div>
                 @endforeach

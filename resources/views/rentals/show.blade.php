@@ -73,7 +73,7 @@
                 @can('manage returns')
                     <section class="panel p-5 sm:p-6">
                         <h2 class="font-black text-slate-950 dark:text-white">Cerrar alquiler</h2>
-                        <p class="mt-1 text-sm text-slate-500">Registra la devolución; la factura se recalculará con los días y cargos reales.</p>
+                        <p class="mt-1 text-sm text-slate-400">Registra la devolución; la factura se recalculará con los días y cargos reales.</p>
                         <form method="POST" action="{{ route('rentals.close', $rental) }}" class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                             @csrf @method('PATCH')
                             <div><label class="form-label" for="returned_at">Fecha de devolución</label><input id="returned_at" type="datetime-local" name="returned_at" value="{{ now()->format('Y-m-d\TH:i') }}" class="form-input" required></div>
@@ -101,7 +101,7 @@
             </section>
             <section class="panel p-5 sm:p-6">
                 <h2 class="font-black text-slate-950 dark:text-white">Responsables</h2>
-                <div class="mt-4 space-y-3 text-sm"><p><span class="text-slate-500">Abierto por:</span> <strong>{{ $rental->opener?->name ?: 'Sistema' }}</strong></p><p><span class="text-slate-500">Cerrado por:</span> <strong>{{ $rental->closer?->name ?: 'Pendiente' }}</strong></p>@if ($rental->reservation)<p><span class="text-slate-500">Reserva:</span> <a href="{{ route('reservations.show', $rental->reservation) }}" class="font-bold text-blue-400">{{ $rental->reservation->code }}</a></p>@endif</div>
+                <div class="mt-4 space-y-3 text-sm"><p><span class="text-slate-400">Abierto por:</span> <strong>{{ $rental->opener?->name ?: 'Sistema' }}</strong></p><p><span class="text-slate-400">Cerrado por:</span> <strong>{{ $rental->closer?->name ?: 'Pendiente' }}</strong></p>@if ($rental->reservation)<p><span class="text-slate-400">Reserva:</span> <a href="{{ route('reservations.show', $rental->reservation) }}" class="font-bold text-blue-400">{{ $rental->reservation->code }}</a></p>@endif</div>
             </section>
         </aside>
     </div>

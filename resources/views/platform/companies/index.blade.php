@@ -46,7 +46,7 @@
                             <td>
                                 <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $statusLabel }}</span>
                                 @if ($company->status === 'trial' && $company->trial_ends_at)
-                                    <p class="mt-1 text-[11px] text-slate-500">Hasta {{ $company->trial_ends_at->format('d/m/Y') }}</p>
+                                    <p class="mt-1 text-[11px] text-slate-400">Hasta {{ $company->trial_ends_at->format('d/m/Y') }}</p>
                                 @endif
                             </td>
                             <td>{{ $plan['name'] ?? $company->plan_code }}</td>

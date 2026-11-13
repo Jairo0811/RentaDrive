@@ -50,7 +50,7 @@
             <article class="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                 <span class="text-2xl" aria-hidden="true">{{ $item['icon'] }}</span>
                 <h2 class="mt-3 font-black">{{ $item['title'] }}</h2>
-                <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ $item['text'] }}</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-400">{{ $item['text'] }}</p>
             </article>
         @endforeach
     </section>

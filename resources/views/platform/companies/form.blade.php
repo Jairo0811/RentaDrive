@@ -17,7 +17,7 @@
         <section class="panel p-5 sm:p-6">
             <div class="mb-5">
                 <h2 class="font-black text-slate-950 dark:text-white">Empresa</h2>
-                <p class="mt-1 text-sm text-slate-500">Identidad, plan comercial y configuración base.</p>
+                <p class="mt-1 text-sm text-slate-400">Identidad, plan comercial y configuración base.</p>
             </div>
             <div class="grid gap-5 md:grid-cols-2">
                 <div><label class="form-label" for="name">Nombre comercial</label><input id="name" name="name" value="{{ old('name', $company->name) }}" class="form-input" required></div>
@@ -57,7 +57,7 @@
                     <div class="md:col-span-2">
                         <label class="form-label" for="trial_ends_at">Vencimiento de prueba</label>
                         <input id="trial_ends_at" type="datetime-local" name="trial_ends_at" value="{{ old('trial_ends_at', $company->trial_ends_at?->format('Y-m-d\TH:i')) }}" class="form-input">
-                        <p class="mt-1 text-xs text-slate-500">Obligatorio cuando el estado sea Prueba.</p>
+                        <p class="mt-1 text-xs text-slate-400">Obligatorio cuando el estado sea Prueba.</p>
                     </div>
                 @endif
             </div>

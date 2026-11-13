@@ -18,7 +18,7 @@
                     <img src="{{ asset('images/rentadrive-mark.png') }}" alt="" class="h-11 w-11 rounded-xl object-contain" aria-hidden="true">
                     <div>
                         <p class="font-black tracking-tight text-white">{{ $company->name }}</p>
-                        <p class="text-xs text-slate-500">Reservas con RentaDrive</p>
+                        <p class="text-xs text-slate-400">Reservas con RentaDrive</p>
                     </div>
                 </a>
 
@@ -27,7 +27,7 @@
                         <p class="font-semibold text-slate-200">{{ $company->phone }}</p>
                     @endif
                     @if ($company->email)
-                        <p class="text-xs text-slate-500">{{ $company->email }}</p>
+                        <p class="text-xs text-slate-400">{{ $company->email }}</p>
                     @endif
                 </div>
             </div>
@@ -55,7 +55,7 @@
         </main>
 
         <footer class="border-t border-slate-800 bg-slate-900 py-6">
-            <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 text-center text-xs text-slate-500 sm:flex-row sm:px-6 sm:text-left lg:px-8">
+            <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 text-center text-xs text-slate-400 sm:flex-row sm:px-6 sm:text-left lg:px-8">
                 <span>© {{ now()->year }} {{ $company->name }}</span>
                 <span>Reservas gestionadas con RentaDrive</span>
             </div>

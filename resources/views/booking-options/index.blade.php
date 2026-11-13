@@ -46,7 +46,7 @@
                     </div>
                 </article>
             @empty
-                <div class="panel p-10 text-center"><h2 class="font-black">Sin opciones configuradas</h2><p class="mt-2 text-sm text-slate-500">Crea extras o seguros para enriquecer la cotización pública.</p></div>
+                <div class="panel p-10 text-center"><h2 class="font-black">Sin opciones configuradas</h2><p class="mt-2 text-sm text-slate-400">Crea extras o seguros para enriquecer la cotización pública.</p></div>
             @endforelse
         </div>
     </section>

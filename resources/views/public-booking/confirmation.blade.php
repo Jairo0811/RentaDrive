@@ -11,7 +11,7 @@
                         {{ $reservation->status === 'cancelled' ? 'Cancelada' : ($reservation->status === 'confirmed' ? 'Confirmada' : 'Recibida') }}
                     </span>
                     <h1 class="mt-4 text-3xl font-black tracking-tight">Reserva {{ $reservation->code }}</h1>
-                    <p class="mt-2 text-sm text-slate-500">Guarda este enlace privado para consultar el estado de tu reserva.</p>
+                    <p class="mt-2 text-sm text-slate-400">Guarda este enlace privado para consultar el estado de tu reserva.</p>
                 </div>
                 <div class="rounded-2xl bg-slate-50 px-4 py-3 text-right dark:bg-slate-950/60">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Total estimado</p>
@@ -23,22 +23,22 @@
                 <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Vehículo</p>
                     <p class="mt-2 font-black">{{ $reservation->category->name }}</p>
-                    <p class="mt-1 text-sm text-slate-500">Asignación de unidad pendiente de la empresa.</p>
+                    <p class="mt-1 text-sm text-slate-400">Asignación de unidad pendiente de la empresa.</p>
                 </div>
                 <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Sucursal</p>
                     <p class="mt-2 font-black">{{ $reservation->branch?->name ?? $reservation->pickup_location }}</p>
-                    @if ($reservation->branch?->city)<p class="mt-1 text-sm text-slate-500">{{ $reservation->branch->city }}</p>@endif
+                    @if ($reservation->branch?->city)<p class="mt-1 text-sm text-slate-400">{{ $reservation->branch->city }}</p>@endif
                 </div>
                 <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Retiro</p>
                     <p class="mt-2 font-black">{{ $reservation->start_at->format('d/m/Y') }}</p>
-                    <p class="mt-1 text-sm text-slate-500">{{ $reservation->start_at->format('h:i A') }}</p>
+                    <p class="mt-1 text-sm text-slate-400">{{ $reservation->start_at->format('h:i A') }}</p>
                 </div>
                 <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Devolución</p>
                     <p class="mt-2 font-black">{{ $reservation->end_at->format('d/m/Y') }}</p>
-                    <p class="mt-1 text-sm text-slate-500">{{ $reservation->end_at->format('h:i A') }}</p>
+                    <p class="mt-1 text-sm text-slate-400">{{ $reservation->end_at->format('h:i A') }}</p>
                 </div>
             </div>
 
@@ -57,10 +57,10 @@
             @endif
 
             <dl class="mt-6 space-y-2 rounded-2xl bg-slate-50 p-5 text-sm dark:bg-slate-950/60">
-                <div class="flex justify-between gap-4"><dt class="text-slate-500">Alquiler</dt><dd class="font-bold">RD$ {{ number_format((float) ($reservation->subtotal ?? $reservation->estimated_total), 2) }}</dd></div>
-                <div class="flex justify-between gap-4"><dt class="text-slate-500">Extras/seguros</dt><dd class="font-bold">RD$ {{ number_format((float) $reservation->extras_total, 2) }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-400">Alquiler</dt><dd class="font-bold">RD$ {{ number_format((float) ($reservation->subtotal ?? $reservation->estimated_total), 2) }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-400">Extras/seguros</dt><dd class="font-bold">RD$ {{ number_format((float) $reservation->extras_total, 2) }}</dd></div>
                 <div class="flex justify-between gap-4 border-t border-slate-200 pt-2 dark:border-slate-800"><dt class="font-black">Total estimado</dt><dd class="font-black">RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</dd></div>
-                <div class="flex justify-between gap-4"><dt class="text-slate-500">Depósito requerido</dt><dd class="font-bold">RD$ {{ number_format((float) $reservation->deposit_amount, 2) }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-400">Depósito requerido</dt><dd class="font-bold">RD$ {{ number_format((float) $reservation->deposit_amount, 2) }}</dd></div>
             </dl>
 
             @if(app()->environment(['local', 'testing']) && (float) $reservation->deposit_amount > 0 && in_array($reservation->status, ['pending', 'confirmed'], true))

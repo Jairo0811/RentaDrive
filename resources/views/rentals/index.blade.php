@@ -24,7 +24,7 @@
                         @foreach ($rentals as $rental)
                             <tr>
                                 <td class="font-bold text-slate-900 dark:text-white">{{ $rental->code }}</td><td>{{ $rental->customer->full_name }}</td><td>{{ $rental->vehicle->display_name }}</td>
-                                <td><p>{{ $rental->start_at->format('d/m/Y h:i A') }}</p><p class="mt-1 text-xs {{ $rental->status === 'open' && $rental->expected_return_at->isPast() ? 'text-red-500 font-bold' : 'text-slate-500' }}">Retorno: {{ $rental->expected_return_at->format('d/m/Y h:i A') }}</p></td>
+                                <td><p>{{ $rental->start_at->format('d/m/Y h:i A') }}</p><p class="mt-1 text-xs {{ $rental->status === 'open' && $rental->expected_return_at->isPast() ? 'text-red-500 font-bold' : 'text-slate-400' }}">Retorno: {{ $rental->expected_return_at->format('d/m/Y h:i A') }}</p></td>
                                 <td>RD$ {{ number_format((float) $rental->total, 2) }}</td><td><x-status-badge :status="$rental->status" /></td><td><a href="{{ route('rentals.show', $rental) }}" class="font-bold text-blue-400">Ver</a></td>
                             </tr>
                         @endforeach

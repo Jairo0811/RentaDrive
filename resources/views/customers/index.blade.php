@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-lg font-black text-slate-950 dark:text-white">Clientes</p>
-            <p class="text-xs text-slate-500">Expedientes y actividad comercial</p>
+            <p class="text-xs text-slate-400">Expedientes y actividad comercial</p>
         </div>
     </x-slot>
 
@@ -47,7 +47,7 @@
                             <tr>
                                 <td>
                                     <p class="font-bold text-slate-900 dark:text-white">{{ $customer->full_name }}</p>
-                                    <p class="mt-1 text-xs text-slate-500">{{ $customer->city ?: 'Ciudad no indicada' }}</p>
+                                    <p class="mt-1 text-xs text-slate-400">{{ $customer->city ?: 'Ciudad no indicada' }}</p>
                                 </td>
                                 <td>
                                     <span aria-hidden="true">{{ $customer->maskedDocumentNumber() }}</span>
@@ -55,7 +55,7 @@
                                 </td>
                                 <td>
                                     <p>{{ $customer->phone }}</p>
-                                    <p class="mt-1 text-xs text-slate-500">{{ $customer->email ?: 'Sin correo' }}</p>
+                                    <p class="mt-1 text-xs text-slate-400">{{ $customer->email ?: 'Sin correo' }}</p>
                                 </td>
                                 <td>{{ $customer->rentals_count }} alquileres · {{ $customer->reservations_count }} reservas</td>
                                 <td><x-status-badge :status="$customer->status" /></td>
