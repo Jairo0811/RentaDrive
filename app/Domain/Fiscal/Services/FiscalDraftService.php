@@ -28,7 +28,6 @@ final class FiscalDraftService
                 ]);
             }
 
-
             $snapshot = [
                 'invoice_number' => $invoice->number,
                 // Preparación: E31/E32 son TIPOS, no un e-NCF asignado.
