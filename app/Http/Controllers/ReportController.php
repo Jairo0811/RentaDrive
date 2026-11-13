@@ -13,11 +13,14 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ReportController extends Controller
 {
+    private const MAX_RANGE_DAYS = 366;
+
     public function index(Request $request): View
     {
         return view('reports.index', $this->reportData($request));
@@ -89,22 +92,18 @@ final class ReportController extends Controller
             ->latest('start_at')
             ->get();
 
-        $payments = Payment::query()
-            ->whereBetween('paid_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
-            ->get();
-
-        $invoices = Invoice::query()
-            ->whereBetween('issued_at', [$from->toDateString(), $to->toDateString()])
-            ->get();
-
         return [
             'from' => $from,
             'to' => $to,
             'rentals' => $rentals,
             'metrics' => [
                 'rental_count' => $rentals->count(),
-                'billed' => $invoices->sum('total'),
-                'collected' => $payments->sum('amount'),
+                'billed' => Invoice::query()
+                    ->whereBetween('issued_at', [$from->toDateString(), $to->toDateString()])
+                    ->sum('total'),
+                'collected' => Payment::query()
+                    ->whereBetween('paid_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
+                    ->sum('amount'),
                 'outstanding' => Invoice::query()->where('balance', '>', 0)->sum('balance'),
                 'utilization' => $this->utilizationRate(),
             ],
@@ -120,8 +119,21 @@ final class ReportController extends Controller
      */
     private function dateRange(Request $request): array
     {
-        $from = Carbon::parse($request->input('from', now()->startOfMonth()->toDateString()));
-        $to = Carbon::parse($request->input('to', now()->toDateString()));
+        $validated = $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+        ]);
+
+        $from = Carbon::parse($validated['from'] ?? now()->startOfMonth()->toDateString())->startOfDay();
+        $to = Carbon::parse($validated['to'] ?? now()->toDateString())->startOfDay();
+
+        if ($to->lt($from)) {
+            throw ValidationException::withMessages(['to' => 'La fecha final no puede ser anterior a la inicial.']);
+        }
+
+        if ($from->diffInDays($to, true) > self::MAX_RANGE_DAYS) {
+            throw ValidationException::withMessages(['to' => 'El rango máximo del reporte es de '.self::MAX_RANGE_DAYS.' días.']);
+        }
 
         return [$from, $to];
     }

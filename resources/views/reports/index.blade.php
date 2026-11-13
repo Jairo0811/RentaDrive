@@ -30,6 +30,9 @@
             <label class="form-label" for="to">Hasta</label>
             <input id="to" type="date" name="to" value="{{ $to->format('Y-m-d') }}" class="form-input">
         </div>
+        @if ($errors->has('from') || $errors->has('to'))
+            <p class="text-sm font-semibold text-red-400 sm:col-span-3" role="alert">{{ $errors->first('to') ?: $errors->first('from') }}</p>
+        @endif
         <div class="flex items-end">
             <button class="btn-secondary inline-flex items-center gap-2">
                 <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
