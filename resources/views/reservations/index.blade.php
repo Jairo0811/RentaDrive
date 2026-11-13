@@ -6,8 +6,10 @@
     </x-page-header>
 
     <form method="GET" class="panel mb-5 grid gap-3 p-4 sm:grid-cols-[1fr_190px_auto]">
-        <input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Código o cliente">
-        <select name="status" class="form-input">
+        <label class="sr-only" for="reservation-search">Buscar reserva</label>
+        <input id="reservation-search" type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Código o cliente">
+        <label class="sr-only" for="reservation-status">Estado de la reserva</label>
+        <select id="reservation-status" name="status" class="form-input">
             <option value="">Todos los estados</option>
             @foreach (['pending' => 'Pendiente', 'confirmed' => 'Confirmada', 'converted' => 'Convertida', 'cancelled' => 'Cancelada'] as $value => $label)<option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>@endforeach
         </select>
@@ -16,7 +18,7 @@
 
     <div class="table-shell">
         @if ($reservations->isEmpty())
-            <x-empty-state title="No hay reservas" message="Crea la primera reserva y asegura la disponibilidad de la unidad." action="Nueva reserva" :href="route('reservations.create')" />
+            <x-empty-state title="No hay reservas" message="Crea la primera reserva y asegura la disponibilidad de la unidad." action="Nueva reserva" :href="route('reservations.create')" ability="manage reservations" />
         @else
             <div class="overflow-x-auto">
                 <table class="data-table">
