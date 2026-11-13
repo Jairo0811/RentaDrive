@@ -6,14 +6,16 @@
     </x-page-header>
 
     <form method="GET" class="panel mb-5 grid gap-3 p-4 sm:grid-cols-[1fr_180px_auto]">
-        <input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Código, cliente o placa">
-        <select name="status" class="form-input"><option value="">Todos</option><option value="open" @selected(request('status') === 'open')>Abiertos</option><option value="closed" @selected(request('status') === 'closed')>Cerrados</option></select>
+        <label class="sr-only" for="rental-search">Buscar alquiler</label>
+        <input id="rental-search" type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Código, cliente o placa">
+        <label class="sr-only" for="rental-status">Estado del alquiler</label>
+        <select id="rental-status" name="status" class="form-input"><option value="">Todos</option><option value="open" @selected(request('status') === 'open')>Abiertos</option><option value="closed" @selected(request('status') === 'closed')>Cerrados</option></select>
         <button class="btn-secondary">Filtrar</button>
     </form>
 
     <div class="table-shell">
         @if ($rentals->isEmpty())
-            <x-empty-state title="No hay alquileres" message="Abre un alquiler directamente o conviértelo desde una reserva." action="Abrir alquiler" :href="route('rentals.create')" />
+            <x-empty-state title="No hay alquileres" message="Abre un alquiler directamente o conviértelo desde una reserva." action="Abrir alquiler" :href="route('rentals.create')" ability="manage rentals" />
         @else
             <div class="overflow-x-auto">
                 <table class="data-table">

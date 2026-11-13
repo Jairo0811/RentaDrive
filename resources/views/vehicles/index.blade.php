@@ -60,7 +60,7 @@
 
     @if ($vehicles->isEmpty())
         <div class="table-shell">
-            <x-empty-state title="No hay vehículos" message="Ningún vehículo coincide con los filtros actuales." action="Nuevo vehículo" :href="route('vehicles.create')" />
+            <x-empty-state title="No hay vehículos" message="Ningún vehículo coincide con los filtros actuales." action="Nuevo vehículo" :href="route('vehicles.create')" ability="manage vehicles" />
         </div>
     @elseif ($viewMode === 'cards')
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

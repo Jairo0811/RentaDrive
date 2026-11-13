@@ -1,7 +1,47 @@
 # RentaDrive — staging privado con Cloudflare Tunnel + Access
 
-**Estado:** preparación documentada; **no se ha publicado ningún túnel, dominio o instancia**.
+**Estado (13/11/2026):**
+
+- **Ruta A, demo temporal (Quick Tunnel protegido):** según el registro del operador, el 12/11/2026 se instaló `cloudflared 2026.11.0` y un Quick Tunnel con `--allowed-mail` obtuvo diagnóstico de conectividad satisfactorio (DNS, QUIC, API) hacia `http://127.0.0.1:8080`. **No hay evidencia** de que existiera un servidor HTTP en ese puerto, de que se completara el OTP desde un navegador externo, de que se sirviera una página, ni de que se desplegara Laravel.
+- **Ruta B, staging estable (dominio + Access + túnel administrado):** **pendiente**. No existe dominio propio en la cuenta, ni instancia de staging, ni aplicación Access, ni túnel permanente.
+
+La URL `*.trycloudflare.com` de un Quick Tunnel es efímera: no debe publicarse ni citarse como dirección de RentaDrive.
+
 **Objetivo:** demo privada y comprobable de la aplicación Laravel 13, sin exponer el desarrollo local ni la base real `RentaDriveDb`.
+
+## Elegir ruta
+
+| | Ruta A: Quick Tunnel protegido | Ruta B: staging estable |
+| --- | --- | --- |
+| Para qué sirve | Demostración corta a personas concretas, con datos sintéticos. | Staging privado repetible, base de un piloto. |
+| Requiere | `cloudflared` actualizado, un origen aislado y los correos autorizados. | Dominio en Cloudflare, aplicación Access, túnel administrado, instancia dedicada. |
+| Dirección | Cambia en cada ejecución. | Hostname fijo. |
+| Disponibilidad | Sin garantía; termina al detener `cloudflared`. | Depende del servidor de origen y de la operación. |
+| Límites (según la documentación oficial) | 200 solicitudes en vuelo por túnel (las demás reciben `429`); sin Server-Sent Events; el OTP exige un navegador interactivo. | Los que fije la configuración propia. |
+| Apto para producción | **No.** Solo pruebas y desarrollo. | Es la base; producción exige además los criterios de la sección 4. |
+
+Referencias oficiales: [Quick Tunnels](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/) y [protección con correo](https://developers.cloudflare.com/changelog/post/2026-10-02-protected-quick-tunnels/).
+
+## Ruta A: demo temporal con Quick Tunnel protegido
+
+**Reglas:** el origen debe ser un entorno de staging aislado con datos sintéticos (ver secciones 0 y 1). **Nunca** apuntar el túnel a la instancia local de desarrollo ni a `RentaDriveDb`. No exponer Vite (5173), `composer dev` ni `php artisan serve`.
+
+1. Preparar el origen de staging y comprobar localmente `GET http://127.0.0.1:8080/up` con HTTP 200.
+2. Actualizar `cloudflared` a la última versión y ejecutar, con los correos autorizados (se admite repetir el flag o separar por comas):
+
+   ```bash
+   cloudflared tunnel --url http://127.0.0.1:8080 --allowed-mail persona@ejemplo.com
+   ```
+
+3. Desde un navegador **externo**, abrir la URL que imprime `cloudflared`, completar el OTP con un correo autorizado y comprobar la página. Comprobar también que un correo no autorizado no obtiene acceso.
+4. No compartir la URL fuera de las personas autorizadas ni el PIN recibido por correo.
+5. Al terminar, detener el proceso `cloudflared`: el acceso termina para todos y la URL deja de funcionar.
+
+Criterio de cierre de la Ruta A: HTTP 200 del origen, OTP completado desde un navegador externo, acceso denegado probado y túnel cerrado. Mientras alguno falte, **no** se considera demostrada.
+
+## Ruta B: staging estable
+
+Todo lo que sigue (secciones 0 a 4) describe la Ruta B y sigue **pendiente**.
 
 ## 0. Requisitos y límites
 
@@ -57,7 +97,7 @@ Referencia oficial: https://developers.cloudflare.com/cloudflare-one/access-cont
 
 ### Gate A — Calidad del código
 
-- [ ] CI de PR completo y correcto sobre **SQL Server 2022** (el `phpunit.xml` local usa SQLite en memoria; no sustituye el CI SQL Server).
+- [ ] CI de PR completo y correcto sobre **SQL Server 2022**. El `phpunit.xml` local usa SQLite en memoria y no sustituye al CI; el workflow define `EXPECT_DB_DRIVER=sqlsrv` y `TestDatabaseDriverTest` falla si la suite no corre sobre ese motor.
 - [ ] `composer validate --strict`, `composer audit --locked`, `npm audit --audit-level=high`, `npm run build`, Pint y suite de tests.
 - [ ] Comprobar en Chrome, Edge y Opera, desktop/móvil: campos `.form-input` oscuros y legibles en Fiscal, Clientes, Flota, Reservas, Facturación, Login y componentes compartidos; probar foco, autocompletado, selects, fechas, disabled y perfil de alto contraste.
 

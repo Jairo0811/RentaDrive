@@ -15,8 +15,10 @@
     </x-page-header>
 
     <form method="GET" class="panel mb-5 grid gap-3 p-4 sm:grid-cols-[1fr_180px_auto]">
-        <input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Nombre, documento, correo o teléfono">
-        <select name="status" class="form-input">
+        <label class="sr-only" for="customer-search">Buscar cliente</label>
+        <input id="customer-search" type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Nombre, documento, correo o teléfono">
+        <label class="sr-only" for="customer-status">Estado del cliente</label>
+        <select id="customer-status" name="status" class="form-input">
             <option value="">Todos los estados</option>
             <option value="active" @selected(request('status') === 'active')>Activos</option>
             <option value="suspended" @selected(request('status') === 'suspended')>Suspendidos</option>
@@ -26,7 +28,7 @@
 
     <div class="table-shell">
         @if ($customers->isEmpty())
-            <x-empty-state title="Aún no hay clientes" message="Registra el primer cliente para comenzar una reserva." action="Nuevo cliente" :href="route('customers.create')" />
+            <x-empty-state title="Aún no hay clientes" message="Registra el primer cliente para comenzar una reserva." action="Nuevo cliente" :href="route('customers.create')" ability="manage customers" />
         @else
             <div class="overflow-x-auto">
                 <table class="data-table">
