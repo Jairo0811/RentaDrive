@@ -17,9 +17,9 @@
                     <div class="flex justify-between gap-4"><div><p class="font-bold text-slate-900 dark:text-white">Alquiler {{ $invoice->rental->code }}</p><p class="mt-1 text-sm text-slate-500">{{ $invoice->rental->vehicle->display_name }} · {{ $invoice->rental->start_at->format('d/m/Y') }} a {{ $invoice->rental->expected_return_at->format('d/m/Y') }}</p></div><p class="font-bold">RD$ {{ number_format((float) $invoice->subtotal, 2) }}</p></div>
                 </div>
                 <dl class="ml-auto mt-6 max-w-sm space-y-3 text-sm">
-                    <div class="flex justify-between"><dt class="text-slate-500">Subtotal</dt><dd>RD$ {{ number_format((float) $invoice->subtotal, 2) }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-slate-500">Impuesto</dt><dd>RD$ {{ number_format((float) $invoice->tax, 2) }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-slate-500">Descuento</dt><dd>- RD$ {{ number_format((float) $invoice->discount, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-400">Subtotal</dt><dd>RD$ {{ number_format((float) $invoice->subtotal, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-400">Impuesto</dt><dd>RD$ {{ number_format((float) $invoice->tax, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-slate-400">Descuento</dt><dd>- RD$ {{ number_format((float) $invoice->discount, 2) }}</dd></div>
                     <div class="flex justify-between border-t border-slate-200 pt-4 text-lg font-black dark:border-slate-800"><dt>Total</dt><dd>RD$ {{ number_format((float) $invoice->total, 2) }}</dd></div>
                     <div class="flex justify-between text-emerald-600"><dt>Pagado</dt><dd>RD$ {{ number_format((float) $invoice->paid_amount, 2) }}</dd></div>
                     <div class="flex justify-between text-xl font-black text-blue-400"><dt>Balance</dt><dd>RD$ {{ number_format((float) $invoice->balance, 2) }}</dd></div>
@@ -31,11 +31,11 @@
                     <h2 class="font-black text-white">Documento fiscal (República Dominicana)</h2>
                     <p class="mt-2 text-sm text-slate-400">Borrador de referencia. No es NCF/e-CF y no se transmite a DGII.</p>
                     @if($invoice->fiscalDraft)
-                        <p class="mt-2 text-sm text-amber-300">Borrador {{ $invoice->fiscalDraft->kind }} · Sin emitir · RD$ {{ number_format((float) $invoice->fiscalDraft->total, 2) }}</p>
+                        <p class="mt-2 text-sm text-amber-300">Borrador {{ $invoice->fiscalDraft->kind }} · Tipo candidato {{ $invoice->fiscalDraft->snapshot['ecf_candidate_type'] ?? ($invoice->fiscalDraft->kind === 'credit' ? 'E31' : 'E32') }} · Sin e-NCF · RD$ {{ number_format((float) $invoice->fiscalDraft->total, 2) }}</p>
                     @endif
                     <form class="mt-4 flex flex-wrap gap-3" method="POST" action="{{ route('invoices.fiscal-draft', $invoice) }}">
                         @csrf
-                        <select name="kind" class="form-input max-w-xs"><option value="consumer">Consumidor final</option><option value="credit">Crédito fiscal</option></select>
+                        <select name="kind" class="form-input max-w-xs" aria-label="Tipo de comprobante"><option value="consumer">Consumidor final</option><option value="credit">Crédito fiscal</option></select>
                         <button class="btn-secondary">Preparar borrador</button>
                     </form>
                     <a href="{{ route('fiscal.edit') }}" class="mt-3 inline-block text-sm text-blue-400 underline">Configurar perfil fiscal</a>

@@ -127,6 +127,10 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 
 ## Fase 4 — Dominican Edition (en desarrollo; borradores)
 
+- [x] Puerto desacoplado de proveedor e-CF con adaptador deshabilitado y pruebas fail-closed.
+- [x] Borradores enriquecidos con tipo **candidato** E31/E32; sin e-NCF ni XML emitido.
+- [x] Estado visible de integración e-CF y guía de requisitos por empresa (docs/ecf-provider-integration.md).
+- [ ] Seleccionar e integrar proveedor autorizado, habilitar cada contribuyente y validar XML/firma/e-NCF/acuse antes de emitir.
 - [x] Perfil fiscal multiempresa (razón social, RNC, dirección).
 - [x] Borradores fiscales vinculados a facturas; NO se emiten NCF/e-CF.
 - [x] Formato RNC y presentación administrativa dark-only.

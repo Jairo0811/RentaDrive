@@ -219,6 +219,9 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         $this->assertSame($draft->getKey(), $again->getKey());
         $this->assertSame('draft', $draft->fresh()->status);
         $this->assertSame('101000001', $draft->issuer_rnc);
+        $this->assertSame('E32', $draft->snapshot['ecf_candidate_type']);
+        $this->assertSame(1, $draft->snapshot['ecf_preparation_version']);
+        $this->assertFalse($draft->snapshot['ecf_issued']);
         $this->assertSame(1, FiscalDraft::query()->count());
     }
 
