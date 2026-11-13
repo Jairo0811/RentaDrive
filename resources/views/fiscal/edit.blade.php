@@ -10,6 +10,28 @@
             <div class="rounded-xl border border-slate-700 bg-slate-950 p-3"><dt class="text-slate-400">Emisión e-CF</dt><dd class="mt-1 font-semibold text-amber-300">Deshabilitada</dd></div>
         </dl>
         <p class="mt-3 text-xs text-slate-400">Los borradores pueden identificarse por tipo candidato E31 o E32; no tienen validez como comprobantes electrónicos.</p>
+        <div class="mt-5 border-t border-slate-700 pt-5">
+            <div class="flex flex-wrap items-end justify-between gap-2">
+                <h3 class="text-base font-bold text-white">Ruta de habilitación e-CF</h3>
+                <p class="text-xs font-semibold text-slate-400">{{ $ecfReadiness['completed_steps'] }} de {{ $ecfReadiness['total_steps'] }} pasos preparatorios</p>
+            </div>
+            <p class="mt-2 text-xs text-slate-400">Esta lista es orientativa: un perfil completo no acredita habilitación fiscal ni autoriza emitir comprobantes.</p>
+            <ol class="mt-4 grid gap-3 md:grid-cols-2">
+                @foreach ($ecfReadiness['checks'] as $check)
+                    <li class="rounded-xl border border-slate-700 bg-slate-950 p-4">
+                        <div class="flex flex-wrap items-start justify-between gap-2">
+                            <p class="font-semibold text-slate-100">{{ $loop->iteration }}. {{ $check['label'] }}</p>
+                            <span @class([
+                                'rounded-full px-2.5 py-1 text-xs font-bold',
+                                'bg-emerald-950 text-emerald-300' => $check['complete'],
+                                'bg-amber-950 text-amber-300' => ! $check['complete'],
+                            ])>{{ $check['complete'] ? 'Datos presentes' : 'Pendiente' }}</span>
+                        </div>
+                        <p class="mt-2 text-sm text-slate-400">{{ $check['detail'] }}</p>
+                    </li>
+                @endforeach
+            </ol>
+        </div>
     </section>
     <section class="panel p-5 sm:p-6">
         <div class="mb-5 rounded-xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-200" role="alert">

@@ -38,6 +38,32 @@ final class EcfProviderFoundationTest extends TestCase
         EcfDraftType::fromKind('refund');
     }
 
+    public function test_onboarding_checklist_distinguishes_present_data_from_dgii_authorization(): void
+    {
+        $readiness = app(EcfReadinessService::class);
+
+        $empty = $readiness->summary(null);
+        $this->assertSame(0, $empty['completed_steps']);
+        $this->assertSame(5, $empty['total_steps']);
+        $this->assertFalse($empty['emission_enabled']);
+
+        $invalid = new FiscalProfile(['legal_name' => 'Empresa', 'rnc' => '123']);
+        $this->assertSame(0, $readiness->summary($invalid)['completed_steps']);
+
+        $profile = new FiscalProfile(['legal_name' => 'Empresa', 'rnc' => '101000001']);
+        $ready = $readiness->summary($profile);
+        $this->assertSame(1, $ready['completed_steps']);
+        $this->assertTrue($ready['checks'][0]['complete']);
+        $this->assertFalse($ready['checks'][1]['complete']);
+        $this->assertFalse($ready['checks'][2]['complete']);
+
+        // Un flag manual "certified" tampoco equivale a aceptación DGII.
+        $profile->ecf_status = 'certified';
+        $certified = $readiness->summary($profile);
+        $this->assertSame(1, $certified['completed_steps']);
+        $this->assertFalse($certified['emission_enabled']);
+    }
+
     public function test_readiness_cannot_announce_real_issuance(): void
     {
         $status = app(EcfReadinessService::class)->summary(new FiscalProfile([
