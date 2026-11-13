@@ -1,0 +1,38 @@
+name: Refresh Laravel security lock (temporary)
+on:
+  push:
+    branches:
+      - feat/ecf-provider-ready-foundation-20261113
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.repository == 'Jairo0811/RentaDrive'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, fileinfo, mbstring, pdo_sqlsrv, sqlsrv, xml, zip
+          coverage: none
+      - name: Update Laravel and compatible dependencies
+        run: composer update laravel/framework --with-all-dependencies --no-scripts --no-interaction --no-progress --prefer-dist
+      - name: Confirm patched Laravel
+        run: |
+          composer show laravel/framework --format=json | php -r '$p=json_decode(stream_get_contents(STDIN),true); if (version_compare(ltrim($p["versions"][0],"v"),"13.40.0","<")) exit(1);'
+          composer audit --locked --no-interaction
+      - name: Commit refreshed lock if changed
+        run: |
+          if git diff --quiet -- composer.lock; then
+            echo "composer.lock unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add composer.lock
+          git commit -m "fix(deps): update Laravel lock to patched 13.40+"
+          git push origin HEAD:feat/ecf-provider-ready-foundation-20261113
