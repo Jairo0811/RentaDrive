@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $vehicle->exists ? 'Editar vehículo' : 'Nuevo vehículo' }}</p><p class="text-xs text-slate-500">Ficha técnica de la unidad</p></div>
+        <div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $vehicle->exists ? 'Editar vehículo' : 'Nuevo vehículo' }}</p><p class="text-xs text-slate-400">Ficha técnica de la unidad</p></div>
     </x-slot>
 
     <x-page-header :title="$vehicle->exists ? 'Editar vehículo' : 'Registrar vehículo'" subtitle="Define identificación, especificaciones, tarifa y disponibilidad.">

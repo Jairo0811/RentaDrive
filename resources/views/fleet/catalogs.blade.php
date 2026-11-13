@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div><p class="text-lg font-black text-slate-950 dark:text-white">Catálogos de flota</p><p class="text-xs text-slate-500">Marcas, modelos y tarifas</p></div>
+        <div><p class="text-lg font-black text-slate-950 dark:text-white">Catálogos de flota</p><p class="text-xs text-slate-400">Marcas, modelos y tarifas</p></div>
     </x-slot>
 
     <x-page-header title="Catálogos de flota" subtitle="Mantén centralizadas las opciones utilizadas por los vehículos.">

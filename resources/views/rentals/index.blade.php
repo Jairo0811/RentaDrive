@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Alquileres</p><p class="text-xs text-slate-500">Contratos y devoluciones</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Alquileres</p><p class="text-xs text-slate-400">Contratos y devoluciones</p></div></x-slot>
 
     <x-page-header title="Alquileres" subtitle="Controla entregas, vehículos en uso y cierres.">
         <x-slot name="actions">@can('manage rentals')<a href="{{ route('rentals.create') }}" class="btn-primary">Abrir alquiler</a>@endcan</x-slot>

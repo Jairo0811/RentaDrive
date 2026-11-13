@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $rental->code }}</p><p class="text-xs text-slate-500">Expediente de alquiler</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $rental->code }}</p><p class="text-xs text-slate-400">Expediente de alquiler</p></div></x-slot>
 
     <x-page-header :title="'Alquiler '.$rental->code" :subtitle="$rental->customer->full_name">
         <x-slot name="actions">
@@ -52,7 +52,7 @@
                 </section>
             @endcan
             <section class="table-shell">
-                <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Inspecciones</h2>@if ($rental->status === 'open')<span class="text-xs text-slate-500">Entrega y devolución</span>@endif</div>
+                <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Inspecciones</h2>@if ($rental->status === 'open')<span class="text-xs text-slate-400">Entrega y devolución</span>@endif</div>
                 @if ($rental->inspections->isEmpty())
                     <x-empty-state title="Sin inspecciones" message="Documenta el estado del vehículo al entregar y devolver." />
                 @else
@@ -94,7 +94,7 @@
                 <p class="text-xs font-bold uppercase tracking-[.18em] text-blue-400">Resumen financiero</p>
                 <dl class="mt-5 space-y-3 text-sm">
                     @foreach (['Subtotal' => $rental->subtotal, 'Cargos' => $rental->fees, 'Impuestos' => $rental->taxes] as $label => $value)
-                        <div class="flex justify-between"><dt class="text-slate-500">{{ $label }}</dt><dd class="font-semibold text-slate-800 dark:text-slate-200">RD$ {{ number_format((float) $value, 2) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-slate-400">{{ $label }}</dt><dd class="font-semibold text-slate-800 dark:text-slate-200">RD$ {{ number_format((float) $value, 2) }}</dd></div>
                     @endforeach
                     <div class="flex justify-between border-t border-slate-200 pt-4 dark:border-slate-800"><dt class="font-black text-slate-950 dark:text-white">Total</dt><dd class="text-xl font-black text-blue-400">RD$ {{ number_format((float) $rental->total, 2) }}</dd></div>
                 </dl>

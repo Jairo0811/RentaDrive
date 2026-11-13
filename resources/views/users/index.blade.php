@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Usuarios</p><p class="text-xs text-slate-500">Acceso, sucursales y roles</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Usuarios</p><p class="text-xs text-slate-400">Acceso, sucursales y roles</p></div></x-slot>
     <x-page-header title="Usuarios" subtitle="Administra cuentas, sucursales, roles y estado de acceso."><x-slot name="actions"><a href="{{ route('users.create') }}" class="btn-primary">Nuevo usuario</a></x-slot></x-page-header>
     <form method="GET" class="panel mb-5 flex gap-3 p-4"><input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Nombre o correo" aria-label="Buscar usuario por nombre o correo"><button class="btn-secondary">Buscar</button></form>
     <div class="table-shell">
@@ -9,7 +9,7 @@
                 <tbody>
                     @foreach ($users as $user)
                         <tr>
-                            <td><p class="font-bold text-slate-900 dark:text-white">{{ $user->name }}</p><p class="mt-1 text-xs text-slate-500">{{ $user->email }}</p></td>
+                            <td><p class="font-bold text-slate-900 dark:text-white">{{ $user->name }}</p><p class="mt-1 text-xs text-slate-400">{{ $user->email }}</p></td>
                             <td>{{ $user->getRoleNames()->first() ?: 'Sin rol' }}</td>
                             <td>{{ $user->branch?->name ?: 'Sin sucursal' }}</td>
                             <td><x-status-badge :status="$user->is_active ? 'active' : 'inactive'" /></td>

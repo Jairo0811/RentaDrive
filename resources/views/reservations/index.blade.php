@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Reservas</p><p class="text-xs text-slate-500">Agenda y disponibilidad</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Reservas</p><p class="text-xs text-slate-400">Agenda y disponibilidad</p></div></x-slot>
 
     <x-page-header title="Reservas" subtitle="Programa vehículos, fechas, ubicaciones y tarifas estimadas.">
         <x-slot name="actions">@can('manage reservations')<a href="{{ route('reservations.create') }}" class="btn-primary">Nueva reserva</a>@endcan</x-slot>
