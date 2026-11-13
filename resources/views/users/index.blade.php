@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Usuarios</p><p class="text-xs text-slate-500">Acceso, sucursales y roles</p></div></x-slot>
     <x-page-header title="Usuarios" subtitle="Administra cuentas, sucursales, roles y estado de acceso."><x-slot name="actions"><a href="{{ route('users.create') }}" class="btn-primary">Nuevo usuario</a></x-slot></x-page-header>
-    <form method="GET" class="panel mb-5 flex gap-3 p-4"><input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Nombre o correo"><button class="btn-secondary">Buscar</button></form>
+    <form method="GET" class="panel mb-5 flex gap-3 p-4"><input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Nombre o correo" aria-label="Buscar usuario por nombre o correo"><button class="btn-secondary">Buscar</button></form>
     <div class="table-shell">
         <div class="overflow-x-auto">
             <table class="data-table">

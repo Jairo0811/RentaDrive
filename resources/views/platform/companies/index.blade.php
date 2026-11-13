@@ -6,8 +6,8 @@
     </x-page-header>
 
     <form method="GET" class="panel mb-5 grid gap-3 p-4 sm:grid-cols-[1fr_220px_auto]">
-        <input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Empresa, RNC o slug">
-        <select name="status" class="form-input">
+        <input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Empresa, RNC o slug" aria-label="Buscar empresa por nombre, RNC o slug">
+        <select name="status" class="form-input" aria-label="Filtrar empresas por estado">
             <option value="">Todos los estados</option>
             <option value="trial" @selected(request('status') === 'trial')>Prueba</option>
             <option value="active" @selected(request('status') === 'active')>Activas</option>

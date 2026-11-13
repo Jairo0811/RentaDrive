@@ -17,7 +17,7 @@
                 @foreach ($brands as $brand)
                     <div class="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
                         @can('manage vehicles')
-                            <form method="POST" action="{{ route('fleet.brands.update', $brand) }}" class="flex items-center gap-2">@csrf @method('PUT')<input name="name" value="{{ $brand->name }}" class="form-input"><select name="is_active" class="form-input max-w-28"><option value="1" @selected($brand->is_active)>Activo</option><option value="0" @selected(!$brand->is_active)>Inactivo</option></select><button class="font-bold text-blue-400">Guardar</button></form>
+                            <form method="POST" action="{{ route('fleet.brands.update', $brand) }}" class="flex items-center gap-2">@csrf @method('PUT')<input name="name" value="{{ $brand->name }}" class="form-input" aria-label="Nombre de la marca"><select name="is_active" class="form-input max-w-28" aria-label="Estado de la marca"><option value="1" @selected($brand->is_active)>Activo</option><option value="0" @selected(!$brand->is_active)>Inactivo</option></select><button class="font-bold text-blue-400">Guardar</button></form>
                             @if ($brand->models_count === 0)
                                 <form method="POST" action="{{ route('fleet.brands.destroy', $brand) }}" class="mt-2 text-right" data-confirm="¿Eliminar esta marca?" data-confirm-label="Eliminar">@csrf @method('DELETE')<button class="text-xs font-bold text-red-400">Eliminar</button></form>
                             @endif
@@ -34,11 +34,11 @@
             @can('manage vehicles')
                 <form method="POST" action="{{ route('fleet.categories.store') }}" class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                     @csrf
-                    <input name="code" class="form-input" placeholder="Código" required>
-                    <input name="name" class="form-input" placeholder="Categoría" required>
-                    <input type="number" step="0.01" name="daily_rate" class="form-input" placeholder="Tarifa diaria" required>
-                    <input type="number" step="0.01" name="deposit_amount" class="form-input" placeholder="Depósito" required>
-                    <textarea name="description" class="form-input md:col-span-2 xl:col-span-3" placeholder="Descripción"></textarea>
+                    <input name="code" class="form-input" placeholder="Código" aria-label="Código de la categoría" required>
+                    <input name="name" class="form-input" placeholder="Categoría" aria-label="Nombre de la categoría" required>
+                    <input type="number" step="0.01" name="daily_rate" class="form-input" placeholder="Tarifa diaria" aria-label="Tarifa diaria" required>
+                    <input type="number" step="0.01" name="deposit_amount" class="form-input" placeholder="Depósito" aria-label="Monto del depósito" required>
+                    <textarea name="description" class="form-input md:col-span-2 xl:col-span-3" placeholder="Descripción" aria-label="Descripción de la categoría"></textarea>
                     <button class="btn-primary">Agregar categoría</button>
                 </form>
             @endcan

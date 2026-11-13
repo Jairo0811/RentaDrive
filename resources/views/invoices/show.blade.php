@@ -35,7 +35,7 @@
                     @endif
                     <form class="mt-4 flex flex-wrap gap-3" method="POST" action="{{ route('invoices.fiscal-draft', $invoice) }}">
                         @csrf
-                        <select name="kind" class="form-input max-w-xs"><option value="consumer">Consumidor final</option><option value="credit">Crédito fiscal</option></select>
+                        <select name="kind" class="form-input max-w-xs" aria-label="Tipo de comprobante"><option value="consumer">Consumidor final</option><option value="credit">Crédito fiscal</option></select>
                         <button class="btn-secondary">Preparar borrador</button>
                     </form>
                     <a href="{{ route('fiscal.edit') }}" class="mt-3 inline-block text-sm text-blue-400 underline">Configurar perfil fiscal</a>
