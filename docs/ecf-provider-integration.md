@@ -26,6 +26,59 @@ Fuentes primarias:
 
 **Límite funcional**: el snapshot no es un XML válido según DGII, no contiene firma digital ni sirve como comprobante tributario. Los PDF actuales continúan siendo documentos internos sin e-NCF.
 
+## Evaluación preliminar de proveedores autorizados (13 de noviembre de 2026)
+
+Todos los candidatos siguientes aparecen en el listado oficial DGII. La evaluación se hizo con información pública, **sin contrato ni pruebas de sandbox**. Los precios publicados para usar una plataforma web no significan que incluyan acceso API.
+
+| Proveedor | Registro oficial DGII | Conectividad publicada | Precio de API para SaaS | Próxima acción |
+| --- | --- | --- | --- | --- |
+| Digifact Servicios SAS, RNC 132752155 | Sí | API y Web Service en el plan Business | No publicado | Solicitar documentación, credenciales sandbox, precio por tenant/e-CF y condiciones white-label |
+| Voxel Caribe SRL, RNC 130873011 | Sí | Web Services, AS2, FTP/SFTP y bavel; cada RNC requiere conexión independiente | No publicado | Confirmar costos de multi-RNC, contrato, eventos y soporte de firma |
+| Factura Dominicana GTI SRL, RNC 132794001 | Sí | Plataforma y planes prepago; API no comprobada públicamente | No confirmado | Solicitar API, sandbox y cotización comercial separada de planes web |
+
+**Selección para evaluación técnica:** Digifact, por publicar claramente API y Web Service para sistemas administrativos. **No es una selección contractual ni una implementación conectada**. Voxel queda como alternativa de integración empresarial y Factura Dominicana como referencia de precios y opción alternativa si confirma API.
+
+Para comparar costos, Factura Dominicana anuncia prepago de 24 documentos por RD$2,050 y plan de 250 mensuales por RD$1,380 (ITBIS incluido), **sin evidencia de acceso API incluido**. El costo que importa a RentaDrive es API multiempresa, onboarding por RNC, volumen por empresa, firmas, límites y soporte.
+
+Fuentes verificables:
+- DGII: https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Paginas/Proveedores-servicios-FE-autorizados.aspx
+- Digifact Business: https://www.digifact.com.do/FacturaElectronica/FacturaElectronica
+- Voxel RD: https://www.voxelgroup.net/es/normativa/facturacion-electronica-republica-dominicana/
+- Factura Dominicana: https://facturadominicana.do/planes
+
+### Documentación API de Digifact encontrada
+
+Se verificó el portal de desarrolladores para República Dominicana:
+https://documentacion.digifact.com/do/api
+
+- Entorno **sandbox/test**: `https://testnucdo.digifact.com/api`; producción: `https://nucdo.digifact.com/api` (solo referencia, no conectado).
+- Autenticación POST `/login/get_token` con JSON `Username: DO.<RNC>.<USUARIO>` y `Password`, respuesta `Token`. El token **nunca debe registrarse en logs**.
+- Consulta informativa GET `/SHAREDINFO`, `DATA1=SHARED_GETDTEINFO`, `DATA2=AUTHNUMBER|<e-NCF>`, `TAXID=<RNC>`, `USERNAME=<usuario>`. La respuesta incluye RNC emisor, secuencia, estado y seguimiento.
+- Certificación API `POST /v2/transform/nuc_json` (o `/nuc` para XML), con esquema NUC y requisitos de firma. **NO llamar desde RentaDrive** hasta tener onboarding, autorización, validación de payload, idempotencia y credenciales con consentimiento.
+
+Se añadió `DigifactSandboxApi` como **cliente exclusivamente de consulta y autenticación en el entorno test**. No implementa el contrato de emisión `EcfProvider`, no cambia el adaptador bloqueado, no se puede invocar desde rutas web y **no usa endpoints de producción**. Los tests usan HTTP simulado y comprueban coincidencia de RNC y e-NCF; nunca contactan la API real.
+
+**Nota de seguridad:** no introducir credenciales de prueba/proveedor en GitHub ni enviarlas en chats. Su almacenamiento por tenant requiere gestor de secretos y protocolo de autorización, aún pendiente.
+
+
+### Preguntas comerciales/técnicas obligatorias
+
+1. ¿Existe API REST o SOAP con documentación, ejemplo de payload y sandbox separado de producción?
+2. ¿Se admite multiempresa SaaS: varios RNC, credenciales segregadas y onboarding por empresa?
+3. ¿El proveedor firma, reserva e-NCF, valida XSD, transmite, recibe y conserva los acuses DGII?
+4. ¿Cómo funcionan idempotencia, reintentos, timeouts, rechazados, cancelaciones y contingencias?
+5. ¿Costos de incorporación, certificado, facturas, licencias por RNC, soporte, mínimo de consumo y SLA?
+6. ¿Cobertura y ejemplos de E31/E32 y notas E33/E34, retenciones e ITBIS?
+7. ¿Ofrecen webhook firmado, polling de estado y exportación de XML/acuse/representación impresa?
+8. ¿Retención, residencia de datos, cifrado, acceso de soporte, privacidad y salida del proveedor?
+
+### Estado de preparación interna
+
+La vista `/fiscal` ahora muestra cinco hitos de preparación por empresa. Solo marca **datos fiscales presentes** cuando existe razón social y RNC con formato válido. Todos los hitos de habilitación DGII, integración, firma y acuses permanecen **pendientes** mientras no exista evidencia y código de emisión certificado.
+
+El contador del panel **no** representa porcentaje de cumplimiento jurídico ni certificación; la transmisión real continúa bloqueada.
+
+
 ## Próxima implementación (requiere elegir proveedor y habilitación)
 
 1. Comparar 2–3 **proveedores actualmente autorizados** en listado DGII: API, sandbox, precios por emisión, volumen, modalidad de empresa, E31/E32/E33/E34, soporte, contingencias, seguridad, manejo de XML/QR, política de retención y exportación de datos.
