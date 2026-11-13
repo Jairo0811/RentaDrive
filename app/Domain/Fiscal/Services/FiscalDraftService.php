@@ -28,12 +28,12 @@ final class FiscalDraftService
                 ]);
             }
 
-            if ($profile->ecf_status !== 'not_certified') {
-                throw ValidationException::withMessages(['fiscal' => 'La emisión electrónica necesita una integración certificada.']);
-            }
-
             $snapshot = [
                 'invoice_number' => $invoice->number,
+                // Preparación: E31/E32 son TIPOS, no un e-NCF asignado.
+                'ecf_candidate_type' => EcfDraftType::fromKind($kind),
+                'ecf_preparation_version' => 1,
+                'ecf_issued' => false,
                 'invoice_date' => $invoice->issued_at->format('Y-m-d'),
                 'issuer_name' => $profile->legal_name,
                 'issuer_rnc' => $profile->rnc,
