@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form method="GET" class="panel mb-5 flex flex-col gap-3 p-4 sm:flex-row">
-        <select name="type" class="form-input sm:max-w-56"><option value="">Todos los tipos</option><option value="delivery" @selected(request('type') === 'delivery')>Entrega</option><option value="return" @selected(request('type') === 'return')>Devolución</option></select>
+        <select name="type" class="form-input sm:max-w-56" aria-label="Filtrar inspecciones por tipo"><option value="">Todos los tipos</option><option value="delivery" @selected(request('type') === 'delivery')>Entrega</option><option value="return" @selected(request('type') === 'return')>Devolución</option></select>
         <button class="btn-secondary">Filtrar</button>
     </form>
 
