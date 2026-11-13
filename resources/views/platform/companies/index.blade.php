@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Empresas</p><p class="text-xs text-slate-500">Tenants de RentaDrive</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Empresas</p><p class="text-xs text-slate-400">Tenants de RentaDrive</p></div></x-slot>
 
     <x-page-header title="Empresas" subtitle="Administra clientes SaaS, planes, estado de servicio y sucursales.">
         <x-slot name="actions"><a href="{{ route('platform.companies.create') }}" class="btn-primary">Nueva empresa</a></x-slot>
@@ -41,7 +41,7 @@
                             $plan = config('rentadrive.plans.'.$company->plan_code);
                         @endphp
                         <tr>
-                            <td><p class="font-bold text-slate-900 dark:text-white">{{ $company->name }}</p><p class="mt-1 text-xs text-slate-500">{{ $company->slug }}</p></td>
+                            <td><p class="font-bold text-slate-900 dark:text-white">{{ $company->name }}</p><p class="mt-1 text-xs text-slate-400">{{ $company->slug }}</p></td>
                             <td>{{ $company->rnc ?: '—' }}</td>
                             <td>
                                 <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $statusLabel }}</span>

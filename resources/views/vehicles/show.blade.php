@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $vehicle->display_name }}</p><p class="text-xs text-slate-500">Ficha de flota</p></div>
+        <div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $vehicle->display_name }}</p><p class="text-xs text-slate-400">Ficha de flota</p></div>
     </x-slot>
 
     <x-page-header :title="$vehicle->model->display_name" :subtitle="$vehicle->code.' · '.$vehicle->plate">
@@ -24,7 +24,7 @@
                     'VIN' => $vehicle->vin ?: 'No indicado',
                     'Próximo mantenimiento' => $vehicle->next_maintenance_at ? number_format($vehicle->next_maintenance_at).' km' : 'No programado',
                 ] as $label => $value)
-                    <div class="flex justify-between gap-5 border-b border-slate-100 pb-3 last:border-0 dark:border-slate-800"><dt class="font-semibold text-slate-500">{{ $label }}</dt><dd class="text-right text-slate-800 dark:text-slate-200">{{ $value }}</dd></div>
+                    <div class="flex justify-between gap-5 border-b border-slate-100 pb-3 last:border-0 dark:border-slate-800"><dt class="font-semibold text-slate-400">{{ $label }}</dt><dd class="text-right text-slate-800 dark:text-slate-200">{{ $value }}</dd></div>
                 @endforeach
             </dl>
         </section>

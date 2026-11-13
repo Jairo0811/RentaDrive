@@ -275,7 +275,7 @@
     }
 
     .table-shell {
-        @apply panel overflow-hidden;
+        @apply relative panel overflow-hidden;
     }
 
     .data-table {
@@ -363,7 +363,7 @@
     }
 
     .calendar-day-today .calendar-number {
-        @apply bg-blue-500 text-white;
+        @apply bg-blue-600 text-white;
     }
 
     .calendar-event {

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Inspecciones</p><p class="text-xs text-slate-500">Estado de entrega y devolución</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Inspecciones</p><p class="text-xs text-slate-400">Estado de entrega y devolución</p></div></x-slot>
 
     <x-page-header title="Inspecciones" subtitle="Documenta kilometraje, combustible, condiciones, daños y evidencias.">
         <x-slot name="actions"><a href="{{ route('inspections.create') }}" class="btn-primary">Nueva inspección</a></x-slot>

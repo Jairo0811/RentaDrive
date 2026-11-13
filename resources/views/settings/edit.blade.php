@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Configuración</p><p class="text-xs text-slate-500">Datos del negocio y facturación</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Configuración</p><p class="text-xs text-slate-400">Datos del negocio y facturación</p></div></x-slot>
     <x-page-header title="Configuración general" subtitle="Personaliza la empresa, moneda y ubicación predeterminada. El ITBIS permanece fijo en 18%." />
     <form method="POST" action="{{ route('settings.update') }}" class="space-y-6">
         @csrf @method('PUT')
