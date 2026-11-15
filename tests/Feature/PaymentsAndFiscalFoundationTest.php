@@ -82,6 +82,19 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         ], $payload);
     }
 
+    public function test_fiscal_preparation_page_links_to_form_without_enabling_issuance(): void
+    {
+        $this->administrator();
+
+        $this->get(route('fiscal.edit'))
+            ->assertOk()
+            ->assertSee('Ruta de habilitación e-CF')
+            ->assertSee('href="#fiscal-profile-form"', false)
+            ->assertSee('id="fiscal-profile-form"', false)
+            ->assertSee('Emisión e-CF')
+            ->assertSee('Deshabilitada');
+    }
+
     public function test_sandbox_deposit_is_idempotent_and_never_confirms_itself(): void
     {
         config()->set('services.rentadrive_gateway.webhook_secret', 'test-webhook-secret');
