@@ -51,7 +51,7 @@
                     </span>
                 </x-input-label>
                 @if (Route::has('password.request'))
-                    <a class="focus-ring inline-flex items-center gap-1.5 rounded text-xs font-semibold text-[#0568f5] hover:text-[#004fc7] dark:text-[#22a3ff]" href="{{ route('password.request') }}">
+                    <a class="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded py-1.5 text-xs font-semibold sm:min-h-0 text-[#0568f5] hover:text-[#004fc7] dark:text-[#22a3ff]" href="{{ route('password.request') }}">
                         <i class="fa-solid fa-key" aria-hidden="true"></i>
                         ¿Olvidaste tu contraseña?
                     </a>
