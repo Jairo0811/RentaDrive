@@ -66,6 +66,9 @@
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($vehicles as $vehicle)
                 <a href="{{ route('vehicles.show', $vehicle) }}" class="panel focus-ring block p-5 transition hover:border-slate-600">
+                    @if ($vehicle->photo_url)
+                        <img src="{{ $vehicle->photo_url }}" alt="" class="mb-4 aspect-video w-full rounded-xl border border-slate-800 object-cover" loading="lazy">
+                    @endif
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="truncate font-black text-white">{{ $vehicle->model->display_name }}</p>

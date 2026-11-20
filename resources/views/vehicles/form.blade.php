@@ -7,7 +7,7 @@
         <x-slot name="actions"><a href="{{ $vehicle->exists ? route('vehicles.show', $vehicle) : route('vehicles.index') }}" class="btn-secondary">Cancelar</a></x-slot>
     </x-page-header>
 
-    <form method="POST" action="{{ $vehicle->exists ? route('vehicles.update', $vehicle) : route('vehicles.store') }}">
+    <form method="POST" enctype="multipart/form-data" action="{{ $vehicle->exists ? route('vehicles.update', $vehicle) : route('vehicles.store') }}">
         @csrf
         @if ($vehicle->exists) @method('PUT') @endif
         <section class="panel p-5 sm:p-6">
@@ -52,6 +52,18 @@
                 <div><label class="form-label" for="daily_rate_override">Tarifa especial</label><input id="daily_rate_override" type="number" step="0.01" name="daily_rate_override" value="{{ old('daily_rate_override', $vehicle->daily_rate_override) }}" class="form-input" placeholder="Usa la tarifa de categoría"></div>
                 <div><label class="form-label" for="acquisition_date">Fecha de adquisición</label><input id="acquisition_date" type="date" name="acquisition_date" value="{{ old('acquisition_date', $vehicle->acquisition_date?->format('Y-m-d')) }}" class="form-input"></div>
                 <div><label class="form-label" for="next_maintenance_at">Próximo mantenimiento (km)</label><input id="next_maintenance_at" type="number" name="next_maintenance_at" value="{{ old('next_maintenance_at', $vehicle->next_maintenance_at) }}" class="form-input"></div>
+                <div class="md:col-span-2 xl:col-span-4">
+                    <label class="form-label" for="photo">Foto principal</label>
+                    @if ($vehicle->photo_url)
+                        <img src="{{ $vehicle->photo_url }}" alt="Foto actual de {{ $vehicle->display_name }}" class="mb-3 h-32 w-auto rounded-xl border border-slate-700 object-cover">
+                    @endif
+                    <input id="photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="form-input" aria-describedby="photo-help">
+                    <p id="photo-help" class="mt-1 text-xs text-slate-400">JPG, PNG o WebP, hasta {{ (int) (config('rentadrive.vehicle_photos.max_kb') / 1024) }} MB.</p>
+                    <x-input-error :messages="$errors->get('photo')" class="mt-2" />
+                    @if ($vehicle->photo_url)
+                        <label class="mt-2 inline-flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" name="remove_photo" value="1" class="rounded border-slate-700 bg-slate-950"> Quitar la foto actual</label>
+                    @endif
+                </div>
                 <div class="md:col-span-2 xl:col-span-4"><label class="form-label" for="notes">Notas</label><textarea id="notes" name="notes" rows="3" class="form-input">{{ old('notes', $vehicle->notes) }}</textarea></div>
             </div>
         </section>

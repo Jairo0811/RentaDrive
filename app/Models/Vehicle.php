@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Vehicle extends Model
 {
@@ -28,6 +29,7 @@ class Vehicle extends Model
         'mileage',
         'daily_rate_override',
         'status',
+        'photo_path',
         'acquisition_date',
         'next_maintenance_at',
         'notes',
@@ -66,6 +68,15 @@ class Vehicle extends Model
     public function maintenances(): HasMany
     {
         return $this->hasMany(VehicleMaintenance::class);
+    }
+
+    protected function photoUrl(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => $this->photo_path
+                ? Storage::disk((string) config('rentadrive.vehicle_photos.disk'))->url($this->photo_path)
+                : null,
+        );
     }
 
     protected function displayName(): Attribute
