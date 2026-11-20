@@ -101,7 +101,7 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [x] Normalización y validación consistente de pasaportes en el portal público.
 - [x] Seeders de datos operativos demo restringidos a `local` y `testing`.
 - [x] Configuración de ejemplo endurecida para despliegue HTTPS.
-- [x] `composer.lock` sincronizado con el requisito PHP 8.4.1+.
+- [x] `composer.lock` sincronizado con el requisito de PHP de aquel momento (el requisito vigente es PHP ^8.4.27, ver `composer.json`).
 - [x] CI con `composer validate --strict`, `composer audit --locked`, `npm audit`, build, Pint y PHPUnit sobre SQL Server 2022.
 - [x] Pruebas de regresión específicas para continuidad administrativa, documentos públicos, PWA y seeders.
 - [x] README actualizado al estado SaaS/comercial actual.
@@ -118,12 +118,8 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Integrar pasarela real, credenciales, cobros, reembolsos y conciliación.
 - [ ] Liquidación segura del depósito al alquiler/factura.
 
-- [ ] Abstracción de pasarela de pagos.
-- [ ] Depósitos de reserva.
-- [ ] Pagos parciales/totales.
-- [ ] Reembolsos.
-- [ ] Webhooks idempotentes.
-- [ ] Conciliación y auditoría.
+- [ ] Pagos parciales y totales online mediante pasarela real (hoy solo intentos sandbox y pagos manuales).
+- [ ] Conciliación contra el extracto de la pasarela y registro de fallos.
 
 ## Fase 4 — Dominican Edition (en desarrollo; borradores)
 
@@ -138,11 +134,7 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Proveedor e-CF certificado, firma digital, XML, acuses y DGII.
 - [ ] Gestión de rangos NCF, notas de crédito y certificación.
 
-- [ ] Perfil fiscal dominicano.
-- [ ] NCF/e-CF mediante integración compatible.
-- [ ] RNC y datos fiscales.
-- [ ] ITBIS y reglas fiscales configuradas con controles de integridad.
-- [ ] Integraciones locales cuando sean técnicamente y legalmente viables.
+- [ ] Reglas de ITBIS configurables con controles de integridad (no verificado en este repositorio; revisar antes de declararlo).
 
 ## Fase 5 — Digital Rental (en desarrollo)
 
@@ -151,12 +143,7 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Firma digital certificada y consentimiento verificable del cliente.
 - [ ] Migración de fotografías públicas existentes y storage externo.
 
-- [ ] Firma de contratos.
-- [ ] Check-in y check-out móvil.
-- [ ] Fotografías por inspección.
-- [ ] Registro de daños.
-- [ ] Combustible, kilometraje y accesorios.
-- [ ] Evidencia auditable del proceso de entrega/devolución.
+- [ ] Validar en dispositivos móviles reales el flujo de inspección de entrega y devolución (fotografías, kilometraje, combustible, daños y accesorios); no se ha probado en teléfono.
 
 ## Fase 6 — Automation (en desarrollo)
 
@@ -166,10 +153,6 @@ El depósito se informa durante la cotización pero no se cobra todavía; el cob
 - [ ] Canal WhatsApp real, proveedor autorizado y opt-in del destinatario.
 - [ ] Reintentos supervisados, alertas, monitoreo de colas y rendimiento de producción.
 
-- [ ] Email y WhatsApp mediante proveedores desacoplados.
-- [ ] Recordatorios de reservas y devoluciones.
-- [ ] Alertas de mantenimiento y documentos.
-- [ ] Jobs y colas de producción.
 
 ## Fase 7 — SaaS Production (preparación técnica)
 
@@ -191,3 +174,22 @@ La Fase 7 no se considera terminada comercialmente hasta verificar estos puntos 
 ## Meta de salida comercial
 
 RentaDrive no considera intentos sandbox ni borradores fiscales como cobros o comprobantes reales. Se considerará listo para pilotos pagados cuando tenga completadas las fases 1, 2, 2.1, 3 y los controles de producción esenciales de la fase 7. La integración fiscal dominicana puede desplegarse de forma incremental según el proveedor y el proceso de certificación elegido.
+
+## Registro de revisión (noviembre de 2026)
+
+Estado verificado al 19-11-2026 sobre `main` (`ecd58c1`). Solo se listan hechos comprobados.
+
+| Elemento | Estado |
+| --- | --- |
+| PR #21 a #26, #28 | Fusionados. Interfaz de flota y dashboard, accesibilidad de filtros y estados vacíos, enmascarado del documento en el listado de clientes, contraste, validación del rango de Reportes y correcciones de tablas. |
+| PR #27 | Fusionado. El correo del administrador ya no se precarga en el login fuera de `local` y `testing`. |
+| PR #29 a #31 | Fusionados. Base e-CF desacoplada (sin emisión), lista de habilitación y optimización móvil de Fiscal RD. |
+| PR #12 | Abierto desde el 28-09-2026. Tiene 234 commits propios, 37 archivos en conflicto con `main` y reimplementa las fases 3 a 7 de otra manera (cinco archivos añadidos por ambos lados). **No fusionar.** Contiene 79 archivos que `main` no tiene (foto de vehículo, webhooks y reembolsos de pago, suscripciones, firma de contrato, respaldos, chequeo de salud, `Dockerfile`, calendario de flota). Recomendación: extraer esas piezas una a una en ramas nuevas con CI y cerrar el PR después. La calidad y la seguridad de ese código no se han revisado. |
+
+### Verificado en navegador (administrador, 809 px, entorno local)
+
+Dashboard, Flota, Clientes, Reservas, Alquileres, Inspecciones, Facturas, Pagos, Reportes y Catálogos: sin imágenes sin `alt` ni botones sin nombre, y con contraste medido por script (WCAG AA). Los cambios del PR #28 se verificaron con CI, no volviendo a medir en navegador.
+
+### Sin verificar
+
+Anchos 320, 360, 390, 768, 1280 y 1920 px; navegación por teclado y lector de pantalla; formularios de alta y edición; Usuarios, Configuración, Auditoría, Perfil fiscal y portal público; Safari iOS; pruebas de navegador automatizadas.
