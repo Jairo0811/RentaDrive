@@ -8,6 +8,7 @@ use App\Domain\Security\Enums\RoleName;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
@@ -105,6 +106,42 @@ final class FleetResponsiveViewTest extends TestCase
             ->assertSee('<table', false)
             ->assertDontSee('hidden md:block', false)
             ->assertDontSee('Tarifa diaria</dt>', false);
+    }
+
+    public function test_cards_have_equal_media_area_when_a_vehicle_has_no_photo(): void
+    {
+        $this->createVehicle();
+
+        $this->actingAs($this->userWithRole(RoleName::ADMINISTRATOR))
+            ->get('/vehicles?view=cards')
+            ->assertOk()
+            ->assertSee('aspect-video', false)
+            ->assertSee('Sin fotografía')
+            ->assertSee('x-data="{ failed: false }"', false);
+    }
+
+    public function test_cards_and_detail_include_fallback_if_photo_fails_to_load(): void
+    {
+        $this->createVehicle();
+
+        Vehicle::withoutGlobalScopes()
+            ->where('code', 'VISTA-001')
+            ->update(['photo_path' => 'vehicles/'.$this->company->getKey().'/missing-photo.png']);
+
+        $vehicle = Vehicle::withoutGlobalScopes()->where('code', 'VISTA-001')->firstOrFail();
+        $administrator = $this->userWithRole(RoleName::ADMINISTRATOR);
+
+        $this->actingAs($administrator)
+            ->get('/vehicles?view=cards')
+            ->assertOk()
+            ->assertSee('Fotografía no disponible')
+            ->assertSee('x-on:error="failed = true"', false);
+
+        $this->actingAs($administrator)
+            ->get('/vehicles/'.$vehicle->getKey())
+            ->assertOk()
+            ->assertSee('Fotografía no disponible')
+            ->assertSee('Foto de', false);
     }
 
     public function test_explicit_card_view_does_not_render_the_table(): void

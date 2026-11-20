@@ -55,7 +55,7 @@
                 <div class="md:col-span-2 xl:col-span-4">
                     <label class="form-label" for="photo">Foto principal</label>
                     @if ($vehicle->photo_url)
-                        <img src="{{ $vehicle->photo_url }}" alt="Foto actual de {{ $vehicle->display_name }}" class="mb-3 h-32 w-auto rounded-xl border border-slate-700 object-cover">
+                        <x-vehicle-photo :url="$vehicle->photo_url" :alt="'Foto actual de '.$vehicle->display_name" class="mb-3 max-w-xs" />
                     @endif
                     <input id="photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="form-input" aria-describedby="photo-help">
                     <p id="photo-help" class="mt-1 text-xs text-slate-400">JPG, PNG o WebP, hasta {{ (int) (config('rentadrive.vehicle_photos.max_kb') / 1024) }} MB.</p>

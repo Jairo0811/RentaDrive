@@ -11,9 +11,7 @@
 
     <div class="grid gap-6 xl:grid-cols-[.75fr_1.25fr]">
         <section class="panel p-5 sm:p-6">
-            @if ($vehicle->photo_url)
-                <img src="{{ $vehicle->photo_url }}" alt="Foto de {{ $vehicle->display_name }}" class="mb-5 aspect-video w-full rounded-xl border border-slate-700 object-cover" loading="lazy">
-            @endif
+            <x-vehicle-photo :url="$vehicle->photo_url" :alt="'Foto de '.$vehicle->display_name" class="mb-5" />
             <div class="flex items-center justify-between"><h2 class="font-black text-slate-950 dark:text-white">Resumen</h2><x-status-badge :status="$vehicle->status" /></div>
             <dl class="mt-6 space-y-4 text-sm">
                 @foreach ([
