@@ -8,7 +8,6 @@ use App\Domain\Operations\Services\ReferenceNumberService;
 use App\Domain\Operations\Services\ReservationAvailabilityService;
 use App\Http\Requests\ReservationRequest;
 use App\Models\Branch;
-use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Vehicle;
 use App\Models\VehicleCategory;
@@ -126,9 +125,7 @@ final class ReservationController extends Controller
     {
         return view('reservations.form', [
             'reservation' => $reservation,
-            'customers' => Customer::query()->where('status', 'active')->orderBy('first_name')->get(),
             'categories' => VehicleCategory::query()->where('is_active', true)->orderBy('name')->get(),
-            'vehicles' => Vehicle::query()->with(['model.brand', 'category'])->whereNotIn('status', ['maintenance', 'inactive'])->get(),
         ]);
     }
 

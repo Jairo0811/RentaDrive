@@ -11,7 +11,7 @@
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 <div class="md:col-span-2">
                     <label class="form-label" for="rental_id">Alquiler</label>
-                    <select id="rental_id" name="rental_id" class="form-input" required><option value="">Selecciona</option>@foreach ($rentals as $rental)<option value="{{ $rental->id }}" @selected((string) old('rental_id', $selectedRental) === (string) $rental->id)>{{ $rental->code }} · {{ $rental->customer->full_name }} · {{ $rental->vehicle->display_name }}</option>@endforeach</select>
+                    <x-lookup-select id="rental_id" name="rental_id" type="rentals" :value="old('rental_id', $selectedRental)" placeholder="Busca por código, cliente o placa" required />
                 </div>
                 <div><label class="form-label" for="type">Tipo</label><select id="type" name="type" class="form-input"><option value="delivery" @selected(old('type') === 'delivery')>Entrega</option><option value="return" @selected(old('type') === 'return')>Devolución</option></select></div>
                 <div><label class="form-label" for="inspected_at">Fecha</label><input id="inspected_at" type="datetime-local" name="inspected_at" value="{{ old('inspected_at', now()->format('Y-m-d\TH:i')) }}" class="form-input" required></div>

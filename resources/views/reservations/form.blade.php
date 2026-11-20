@@ -12,7 +12,7 @@
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 <div>
                     <label class="form-label" for="customer_id">Cliente</label>
-                    <select id="customer_id" name="customer_id" class="form-input" required><option value="">Selecciona</option>@foreach ($customers as $customer)<option value="{{ $customer->id }}" @selected((string) old('customer_id', $reservation->customer_id ?: request('customer')) === (string) $customer->id)>{{ $customer->full_name }} · {{ $customer->document_number }}</option>@endforeach</select>
+                    <x-lookup-select id="customer_id" name="customer_id" type="customers" :value="old('customer_id', $reservation->customer_id ?: request('customer'))" placeholder="Busca por nombre o documento" required />
                 </div>
                 <div>
                     <label class="form-label" for="vehicle_category_id">Categoría</label>
@@ -20,7 +20,7 @@
                 </div>
                 <div>
                     <label class="form-label" for="vehicle_id">Vehículo específico</label>
-                    <select id="vehicle_id" name="vehicle_id" class="form-input"><option value="">Asignar después</option>@foreach ($vehicles as $vehicle)<option value="{{ $vehicle->id }}" data-category="{{ $vehicle->vehicle_category_id }}" data-rate="{{ $vehicle->effective_daily_rate }}" @selected((string) old('vehicle_id', $reservation->vehicle_id) === (string) $vehicle->id)>{{ $vehicle->display_name }} · {{ $vehicle->category->name }}</option>@endforeach</select>
+                    <x-lookup-select id="vehicle_id" name="vehicle_id" type="vehicles" scope="reservation" :value="old('vehicle_id', $reservation->vehicle_id)" placeholder="Asignar después (busca por placa o modelo)" clearable />
                     <p class="mt-2 text-xs text-slate-400">La disponibilidad se valida antes de guardar.</p>
                 </div>
                 <div><label class="form-label" for="start_at">Inicio</label><input id="start_at" type="datetime-local" name="start_at" value="{{ old('start_at', $reservation->start_at?->format('Y-m-d\TH:i') ?? now()->addDay()->format('Y-m-d\T09:00')) }}" class="form-input" required></div>

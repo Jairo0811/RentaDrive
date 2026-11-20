@@ -169,6 +169,128 @@ Alpine.store('toast', {
 });
 
 Alpine.store('accessibility').apply();
+Alpine.data('lookupSelect', (config) => ({
+    url: config.url,
+    scope: config.scope,
+    name: config.name,
+    value: config.value,
+    label: config.label,
+    query: config.label,
+    items: [],
+    more: false,
+    open: false,
+    active: -1,
+    status: '',
+    controller: null,
+
+    openList() {
+        this.open = true;
+        if (this.items.length === 0) this.search();
+    },
+
+    close() {
+        this.open = false;
+        this.active = -1;
+    },
+
+    onInput() {
+        if (this.query.trim() === '' && this.value !== null) {
+            this.setValue(null, '', null);
+        }
+        this.open = true;
+        this.search();
+    },
+
+    onBlur() {
+        // Si no se eligió ninguna opción, se restaura el texto de la selección vigente.
+        window.setTimeout(() => {
+            if (this.query !== this.label) this.query = this.label;
+            this.close();
+        }, 120);
+    },
+
+    async search() {
+        this.controller?.abort();
+        this.controller = new AbortController();
+        this.status = 'Buscando…';
+        const params = new URLSearchParams();
+        const term = this.query === this.label ? '' : this.query.trim();
+        if (term !== '') params.set('q', term);
+        if (this.scope) params.set('scope', this.scope);
+
+        try {
+            const response = await fetch(`${this.url}?${params.toString()}`, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                signal: this.controller.signal,
+            });
+            if (! response.ok) throw new Error(String(response.status));
+            const payload = await response.json();
+            this.items = payload.data ?? [];
+            this.more = Boolean(payload.more);
+            this.active = this.items.length > 0 ? 0 : -1;
+            this.status = this.items.length === 0
+                ? 'Sin resultados.'
+                : `${this.items.length} ${this.items.length === 1 ? 'resultado disponible' : 'resultados disponibles'}.`;
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            this.items = [];
+            this.more = false;
+            this.status = 'No se pudo cargar la lista. Intenta de nuevo.';
+        }
+    },
+
+    move(step) {
+        if (! this.open) {
+            this.openList();
+            return;
+        }
+        if (this.items.length === 0) return;
+        this.active = (this.active + step + this.items.length) % this.items.length;
+        this.$nextTick(() => document.getElementById(`${config.id}-option-${this.active}`)?.scrollIntoView({ block: 'nearest' }));
+    },
+
+    choose(item) {
+        if (! item) return;
+        this.setValue(item.id, item.label, item);
+        this.close();
+    },
+
+    clear() {
+        this.setValue(null, '', null);
+        this.items = [];
+    },
+
+    setValue(value, label, item) {
+        this.value = value;
+        this.label = label;
+        this.query = label;
+        this.$root.dispatchEvent(new CustomEvent('lookup:selected', { bubbles: true, detail: { name: this.name, item } }));
+    },
+}));
+
+document.addEventListener('lookup:selected', (event) => {
+    const { name, item } = event.detail;
+    if (name !== 'vehicle_id' || ! item) return;
+
+    const meta = item.meta ?? {};
+    const category = document.querySelector('#vehicle_category_id');
+    const rate = document.querySelector('#daily_rate');
+    const mileage = document.querySelector('#opening_mileage');
+    const deposit = document.querySelector('#deposit_amount');
+
+    if (category && meta.category) category.value = String(meta.category);
+
+    if (mileage) {
+        // Apertura de alquiler: solo se completan los campos que sigan vacíos.
+        if (! mileage.value && meta.mileage != null) mileage.value = meta.mileage;
+        if (rate && ! rate.value && meta.rate) rate.value = meta.rate;
+        if (deposit && ! deposit.value && meta.deposit) deposit.value = meta.deposit;
+    } else if (rate && meta.rate) {
+        rate.value = meta.rate;
+    }
+});
+
 Alpine.start();
 
 const chartTextColor = () => '#94a3b8';
@@ -305,33 +427,7 @@ const populateReservationRate = () => {
     if (option?.dataset.rate && ! rate.value) rate.value = option.dataset.rate;
 };
 
-const populateReservationVehicle = () => {
-    const vehicle = document.querySelector('#vehicle_id');
-    const category = document.querySelector('#vehicle_category_id');
-    const rate = document.querySelector('#daily_rate');
-    if (! vehicle || ! category || ! rate) return;
-    const option = vehicle.options[vehicle.selectedIndex];
-    if (option?.dataset.category) category.value = option.dataset.category;
-    if (option?.dataset.rate) rate.value = option.dataset.rate;
-};
-
-const populateRentalVehicle = () => {
-    const vehicle = document.querySelector('#vehicle_id');
-    const mileage = document.querySelector('#opening_mileage');
-    const rate = document.querySelector('#daily_rate');
-    const deposit = document.querySelector('#deposit_amount');
-    if (! vehicle || ! mileage || ! rate || ! deposit) return;
-    const option = vehicle.options[vehicle.selectedIndex];
-    if (option?.dataset.mileage && ! mileage.value) mileage.value = option.dataset.mileage;
-    if (option?.dataset.rate && ! rate.value) rate.value = option.dataset.rate;
-    if (option?.dataset.deposit && ! deposit.value) deposit.value = option.dataset.deposit;
-};
-
 document.querySelector('#vehicle_category_id')?.addEventListener('change', populateReservationRate);
-document.querySelector('#vehicle_id')?.addEventListener('change', () => {
-    populateReservationVehicle();
-    populateRentalVehicle();
-});
 
 const askConfirmation = (message, confirmLabel) => new Promise((resolve) => {
     const dialog = document.createElement('dialog');
@@ -398,4 +494,3 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 populateReservationRate();
-populateRentalVehicle();
