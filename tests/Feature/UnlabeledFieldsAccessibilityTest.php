@@ -31,4 +31,18 @@ final class UnlabeledFieldsAccessibilityTest extends TestCase
             $this->actingAs($administrator)->get($uri)->assertOk()->assertSee($attribute, false);
         }
     }
+
+    public function test_catalog_forms_expose_accessible_names_for_every_field(): void
+    {
+        $this->seed(RolePermissionSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->assignRole(RoleName::ADMINISTRATOR->value);
+
+        $this->actingAs($administrator)
+            ->get('/fleet/catalogs')
+            ->assertOk()
+            ->assertSee('aria-label="Nombre de la nueva marca"', false)
+            ->assertSee('aria-label="Marca del modelo"', false)
+            ->assertSee('aria-label="Año del modelo"', false);
+    }
 }

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Sucursales</p><p class="text-xs text-slate-500">{{ $company->name }}</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Sucursales</p><p class="text-xs text-slate-400">{{ $company->name }}</p></div></x-slot>
 
     <x-page-header title="Sucursales" :subtitle="'Administra ubicaciones operativas de '.$company->name.'.'">
         <x-slot name="actions">
@@ -15,7 +15,7 @@
                 <tbody>
                     @foreach ($branches as $branch)
                         <tr>
-                            <td><p class="font-bold text-slate-900 dark:text-white">{{ $branch->name }}</p><p class="mt-1 text-xs text-slate-500">{{ $branch->address ?: 'Sin dirección' }}</p></td>
+                            <td><p class="font-bold text-slate-900 dark:text-white">{{ $branch->name }}</p><p class="mt-1 text-xs text-slate-400">{{ $branch->address ?: 'Sin dirección' }}</p></td>
                             <td>{{ $branch->code }}</td>
                             <td>{{ $branch->city ?: '—' }}</td>
                             <td>{{ $branch->users_count }}</td>

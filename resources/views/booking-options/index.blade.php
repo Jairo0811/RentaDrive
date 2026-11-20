@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Opciones de reserva</p><p class="text-xs text-slate-500">Extras y seguros del portal público</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Opciones de reserva</p><p class="text-xs text-slate-400">Extras y seguros del portal público</p></div></x-slot>
 
     <x-page-header title="Extras y seguros" subtitle="Configura los productos opcionales que el cliente puede añadir a una reserva online.">
         <x-slot name="actions">

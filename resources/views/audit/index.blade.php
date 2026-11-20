@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Auditoría</p><p class="text-xs text-slate-500">Trazabilidad del sistema</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Auditoría</p><p class="text-xs text-slate-400">Trazabilidad del sistema</p></div></x-slot>
     <x-page-header title="Registro de auditoría" subtitle="Consulta quién creó, actualizó o eliminó información sensible." />
     <form method="GET" class="panel mb-5 grid gap-3 p-4 sm:grid-cols-[1fr_180px_auto]"><input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Usuario, entidad o identificador" aria-label="Buscar por usuario, entidad o identificador"><select name="event" class="form-input" aria-label="Filtrar por evento"><option value="">Todos los eventos</option><option value="created" @selected(request('event') === 'created')>Creación</option><option value="updated" @selected(request('event') === 'updated')>Actualización</option><option value="deleted" @selected(request('event') === 'deleted')>Eliminación</option></select><button class="btn-secondary">Filtrar</button></form>
     <div class="table-shell">

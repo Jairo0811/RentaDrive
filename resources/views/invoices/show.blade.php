@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $invoice->number }}</p><p class="text-xs text-slate-500">Detalle de factura</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $invoice->number }}</p><p class="text-xs text-slate-400">Detalle de factura</p></div></x-slot>
 
     <x-page-header :title="'Factura '.$invoice->number" :subtitle="$invoice->customer->full_name">
         <x-slot name="actions"><a href="{{ route('invoices.download', $invoice) }}" class="btn-primary">Descargar PDF</a><a href="{{ route('rentals.show', $invoice->rental) }}" class="btn-secondary">Ver alquiler</a></x-slot>
@@ -10,11 +10,11 @@
             <section class="panel p-5 sm:p-6">
                 <div class="flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-blue-400">RentaDrive</p><h2 class="mt-2 text-xl font-black text-slate-950 dark:text-white">{{ $invoice->number }}</h2></div><x-status-badge :status="$invoice->status" /></div>
                 <div class="mt-6 grid gap-5 sm:grid-cols-2">
-                    <div><p class="text-xs font-bold uppercase text-slate-400">Facturado a</p><p class="mt-2 font-bold text-slate-900 dark:text-white">{{ $invoice->customer->full_name }}</p><p class="mt-1 text-sm text-slate-500">{{ $invoice->customer->document_number }}</p></div>
-                    <div class="sm:text-right"><p class="text-sm text-slate-500">Emitida: <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->issued_at->format('d/m/Y') }}</strong></p><p class="mt-1 text-sm text-slate-500">Vence: <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->due_at?->format('d/m/Y') ?: 'Sin vencimiento' }}</strong></p></div>
+                    <div><p class="text-xs font-bold uppercase text-slate-400">Facturado a</p><p class="mt-2 font-bold text-slate-900 dark:text-white">{{ $invoice->customer->full_name }}</p><p class="mt-1 text-sm text-slate-400">{{ $invoice->customer->document_number }}</p></div>
+                    <div class="sm:text-right"><p class="text-sm text-slate-400">Emitida: <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->issued_at->format('d/m/Y') }}</strong></p><p class="mt-1 text-sm text-slate-400">Vence: <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->due_at?->format('d/m/Y') ?: 'Sin vencimiento' }}</strong></p></div>
                 </div>
                 <div class="mt-6 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-                    <div class="flex justify-between gap-4"><div><p class="font-bold text-slate-900 dark:text-white">Alquiler {{ $invoice->rental->code }}</p><p class="mt-1 text-sm text-slate-500">{{ $invoice->rental->vehicle->display_name }} · {{ $invoice->rental->start_at->format('d/m/Y') }} a {{ $invoice->rental->expected_return_at->format('d/m/Y') }}</p></div><p class="font-bold">RD$ {{ number_format((float) $invoice->subtotal, 2) }}</p></div>
+                    <div class="flex justify-between gap-4"><div><p class="font-bold text-slate-900 dark:text-white">Alquiler {{ $invoice->rental->code }}</p><p class="mt-1 text-sm text-slate-400">{{ $invoice->rental->vehicle->display_name }} · {{ $invoice->rental->start_at->format('d/m/Y') }} a {{ $invoice->rental->expected_return_at->format('d/m/Y') }}</p></div><p class="font-bold">RD$ {{ number_format((float) $invoice->subtotal, 2) }}</p></div>
                 </div>
                 <dl class="ml-auto mt-6 max-w-sm space-y-3 text-sm">
                     <div class="flex justify-between"><dt class="text-slate-400">Subtotal</dt><dd>RD$ {{ number_format((float) $invoice->subtotal, 2) }}</dd></div>

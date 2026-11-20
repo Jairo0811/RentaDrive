@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Abrir alquiler</p><p class="text-xs text-slate-500">Entrega de vehículo y facturación</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Abrir alquiler</p><p class="text-xs text-slate-400">Entrega de vehículo y facturación</p></div></x-slot>
 
     <x-page-header title="Abrir alquiler" subtitle="Valida cliente, unidad, kilometraje, combustible y condiciones económicas.">
         <x-slot name="actions"><a href="{{ route('rentals.index') }}" class="btn-secondary">Cancelar</a></x-slot>

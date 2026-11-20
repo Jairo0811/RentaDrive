@@ -1,11 +1,11 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Pagos</p><p class="text-xs text-slate-500">Cobros y recibos</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Pagos</p><p class="text-xs text-slate-400">Cobros y recibos</p></div></x-slot>
 
     <x-page-header title="Pagos" subtitle="Registra cobros y consulta el historial de recibos." />
 
     @can('manage payments')
         <section class="panel mb-6 p-5 sm:p-6" x-data="{ open: false }">
-            <button type="button" class="flex w-full items-center justify-between text-left" @click="open = ! open"><span><span class="block font-black text-slate-950 dark:text-white">Registrar pago</span><span class="mt-1 block text-sm text-slate-500">{{ $openInvoices->count() }} facturas con balance</span></span><span class="btn-primary">Nuevo pago</span></button>
+            <button type="button" class="flex w-full items-center justify-between text-left" @click="open = ! open"><span><span class="block font-black text-slate-950 dark:text-white">Registrar pago</span><span class="mt-1 block text-sm text-slate-400">{{ $openInvoices->count() }} facturas con balance</span></span><span class="btn-primary">Nuevo pago</span></button>
             <form x-cloak x-show="open" x-transition method="POST" action="{{ route('payments.store') }}" class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 @csrf
                 <div class="md:col-span-2"><label class="form-label" for="invoice_id">Factura</label><select id="invoice_id" name="invoice_id" class="form-input" required><option value="">Selecciona</option>@foreach ($openInvoices as $invoice)<option value="{{ $invoice->id }}">{{ $invoice->number }} · {{ $invoice->customer->full_name }} · RD$ {{ number_format((float) $invoice->balance, 2) }}</option>@endforeach</select></div>

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $company->exists ? 'Editar empresa' : 'Nueva empresa' }}</p><p class="text-xs text-slate-500">{{ $company->exists ? 'Configuración del tenant' : 'Onboarding comercial' }}</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $company->exists ? 'Editar empresa' : 'Nueva empresa' }}</p><p class="text-xs text-slate-400">{{ $company->exists ? 'Configuración del tenant' : 'Onboarding comercial' }}</p></div></x-slot>
 
     <x-page-header :title="$company->exists ? 'Editar empresa' : 'Crear empresa'" :subtitle="$company->exists ? 'Actualiza perfil, plan y ciclo de vida del tenant.' : 'Provisiona empresa, sucursal principal y administrador en una sola operación.'">
         <x-slot name="actions">
@@ -65,7 +65,7 @@
 
         @unless ($company->exists)
             <section class="panel p-5 sm:p-6">
-                <div class="mb-5"><h2 class="font-black text-slate-950 dark:text-white">Sucursal principal</h2><p class="mt-1 text-sm text-slate-500">Punto operativo inicial del nuevo tenant.</p></div>
+                <div class="mb-5"><h2 class="font-black text-slate-950 dark:text-white">Sucursal principal</h2><p class="mt-1 text-sm text-slate-400">Punto operativo inicial del nuevo tenant.</p></div>
                 <div class="grid gap-5 md:grid-cols-2">
                     <div><label class="form-label" for="branch_name">Nombre</label><input id="branch_name" name="branch_name" value="{{ old('branch_name', 'Sucursal Principal') }}" class="form-input" required></div>
                     <div><label class="form-label" for="branch_code">Código</label><input id="branch_code" name="branch_code" value="{{ old('branch_code', 'PRINCIPAL') }}" class="form-input" required></div>
@@ -77,7 +77,7 @@
             </section>
 
             <section class="panel p-5 sm:p-6">
-                <div class="mb-5"><h2 class="font-black text-slate-950 dark:text-white">Administrador inicial</h2><p class="mt-1 text-sm text-slate-500">Primera cuenta administradora de la empresa.</p></div>
+                <div class="mb-5"><h2 class="font-black text-slate-950 dark:text-white">Administrador inicial</h2><p class="mt-1 text-sm text-slate-400">Primera cuenta administradora de la empresa.</p></div>
                 <div class="grid gap-5 md:grid-cols-2">
                     <div><label class="form-label" for="admin_name">Nombre</label><input id="admin_name" name="admin_name" value="{{ old('admin_name') }}" class="form-input" required></div>
                     <div><label class="form-label" for="admin_email">Correo</label><input id="admin_email" type="email" name="admin_email" value="{{ old('admin_email') }}" class="form-input" required></div>

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $reservation->exists ? 'Editar reserva' : 'Nueva reserva' }}</p><p class="text-xs text-slate-500">Programación de disponibilidad</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $reservation->exists ? 'Editar reserva' : 'Nueva reserva' }}</p><p class="text-xs text-slate-400">Programación de disponibilidad</p></div></x-slot>
 
     <x-page-header :title="$reservation->exists ? 'Editar reserva' : 'Crear reserva'" subtitle="Selecciona cliente, categoría, vehículo y período.">
         <x-slot name="actions"><a href="{{ $reservation->exists ? route('reservations.show', $reservation) : route('reservations.index') }}" class="btn-secondary">Cancelar</a></x-slot>

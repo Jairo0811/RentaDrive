@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $user->exists ? 'Editar usuario' : 'Nuevo usuario' }}</p><p class="text-xs text-slate-500">Cuenta, sucursal y permisos</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $user->exists ? 'Editar usuario' : 'Nuevo usuario' }}</p><p class="text-xs text-slate-400">Cuenta, sucursal y permisos</p></div></x-slot>
     <x-page-header :title="$user->exists ? 'Editar usuario' : 'Crear usuario'" subtitle="Asigna sucursal, rol operativo y controla el acceso."><x-slot name="actions"><a href="{{ route('users.index') }}" class="btn-secondary">Cancelar</a></x-slot></x-page-header>
     <form method="POST" action="{{ $user->exists ? route('users.update', $user) : route('users.store') }}" class="panel mx-auto max-w-3xl p-5 sm:p-6">
         @csrf @if ($user->exists) @method('PUT') @endif

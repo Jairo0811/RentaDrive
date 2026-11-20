@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $reservation->code }}</p><p class="text-xs text-slate-500">Detalle de reserva</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">{{ $reservation->code }}</p><p class="text-xs text-slate-400">Detalle de reserva</p></div></x-slot>
 
     <x-page-header :title="'Reserva '.$reservation->code" :subtitle="$reservation->customer->full_name">
         <x-slot name="actions">

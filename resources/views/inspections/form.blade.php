@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Nueva inspección</p><p class="text-xs text-slate-500">Evidencia del estado vehicular</p></div></x-slot>
+    <x-slot name="header"><div><p class="text-lg font-black text-slate-950 dark:text-white">Nueva inspección</p><p class="text-xs text-slate-400">Evidencia del estado vehicular</p></div></x-slot>
 
     <x-page-header title="Registrar inspección" subtitle="Completa la revisión física y adjunta fotografías cuando sea necesario.">
         <x-slot name="actions"><a href="{{ route('inspections.index') }}" class="btn-secondary">Cancelar</a></x-slot>
