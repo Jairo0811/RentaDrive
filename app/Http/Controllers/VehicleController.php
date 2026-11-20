@@ -25,7 +25,12 @@ final class VehicleController extends Controller
     {
         $sort = in_array($request->query('sort'), self::SORTABLE, true) ? $request->query('sort') : 'created_at';
         $direction = $request->query('dir') === 'asc' ? 'asc' : 'desc';
-        $viewMode = $request->query('view') === 'cards' ? 'cards' : 'table';
+        // auto: tarjetas en pantallas pequeñas y tabla desde md, sin elegir en el servidor.
+        $viewMode = match ($request->query('view')) {
+            'cards' => 'cards',
+            'table' => 'table',
+            default => 'auto',
+        };
 
         $vehicles = Vehicle::query()
             ->with(['model.brand', 'category'])
