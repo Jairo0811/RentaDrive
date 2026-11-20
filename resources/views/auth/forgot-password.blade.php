@@ -1,25 +1,42 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <div class="mb-7">
+        <p class="text-sm font-bold uppercase tracking-[.18em] text-blue-400">Recuperación de acceso</p>
+        <h1 class="mt-3 text-3xl font-black tracking-tight text-white">¿Olvidaste tu contraseña?</h1>
+        <p class="mt-3 text-sm leading-relaxed text-slate-300">
+            Escribe el correo asociado a tu cuenta. Si está registrado, te enviaremos un enlace para establecer una nueva contraseña.
+        </p>
     </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status
+        class="mb-5 rounded-xl border border-emerald-800 bg-emerald-950/50 px-4 py-3 text-emerald-200"
+        role="status"
+        aria-live="polite"
+        :status="session('status')"
+    />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="space-y-5">
         @csrf
-
-        <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-label for="email" value="Correo electrónico" />
+            <x-text-input
+                id="email"
+                class="mt-2 block w-full"
+                type="email"
+                name="email"
+                :value="old('email')"
+                placeholder="nombre@empresa.com"
+                maxlength="255"
+                autocomplete="email"
+                required
+                autofocus
+            />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" role="alert" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full">Enviar enlace de recuperación</x-primary-button>
     </form>
+
+    <a href="{{ route('login') }}" class="focus-ring mt-5 inline-flex min-h-11 items-center rounded text-sm font-semibold text-blue-300 hover:text-blue-200">
+        Volver al inicio de sesión
+    </a>
 </x-guest-layout>
