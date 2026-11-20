@@ -10,7 +10,7 @@
             >
         </a>
 
-        <button type="button" class="rounded-lg p-2 text-slate-400 hover:bg-slate-900 hover:text-white lg:hidden" @click="sidebarOpen = false">
+        <button type="button" class="focus-ring inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-900 hover:text-white lg:hidden" x-ref="drawerClose" @click="sidebarOpen = false">
             <span class="sr-only">Cerrar menú</span>
             <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
         </button>

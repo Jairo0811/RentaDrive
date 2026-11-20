@@ -1,6 +1,6 @@
 <header class="z-30 border-b border-slate-800 bg-slate-900/90 backdrop-blur">
     <div class="flex h-20 items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <button type="button" class="focus-ring rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden" @click="sidebarOpen = true" aria-controls="primary-navigation" :aria-expanded="sidebarOpen">
+        <button type="button" class="focus-ring rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden" x-ref="menuToggle" @click="sidebarOpen = true" aria-controls="primary-navigation" :aria-expanded="sidebarOpen">
             <span class="sr-only">Abrir menú principal</span>
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>

@@ -23,7 +23,25 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="h-full antialiased" x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false">
+    <body
+        class="h-full antialiased"
+        x-data="{
+            sidebarOpen: false,
+            desktop: window.matchMedia('(min-width: 1024px)').matches,
+            init() {
+                const query = window.matchMedia('(min-width: 1024px)');
+                query.addEventListener('change', (event) => {
+                    this.desktop = event.matches;
+                    if (event.matches) this.sidebarOpen = false;
+                });
+                this.$watch('sidebarOpen', (open) => this.$nextTick(() => {
+                    if (open) this.$refs.drawerClose?.focus();
+                    else if (! this.desktop) this.$refs.menuToggle?.focus();
+                }));
+            },
+        }"
+        @keydown.escape.window="sidebarOpen = false"
+    >
         <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
         <a href="#primary-navigation" class="skip-link left-56">Saltar a la navegación</a>
 
@@ -72,12 +90,13 @@
                 id="primary-navigation"
                 class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transition-transform duration-300 lg:static lg:translate-x-0"
                 :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': ! sidebarOpen }"
+                :inert="! desktop && ! sidebarOpen"
                 aria-label="Navegación principal"
             >
                 @include('layouts.partials.sidebar')
             </aside>
 
-            <div class="flex min-w-0 flex-1 flex-col">
+            <div class="flex min-w-0 flex-1 flex-col" :inert="! desktop && sidebarOpen">
                 @include('layouts.partials.topbar')
 
                 <main id="main-content" class="min-h-0 flex-1 overflow-y-auto" tabindex="-1">
