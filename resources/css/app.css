@@ -482,3 +482,23 @@ html:not(.high-contrast) input.form-input::-webkit-calendar-picker-indicator {
     filter: invert(1);
     opacity: 0.85;
 }
+
+/* Touch targets and iOS form zoom prevention at narrow widths. */
+@media (max-width: 639px) {
+    .form-input {
+        font-size: 16px;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        min-height: 44px;
+    }
+
+    .toast-shell {
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+        max-width: none;
+    }
+}

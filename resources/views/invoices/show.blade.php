@@ -31,7 +31,7 @@
                     <h2 class="font-black text-white">Documento fiscal (República Dominicana)</h2>
                     <p class="mt-2 text-sm text-slate-400">Borrador de referencia. No es NCF/e-CF y no se transmite a DGII.</p>
                     @if($invoice->fiscalDraft)
-                        <p class="mt-2 text-sm text-amber-300">Borrador {{ $invoice->fiscalDraft->kind }} · Sin emitir · RD$ {{ number_format((float) $invoice->fiscalDraft->total, 2) }}</p>
+                        <p class="mt-2 text-sm text-amber-300">Borrador {{ $invoice->fiscalDraft->kind }} · Tipo candidato {{ $invoice->fiscalDraft->snapshot['ecf_candidate_type'] ?? ($invoice->fiscalDraft->kind === 'credit' ? 'E31' : 'E32') }} · Sin e-NCF · RD$ {{ number_format((float) $invoice->fiscalDraft->total, 2) }}</p>
                     @endif
                     <form class="mt-4 flex flex-wrap gap-3" method="POST" action="{{ route('invoices.fiscal-draft', $invoice) }}">
                         @csrf
