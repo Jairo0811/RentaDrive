@@ -9,14 +9,14 @@
             <h1 class="mt-2 text-3xl font-black tracking-tight">Elige una categoría</h1>
             <p class="mt-2 text-sm text-slate-400">{{ $branch->name }} · {{ $startAt->format('d/m/Y h:i A') }} → {{ $endAt->format('d/m/Y h:i A') }} · {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
         </div>
-        <a href="{{ route('public-booking.show', $company->slug) }}" class="font-bold text-blue-400 dark:text-blue-400">Cambiar búsqueda</a>
+        <a href="{{ route('public-booking.show', $company->slug) }}" class="focus-ring inline-flex min-h-11 items-center self-start rounded font-bold text-blue-300 hover:text-blue-200">Cambiar búsqueda</a>
     </div>
 
     <div class="grid gap-5 lg:grid-cols-2">
         @forelse ($categories as $category)
             @php($available = (int) $category->getAttribute('available_count'))
-            <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div class="flex items-start justify-between gap-4">
+            <article class="min-w-0 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+                <div class="flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
                     <div>
                         <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold {{ $available > 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-800' }}">
                             {{ $available > 0 ? $available.' disponibles' : 'Sin disponibilidad' }}
@@ -26,13 +26,13 @@
                             <p class="mt-2 text-sm leading-relaxed text-slate-400">{{ $category->description }}</p>
                         @endif
                     </div>
-                    <div class="text-right">
+                    <div class="min-w-0 text-left sm:text-right">
                         <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Por día</p>
                         <p class="mt-1 text-xl font-black">RD$ {{ number_format((float) $category->daily_rate, 2) }}</p>
                     </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-4 text-sm dark:bg-slate-950/60">
+                <div class="mt-6 grid grid-cols-1 gap-3 rounded-2xl bg-slate-50 p-4 text-sm dark:bg-slate-950/60 sm:grid-cols-2">
                     <div>
                         <p class="text-xs text-slate-400">Subtotal {{ $days }} {{ $days === 1 ? 'día' : 'días' }}</p>
                         <p class="mt-1 font-black">RD$ {{ number_format((float) $category->getAttribute('quote_subtotal'), 2) }}</p>
@@ -51,9 +51,9 @@
                             'vehicle_category_id' => $category->id,
                             'start_at' => $startAt->format('Y-m-d\TH:i'),
                             'end_at' => $endAt->format('Y-m-d\TH:i'),
-                        ]) }}" class="btn-primary w-full justify-center">Cotizar y reservar</a>
+                        ]) }}" class="btn-primary min-h-11 w-full justify-center">Cotizar y reservar</a>
                     @else
-                        <button class="btn-secondary w-full justify-center" disabled aria-disabled="true">No disponible</button>
+                        <button class="btn-secondary min-h-11 w-full justify-center" disabled aria-disabled="true">No disponible</button>
                     @endif
                 </div>
             </article>

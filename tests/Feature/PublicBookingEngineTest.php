@@ -34,6 +34,39 @@ final class PublicBookingEngineTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_public_booking_forms_expose_mobile_and_accessibility_controls(): void
+    {
+        [$user, $category] = $this->tenantWithVehicle();
+        $company = $user->company;
+        $startAt = now()->addDays(2)->setTime(9, 0, 0);
+        $endAt = $startAt->copy()->addDay();
+
+        $this->get(route('public-booking.show', $company->slug))
+            ->assertOk()
+            ->assertSee('Buscar disponibilidad')
+            ->assertSee('name="branch_id"', false);
+
+        $query = [
+            'company' => $company->slug,
+            'branch_id' => $user->branch_id,
+            'vehicle_category_id' => $category->getKey(),
+            'start_at' => $startAt->format('Y-m-d H:i:s'),
+            'end_at' => $endAt->format('Y-m-d H:i:s'),
+        ];
+
+        $this->get(route('public-booking.availability', $query))
+            ->assertOk()
+            ->assertSee('Cotizar y reservar')
+            ->assertSee('sm:flex-row', false);
+
+        $this->get(route('public-booking.create', $query))
+            ->assertOk()
+            ->assertSee('id="quote-update-status"', false)
+            ->assertSee('aria-live="polite"', false)
+            ->assertSee('type="tel"', false)
+            ->assertSee('Volver a categorías');
+    }
+
     public function test_public_booking_creates_customer_quote_options_and_private_reservation(): void
     {
         [$user, $category] = $this->tenantWithVehicle();

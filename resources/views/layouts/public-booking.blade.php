@@ -14,10 +14,10 @@
 
         <header class="border-b border-slate-800 bg-slate-900/95 backdrop-blur">
             <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-                <a href="{{ route('public-booking.show', $company->slug) }}" class="flex items-center gap-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <a href="{{ route('public-booking.show', $company->slug) }}" class="focus-ring flex min-w-0 items-center gap-3 rounded-xl">
                     <img src="{{ asset('images/rentadrive-mark.png') }}" alt="" class="h-11 w-11 rounded-xl object-contain" aria-hidden="true">
-                    <div>
-                        <p class="font-black tracking-tight text-white">{{ $company->name }}</p>
+                    <div class="min-w-0">
+                        <p class="break-words font-black tracking-tight text-white">{{ $company->name }}</p>
                         <p class="text-xs text-slate-400">Reservas con RentaDrive</p>
                     </div>
                 </a>
