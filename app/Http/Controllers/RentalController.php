@@ -6,10 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Operations\Services\RentalWorkflowService;
 use App\Http\Requests\RentalRequest;
-use App\Models\Customer;
 use App\Models\Rental;
 use App\Models\Reservation;
-use App\Models\Vehicle;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,8 +45,6 @@ final class RentalController extends Controller
         return view('rentals.form', [
             'rental' => new Rental,
             'reservation' => $reservation,
-            'customers' => Customer::query()->where('status', 'active')->orderBy('first_name')->get(),
-            'vehicles' => Vehicle::query()->with(['model.brand', 'category'])->whereNotIn('status', ['rented', 'maintenance', 'inactive'])->get(),
         ]);
     }
 

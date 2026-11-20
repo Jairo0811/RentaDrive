@@ -18,11 +18,11 @@
             <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 <div>
                     <label class="form-label" for="customer_id">Cliente</label>
-                    <select id="customer_id" name="customer_id" class="form-input" required><option value="">Selecciona</option>@foreach ($customers as $customer)<option value="{{ $customer->id }}" @selected((string) old('customer_id', $reservation?->customer_id) === (string) $customer->id)>{{ $customer->full_name }} · {{ $customer->document_number }}</option>@endforeach</select>
+                    <x-lookup-select id="customer_id" name="customer_id" type="customers" :value="old('customer_id', $reservation?->customer_id)" placeholder="Busca por nombre o documento" required />
                 </div>
                 <div class="xl:col-span-2">
                     <label class="form-label" for="vehicle_id">Vehículo</label>
-                    <select id="vehicle_id" name="vehicle_id" class="form-input" required><option value="">Selecciona una unidad disponible</option>@foreach ($vehicles as $vehicle)<option value="{{ $vehicle->id }}" data-mileage="{{ $vehicle->mileage }}" data-rate="{{ $vehicle->effective_daily_rate }}" data-deposit="{{ $vehicle->category->deposit_amount }}" @selected((string) old('vehicle_id', $reservation?->vehicle_id) === (string) $vehicle->id)>{{ $vehicle->display_name }} · {{ $vehicle->category->name }} · RD$ {{ number_format($vehicle->effective_daily_rate, 2) }}/día</option>@endforeach</select>
+                    <x-lookup-select id="vehicle_id" name="vehicle_id" type="vehicles" scope="rental" :value="old('vehicle_id', $reservation?->vehicle_id)" placeholder="Busca por placa, código o modelo" required />
                 </div>
                 <div><label class="form-label" for="start_at">Fecha de entrega</label><input id="start_at" type="datetime-local" name="start_at" value="{{ old('start_at', $reservation?->start_at?->format('Y-m-d\TH:i') ?? now()->format('Y-m-d\TH:i')) }}" class="form-input" required></div>
                 <div><label class="form-label" for="expected_return_at">Retorno esperado</label><input id="expected_return_at" type="datetime-local" name="expected_return_at" value="{{ old('expected_return_at', $reservation?->end_at?->format('Y-m-d\TH:i') ?? now()->addDay()->format('Y-m-d\TH:i')) }}" class="form-input" required></div>

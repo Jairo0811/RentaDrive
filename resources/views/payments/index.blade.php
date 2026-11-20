@@ -5,13 +5,13 @@
 
     @can('manage payments')
         <section class="panel mb-6 p-5 sm:p-6" x-data="{ open: false }">
-            @if ($openInvoices->isEmpty())
+            @if ($openInvoiceCount === 0)
                 <div><p class="font-black text-slate-950 dark:text-white">Registrar pago</p><p class="mt-1 text-sm text-slate-400">No hay facturas con balance pendiente. Cuando existan, podrás registrar el cobro aquí.</p></div>
             @else
-            <button type="button" class="focus-ring flex w-full items-center justify-between gap-3 text-left" @click="open = ! open" :aria-expanded="open.toString()" aria-controls="payment-form"><span><span class="block font-black text-slate-950 dark:text-white">Registrar pago</span><span class="mt-1 block text-sm text-slate-400">{{ $openInvoices->count() }} {{ $openInvoices->count() === 1 ? 'factura con balance' : 'facturas con balance' }}</span></span><span class="btn-primary" aria-hidden="true">Nuevo pago</span></button>
+            <button type="button" class="focus-ring flex w-full items-center justify-between gap-3 text-left" @click="open = ! open" :aria-expanded="open.toString()" aria-controls="payment-form"><span><span class="block font-black text-slate-950 dark:text-white">Registrar pago</span><span class="mt-1 block text-sm text-slate-400">{{ $openInvoiceCount }} {{ $openInvoiceCount === 1 ? 'factura con balance' : 'facturas con balance' }}</span></span><span class="btn-primary" aria-hidden="true">Nuevo pago</span></button>
             <form id="payment-form" x-cloak x-show="open" x-transition method="POST" action="{{ route('payments.store') }}" class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 @csrf
-                <div class="md:col-span-2"><label class="form-label" for="invoice_id">Factura</label><select id="invoice_id" name="invoice_id" class="form-input" required><option value="">Selecciona</option>@foreach ($openInvoices as $invoice)<option value="{{ $invoice->id }}">{{ $invoice->number }} · {{ $invoice->customer->full_name }} · RD$ {{ number_format((float) $invoice->balance, 2) }}</option>@endforeach</select></div>
+                <div class="md:col-span-2"><label class="form-label" for="invoice_id">Factura</label><x-lookup-select id="invoice_id" name="invoice_id" type="invoices" :value="old('invoice_id')" placeholder="Busca por número o cliente" required /></div>
                 <div><label class="form-label" for="paid_at">Fecha</label><input id="paid_at" type="datetime-local" name="paid_at" value="{{ now()->format('Y-m-d\TH:i') }}" class="form-input" required></div>
                 <div><label class="form-label" for="method">Método</label><select id="method" name="method" class="form-input"><option value="cash">Efectivo</option><option value="card">Tarjeta</option><option value="transfer">Transferencia</option><option value="other">Otro</option></select></div>
                 <div><label class="form-label" for="amount">Monto</label><input id="amount" type="number" step="0.01" min="0.01" name="amount" class="form-input" required></div>
