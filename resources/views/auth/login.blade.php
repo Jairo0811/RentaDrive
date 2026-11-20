@@ -32,7 +32,7 @@
                     class="block w-full pl-11"
                     type="email"
                     name="email"
-                    :value="old('email', 'admin@rentadrive.com.do')"
+                    :value="old('email', app()->environment(['local', 'testing']) ? config('rentadrive.seed.admin_email') : null)"
                     placeholder="nombre@empresa.com"
                     required
                     autofocus
