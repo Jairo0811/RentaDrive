@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/ITLA-SOF--007-0057B8?style=for-the-badge" alt="ITLA SOF-007">
   <img src="https://img.shields.io/badge/Estado-Evolución%20Comercial-0f766e?style=for-the-badge" alt="Estado: evolución comercial">
-  <img src="https://img.shields.io/badge/Fase-2.1%20Hardening-7c3aed?style=for-the-badge" alt="Fase 2.1 Hardening">
+  <img src="https://img.shields.io/badge/Fases-3%E2%80%937%20en%20evoluci%C3%B3n-7c3aed?style=for-the-badge" alt="Fases 3 a 7 en evolución">
   <img src="https://img.shields.io/badge/Licencia-MIT-16a34a?style=for-the-badge" alt="Licencia MIT">
 </p>
 
@@ -399,12 +399,12 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 | 2 — Booking Engine | ✅ Completa |
 | 2.1 — Hardening | ✅ Completa |
 | 3 — Payments | 🟡 Sandbox; pasarela real pendiente |
-| 4 — Dominican Edition | 🟡 Borradores; certificación pendiente |
+| 4 — Dominican Edition | 🟡 Borradores y base e-CF desacoplada con emisión deshabilitada; proveedor autorizado y certificación pendientes |
 | 5 — Digital Rental | 🟡 Expediente seguro y acuse interno; firma digital cliente pendiente |
 | 6 — Automation | 🟡 Email opt-in y deduplicación; WhatsApp pendiente |
 | 7 — SaaS Production | 🟡 Preparación y preflight; infraestructura real pendiente |
 
-Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico.
+Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico y el registro de revisión de noviembre de 2026 (estado de los pull requests y de lo verificado en navegador).
 
 ## 🎓 Información académica
 
