@@ -231,7 +231,7 @@ Alpine.data('lookupSelect', (config) => ({
             this.active = this.items.length > 0 ? 0 : -1;
             this.status = this.items.length === 0
                 ? 'Sin resultados.'
-                : `${this.items.length} resultado${this.items.length === 1 ? '' : 's'} disponibles.`;
+                : `${this.items.length} ${this.items.length === 1 ? 'resultado disponible' : 'resultados disponibles'}.`;
         } catch (error) {
             if (error.name === 'AbortError') return;
             this.items = [];

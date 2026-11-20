@@ -27,7 +27,7 @@
         role="combobox"
         autocomplete="off"
         spellcheck="false"
-        class="form-input"
+        class="form-input {{ $clearable ? 'pr-20' : '' }}"
         placeholder="{{ $placeholder }}"
         aria-autocomplete="list"
         aria-controls="{{ $id }}-list"
