@@ -5,6 +5,12 @@ declare(strict_types=1);
 return [
     'trial_days' => 14,
 
+    'vehicle_photos' => [
+        // Fotos del catálogo de flota (no son datos personales). 'public' requiere `php artisan storage:link`.
+        'disk' => env('RENTA_VEHICLE_PHOTO_DISK', 'public'),
+        'max_kb' => 4096,
+    ],
+
     'evidence' => [
         'disk' => env('RENTA_EVIDENCE_DISK', 'local'),
     ],

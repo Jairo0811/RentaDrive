@@ -12,6 +12,7 @@ use App\Support\Commercial\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 final class VehicleController extends Controller
@@ -74,7 +75,13 @@ final class VehicleController extends Controller
 
         $this->planLimits->ensureCanAdd($company, 'vehicles', Vehicle::query()->count());
 
-        $vehicle = Vehicle::query()->create($request->validated());
+        $data = $request->safe()->except(['photo', 'remove_photo']);
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), $this->photoDisk());
+        }
+
+        $vehicle = Vehicle::query()->create($data);
 
         return redirect()->route('vehicles.show', $vehicle)->with('status', 'Vehículo registrado.');
     }
@@ -98,7 +105,23 @@ final class VehicleController extends Controller
 
     public function update(VehicleRequest $request, Vehicle $vehicle): RedirectResponse
     {
-        $vehicle->update($request->validated());
+        $company = $request->user()?->company;
+        abort_unless($company !== null, 403);
+
+        $data = $request->safe()->except(['photo', 'remove_photo']);
+        $previous = $vehicle->photo_path;
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('vehicles/'.$company->getKey(), $this->photoDisk());
+        } elseif ($request->boolean('remove_photo')) {
+            $data['photo_path'] = null;
+        }
+
+        $vehicle->update($data);
+
+        if ($previous !== null && array_key_exists('photo_path', $data) && $data['photo_path'] !== $previous) {
+            Storage::disk($this->photoDisk())->delete($previous);
+        }
 
         return redirect()->route('vehicles.show', $vehicle)->with('status', 'Vehículo actualizado.');
     }
@@ -111,9 +134,19 @@ final class VehicleController extends Controller
             ]);
         }
 
+        $photo = $vehicle->photo_path;
         $vehicle->delete();
 
+        if ($photo !== null) {
+            Storage::disk($this->photoDisk())->delete($photo);
+        }
+
         return redirect()->route('vehicles.index')->with('status', 'Vehículo eliminado.');
+    }
+
+    private function photoDisk(): string
+    {
+        return (string) config('rentadrive.vehicle_photos.disk');
     }
 
     private function formView(Vehicle $vehicle): View

@@ -38,6 +38,8 @@ final class VehicleRequest extends FormRequest
             'acquisition_date' => ['nullable', 'date'],
             'next_maintenance_at' => ['nullable', 'integer', 'gte:mileage'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'photo' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:'.(int) config('rentadrive.vehicle_photos.max_kb', 4096), 'dimensions:max_width=6000,max_height=6000'],
+            'remove_photo' => ['nullable', 'boolean'],
         ];
     }
 }
