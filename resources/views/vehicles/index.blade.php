@@ -62,8 +62,9 @@
         <div class="table-shell">
             <x-empty-state title="No hay vehículos" message="Ningún vehículo coincide con los filtros actuales." action="Nuevo vehículo" :href="route('vehicles.create')" ability="manage vehicles" />
         </div>
-    @elseif ($viewMode === 'cards')
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @else
+    @if ($viewMode !== 'table')
+        <div class="grid gap-4 sm:grid-cols-2 {{ $viewMode === 'auto' ? 'md:hidden' : 'xl:grid-cols-3' }}">
             @foreach ($vehicles as $vehicle)
                 <a href="{{ route('vehicles.show', $vehicle) }}" class="panel focus-ring block p-5 transition hover:border-slate-600">
                     @if ($vehicle->photo_url)
@@ -87,9 +88,10 @@
                 </a>
             @endforeach
         </div>
-        <div class="mt-5">{{ $vehicles->links() }}</div>
-    @else
-        <div class="table-shell">
+        @if ($viewMode === 'cards')<div class="mt-5">{{ $vehicles->links() }}</div>@endif
+    @endif
+    @if ($viewMode !== 'cards')
+        <div class="table-shell {{ $viewMode === 'auto' ? 'hidden md:block' : '' }}">
             <div class="overflow-x-auto">
                 <table class="data-table">
                     <thead>
@@ -120,5 +122,7 @@
             </div>
             <div class="border-t border-slate-800 px-5 py-4">{{ $vehicles->links() }}</div>
         </div>
+        @if ($viewMode === 'auto')<div class="mt-5 md:hidden">{{ $vehicles->links() }}</div>@endif
+    @endif
     @endif
 </x-app-layout>
