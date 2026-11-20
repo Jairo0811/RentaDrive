@@ -52,7 +52,7 @@
                                 <td>
                                     @can('manage vehicles')
                                         <details class="relative">
-                                            <summary class="cursor-pointer font-bold text-blue-400">Editar</summary>
+                                            <summary class="focus-ring inline-flex min-h-11 cursor-pointer items-center font-bold text-blue-400 sm:min-h-6">Editar</summary>
                                             <form method="POST" action="{{ route('fleet.categories.update', $category) }}" class="absolute right-0 z-20 mt-2 w-80 space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                                                 @csrf @method('PUT')
                                                 <input name="code" value="{{ $category->code }}" class="form-input" aria-label="Código de la categoría" required>
@@ -98,7 +98,7 @@
                             <td>
                                 @can('manage vehicles')
                                     <details class="relative">
-                                        <summary class="cursor-pointer font-bold text-blue-400">Editar</summary>
+                                        <summary class="focus-ring inline-flex min-h-11 cursor-pointer items-center font-bold text-blue-400 sm:min-h-6">Editar</summary>
                                         <form method="POST" action="{{ route('fleet.models.update', $model) }}" class="absolute right-0 z-20 mt-2 w-72 space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                                             @csrf @method('PUT')
                                             <select name="vehicle_brand_id" class="form-input" aria-label="Marca del modelo">@foreach ($brands as $brand)<option value="{{ $brand->id }}" @selected($model->vehicle_brand_id === $brand->id)>{{ $brand->name }}</option>@endforeach</select>
