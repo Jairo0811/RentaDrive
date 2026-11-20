@@ -29,7 +29,7 @@ final class FleetResponsiveViewTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-                $this->seed(RolePermissionSeeder::class);
+        $this->seed(RolePermissionSeeder::class);
 
         $this->company = Company::query()->create([
             'name' => 'Rent a Car VISTA',
