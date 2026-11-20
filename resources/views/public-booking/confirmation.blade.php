@@ -10,10 +10,10 @@
                     <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide {{ $reservation->status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' }}">
                         {{ $reservation->status === 'cancelled' ? 'Cancelada' : ($reservation->status === 'confirmed' ? 'Confirmada' : 'Recibida') }}
                     </span>
-                    <h1 class="mt-4 text-3xl font-black tracking-tight">Reserva {{ $reservation->code }}</h1>
+                    <h1 class="mt-4 break-words text-3xl font-black tracking-tight">Reserva {{ $reservation->code }}</h1>
                     <p class="mt-2 text-sm text-slate-400">Guarda este enlace privado para consultar el estado de tu reserva.</p>
                 </div>
-                <div class="rounded-2xl bg-slate-50 px-4 py-3 text-right dark:bg-slate-950/60">
+                <div class="min-w-0 rounded-2xl bg-slate-50 px-4 py-3 text-left dark:bg-slate-950/60 sm:text-right">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Total estimado</p>
                     <p class="mt-1 text-2xl font-black text-blue-400 dark:text-blue-400">RD$ {{ number_format((float) $reservation->estimated_total, 2) }}</p>
                 </div>
@@ -82,7 +82,7 @@
                 @if (in_array($reservation->status, ['pending', 'confirmed'], true) && $reservation->start_at->isFuture())
                     <form method="POST" action="{{ route('public-booking.cancel', ['company' => $company->slug, 'token' => $reservation->public_token]) }}" data-confirm="¿Seguro que deseas cancelar esta reserva?" data-confirm-label="Cancelar reserva">
                         @csrf
-                        <button class="inline-flex w-full items-center justify-center rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-400 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40">Cancelar reserva</button>
+                        <button class="focus-ring inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-400 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40">Cancelar reserva</button>
                     </form>
                 @endif
             </div>
