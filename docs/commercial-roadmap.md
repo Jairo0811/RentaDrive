@@ -177,14 +177,28 @@ RentaDrive no considera intentos sandbox ni borradores fiscales como cobros o co
 
 ## Registro de revisión (noviembre de 2026)
 
-Estado verificado al 19-11-2026 sobre `main` (`ecd58c1`). Solo se listan hechos comprobados.
+Estado verificado al 19-11-2026 sobre `main` (`4656b5b`). Solo se listan hechos comprobados.
 
 | Elemento | Estado |
 | --- | --- |
 | PR #21 a #26, #28 | Fusionados. Interfaz de flota y dashboard, accesibilidad de filtros y estados vacíos, enmascarado del documento en el listado de clientes, contraste, validación del rango de Reportes y correcciones de tablas. |
 | PR #27 | Fusionado. El correo del administrador ya no se precarga en el login fuera de `local` y `testing`. |
 | PR #29 a #31 | Fusionados. Base e-CF desacoplada (sin emisión), lista de habilitación y optimización móvil de Fiscal RD. |
-| PR #12 | Abierto desde el 28-09-2026. Tiene 234 commits propios, 37 archivos en conflicto con `main` y reimplementa las fases 3 a 7 de otra manera (cinco archivos añadidos por ambos lados). **No fusionar.** Contiene 79 archivos que `main` no tiene (foto de vehículo, webhooks y reembolsos de pago, suscripciones, firma de contrato, respaldos, chequeo de salud, `Dockerfile`, calendario de flota). Recomendación: extraer esas piezas una a una en ramas nuevas con CI y cerrar el PR después. La calidad y la seguridad de ese código no se han revisado. |
+| PR #12 | **Cerrado sin fusionar el 19-11-2026; la rama `feature/commercial-booking-ui` se conserva.** Tenía 234 commits propios, 37 archivos en conflicto con `main` y reimplementaba las fases 3 a 7 de otra manera (cinco archivos añadidos por ambos lados). Sus piezas útiles se recuperan una a una en ramas nuevas con CI (ver «Piezas pendientes de extraer»). La calidad y la seguridad de ese código no se han revisado. |
+| PR #33 | Borrador con CI verde. Foto principal del vehículo, implementación propia (no copiada de #12). Requiere `php artisan migrate` y `php artisan storage:link`. |
+| PR #34 y #35 | Fusionados. Altura táctil mínima en botones de componentes, enlace del login y toggles «Ver detalle»/«Editar». Medido en navegador local: 0 objetivos menores de 24 px en Auditoría y Catálogos a 320 y 1280 px. |
+
+### Piezas pendientes de extraer de la rama de #12
+
+Cada una irá en un PR propio, con pruebas y revisión de seguridad previa. Ninguna está en `main`.
+
+- [ ] Webhooks y reembolsos de pago
+- [ ] Suscripciones
+- [ ] Firma de contrato
+- [ ] Respaldos
+- [ ] Chequeo de salud
+- [ ] `Dockerfile`
+- [ ] Calendario de flota
 
 ### Verificado en navegador (administrador, 809 px, entorno local)
 
@@ -192,4 +206,4 @@ Dashboard, Flota, Clientes, Reservas, Alquileres, Inspecciones, Facturas, Pagos,
 
 ### Sin verificar
 
-Anchos 320, 360, 390, 768, 1280 y 1920 px; navegación por teclado y lector de pantalla; formularios de alta y edición; Usuarios, Configuración, Auditoría, Perfil fiscal y portal público; Safari iOS; pruebas de navegador automatizadas.
+Anchos 360, 390 y 1920 px en casi todas las pantallas, y 320, 768 y 1280 px en las no medidas (Pagos, Facturas, Reportes, detalles, portal público); navegación por teclado y lector de pantalla; formularios de edición; portal público y recuperación de contraseña; Safari iOS; pruebas de navegador automatizadas.
