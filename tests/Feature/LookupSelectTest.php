@@ -199,8 +199,8 @@ final class LookupSelectTest extends TestCase
 
         $this->actingAs($admin)->getJson('/lookups/vehicles?q=B100001')->assertOk()->assertJsonCount(0, 'data');
         $this->actingAs($admin)->getJson('/lookups/vehicles?q=A100001')->assertOk()
-            ->assertJsonPath('data.0.meta.rate', 2500.0)
-            ->assertJsonPath('data.0.meta.deposit', 5000.0);
+            ->assertJsonPath('data.0.meta.rate', 2500)
+            ->assertJsonPath('data.0.meta.deposit', 5000);
     }
 
     public function test_lookup_requires_the_permission_of_the_operation(): void
