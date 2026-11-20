@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Domain\Fiscal\Contracts\EcfProvider;
+use App\Domain\Fiscal\Providers\DisabledEcfProvider;
 use App\Domain\Payments\Contracts\PaymentGateway;
 use App\Domain\Payments\Gateways\SandboxGateway;
 use App\Support\Tenancy\TenantContext;
@@ -22,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(TenantContext::class);
         $this->app->bind(PaymentGateway::class, SandboxGateway::class);
+        $this->app->bind(EcfProvider::class, DisabledEcfProvider::class);
         $this->app->singleton(TenantResolver::class);
     }
 

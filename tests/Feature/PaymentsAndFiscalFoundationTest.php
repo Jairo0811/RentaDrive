@@ -82,6 +82,19 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         ], $payload);
     }
 
+    public function test_fiscal_preparation_page_links_to_form_without_enabling_issuance(): void
+    {
+        $this->administrator();
+
+        $this->get(route('fiscal.edit'))
+            ->assertOk()
+            ->assertSee('Ruta de habilitación e-CF')
+            ->assertSee('href="#fiscal-profile-form"', false)
+            ->assertSee('id="fiscal-profile-form"', false)
+            ->assertSee('Emisión e-CF')
+            ->assertSee('Deshabilitada');
+    }
+
     public function test_sandbox_deposit_is_idempotent_and_never_confirms_itself(): void
     {
         config()->set('services.rentadrive_gateway.webhook_secret', 'test-webhook-secret');
@@ -219,6 +232,17 @@ final class PaymentsAndFiscalFoundationTest extends TestCase
         $this->assertSame($draft->getKey(), $again->getKey());
         $this->assertSame('draft', $draft->fresh()->status);
         $this->assertSame('101000001', $draft->issuer_rnc);
+        $this->assertSame('E32', $draft->snapshot['ecf_candidate_type']);
+        $this->assertSame(1, $draft->snapshot['ecf_preparation_version']);
+        $this->assertFalse($draft->snapshot['ecf_issued']);
+        // Un emisor autorizado sigue pudiendo PREPARAR borradores:
+        // la autorización no activa por sí sola el envío a DGII.
+        $profile->ecf_status = 'certified';
+        $profile->save();
+        $credit = app(FiscalDraftService::class)->prepare($invoice, 'credit');
+        $this->assertSame('draft', $credit->status);
+        $this->assertSame('E31', $credit->snapshot['ecf_candidate_type']);
+        $this->assertFalse($credit->snapshot['ecf_issued']);
         $this->assertSame(1, FiscalDraft::query()->count());
     }
 

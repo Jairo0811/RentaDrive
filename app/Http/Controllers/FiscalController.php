@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Fiscal\Services\EcfReadinessService;
 use App\Domain\Fiscal\Services\FiscalDraftService;
 use App\Models\FiscalDraft;
 use App\Models\FiscalProfile;
@@ -16,10 +17,13 @@ use Illuminate\Validation\Rule;
 
 final class FiscalController extends Controller
 {
-    public function edit(TenantContext $tenant): View
+    public function edit(TenantContext $tenant, EcfReadinessService $readiness): View
     {
+        $profile = FiscalProfile::query()->where('company_id', $tenant->companyId())->first();
+
         return view('fiscal.edit', [
-            'profile' => FiscalProfile::query()->where('company_id', $tenant->companyId())->first(),
+            'profile' => $profile,
+            'ecfReadiness' => $readiness->summary($profile),
             'drafts' => FiscalDraft::query()->with('invoice')->latest()->paginate(10),
         ]);
     }
