@@ -31,6 +31,15 @@ final class ReportDateRangeTest extends TestCase
         $this->actingAs($administrator)->get('/reports?from=2026-01-01&to=2026-12-31')->assertOk();
     }
 
+    public function test_reports_use_chart_icon_when_no_operations_exist(): void
+    {
+        $this->actingAs($this->administrator())
+            ->get('/reports')
+            ->assertOk()
+            ->assertSee('Sin operaciones')
+            ->assertSee('data-empty-icon="chart"', false);
+    }
+
     public function test_range_longer_than_a_year_is_rejected(): void
     {
         $this->actingAs($this->administrator())

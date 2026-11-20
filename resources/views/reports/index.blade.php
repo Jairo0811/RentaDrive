@@ -63,7 +63,7 @@
                 <h2 class="font-black text-slate-950 dark:text-white">Operaciones del período</h2>
             </div>
             @if ($rentals->isEmpty())
-                <x-empty-state title="Sin operaciones" message="No hay alquileres dentro del rango elegido." />
+                <x-empty-state title="Sin operaciones" message="No hay alquileres dentro del rango elegido." icon="chart" />
             @else
                 <div class="overflow-x-auto">
                     <table class="data-table">
