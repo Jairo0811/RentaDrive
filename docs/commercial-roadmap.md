@@ -208,4 +208,4 @@ Ver la matriz por ancho en `docs/responsive-test-matrix.md`: 320, 360, 390, 640,
 
 ### Sin verificar
 
-Recuperación de contraseña y login a 360/390 px; estados de error de los selectores con búsqueda; disponibilidad, cotización y confirmación del portal público con datos reales; zoom real al 200 % y 400 %; lector de pantalla; Safari iOS y Chrome Android reales; pruebas E2E de navegador automatizadas en CI.
+Recuperación de contraseña y login a 360/390 px; estados de error de los selectores con búsqueda; disponibilidad, cotización y confirmación del portal público con datos reales; zoom real al 200 % y 400 %; lector de pantalla; Safari iOS y Chrome Android reales. Las pruebas E2E automatizadas (Playwright, Chromium de escritorio) ya corren en CI; ver `docs/responsive-test-matrix.md`.
