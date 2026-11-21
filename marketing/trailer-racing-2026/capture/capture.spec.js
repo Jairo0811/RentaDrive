@@ -10,6 +10,10 @@ const out = (name) => path.join(here, '../captures', name);
 test.describe.configure({ mode: 'serial' });
 const debug = [];
 
+const isoDay = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+// Rango que incluye el alquiler ficticio (que empieza mañana) para que Reportes muestre datos.
+const rangeUrl = `/reports?from=${isoDay(0).slice(0, 8)}01&to=${isoDay(30)}`;
+
 const DESKTOP = { width: 1920, height: 1080 };
 const MOBILE = { width: 540, height: 960 };
 
@@ -173,7 +177,14 @@ test('capturas 16:9 (1920x1080)', async ({ browser }) => {
     await shoot(page, 'h-inspecciones.png', '/inspections');
     await shoot(page, 'h-facturas.png', '/invoices');
     await shoot(page, 'h-pagos.png', '/payments');
-    await shoot(page, 'h-reportes.png', '/reports', { wait: 2500 });
+    await shoot(page, 'h-reportes.png', rangeUrl, { wait: 2500 });
+    await shoot(page, 'h-dashboard-graficos.png', '/dashboard', {
+        wait: 2500,
+        before: async (p) => {
+            await p.evaluate(() => { const el = [...document.querySelectorAll('*')].find((e) => e.scrollHeight > e.clientHeight + 200 && getComputedStyle(e).overflowY !== 'visible') ?? document.scrollingElement; el.scrollTo(0, el.scrollHeight); window.scrollTo(0, document.body.scrollHeight); });
+            await p.waitForTimeout(1200);
+        },
+    });
     await context.close();
 });
 
@@ -190,7 +201,14 @@ test('capturas 9:16 (540x960 a 2x = 1080x1920)', async ({ browser }) => {
     await shoot(page, 'v-reservas.png', '/reservations');
     await shoot(page, 'v-reserva-formulario.png', '/reservations/create');
     await shoot(page, 'v-facturas.png', '/invoices');
-    await shoot(page, 'v-reportes.png', '/reports', { wait: 2500 });
+    await shoot(page, 'v-reportes.png', rangeUrl, { wait: 2500 });
+    await shoot(page, 'v-dashboard-graficos.png', '/dashboard', {
+        wait: 2500,
+        before: async (p) => {
+            await p.evaluate(() => { window.scrollTo(0, 1500); });
+            await p.waitForTimeout(1200);
+        },
+    });
     await context.close();
 });
 
