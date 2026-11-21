@@ -150,7 +150,7 @@ def wrap_title(text, max_chars):
     return lines
 
 
-def title(base, text, t, t0, t1, y, size, fade_out=0.4, color=WHITE, tracking=0.04, impact=True):
+def title(base, text, t, t0, t1, y, size, fade_out=0.4, color=WHITE, tracking=0.04, impact=True, max_chars=None):
     """Texto de título con entrada rápida (sincronizada al golpe) y salida suave."""
     if t < t0 or t > t1:
         return base
@@ -158,8 +158,18 @@ def title(base, text, t, t0, t1, y, size, fade_out=0.4, color=WHITE, tracking=0.
     a_out = 1.0 - ease((t - (t1 - fade_out)) / fade_out)
     alpha = a_in * a_out
     pop = 1.0 + (0.06 * (1 - ease_out((t - t0) / 0.35)) if impact else 0)
-    lines = wrap_title(text, 25 if VERT else 46)
-    s = size * pop
+    lines = wrap_title(text, max_chars or (25 if VERT else 46))
+    # reduce el cuerpo hasta que la línea más ancha cabe en el área segura
+    probe = ImageDraw.Draw(Image.new("RGB", (4, 4)))
+    avail = (SAFE_R - SAFE_L) * 0.98
+    fit_size = size
+    for _ in range(12):
+        f = font(fit_size)
+        widest = max(sum(probe.textlength(ch, font=f) for ch in line) + tracking * fit_size * (len(line) - 1) for line in lines)
+        if widest * 1.06 <= avail:
+            break
+        fit_size *= 0.93
+    s = fit_size * pop
     for i, line in enumerate(lines):
         yy = y + (i - (len(lines) - 1) / 2) * s * 1.18
         base = glow_text(base, line, s, (W // 2, yy), color=color, alpha=alpha, tracking=tracking, rise=(1 - a_in) * 24)
@@ -407,7 +417,7 @@ def dark_bg(t, zoom_speed=0.01):
     if key not in CACHE:
         art = cover(ART(), (W, H), 1.0)
         art = art.filter(ImageFilter.GaussianBlur(18))
-        arr = np.asarray(art, dtype=np.float32) * 0.28 + np.array(DEEP, dtype=np.float32) * 0.6
+        arr = np.asarray(art, dtype=np.float32) * (0.18 if VERT else 0.28) + np.array(DEEP, dtype=np.float32) * 0.6
         CACHE[key] = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
     return CACHE[key].copy()
 
@@ -615,9 +625,9 @@ def scene6(t):
     frame = flash(frame, 0.8 * max(0, 1 - local / 0.3))
     frame = light_sweep(frame, (local - 0.1) / 0.8, alpha=0.9)
     slogan_y = H * 0.865 if not VERT else 0.30 * H + rect_h + 90
-    req_y = H * 0.94 if not VERT else 0.30 * H + rect_h + 190
+    req_y = H * 0.94 if not VERT else 0.30 * H + rect_h + 215
     frame = title(frame, "GESTIONA TU FLOTA. IMPULSA TU NEGOCIO.", t, 40.0, 45.0, slogan_y, 40 if not VERT else 54, fade_out=0.8, tracking=0.05)
-    frame = title(frame, "EN DESARROLLO COMERCIAL · PRÓXIMAMENTE", t, 41.6, 45.0, req_y, 26 if not VERT else 34, fade_out=0.8, color=SILVER, tracking=0.08, impact=False)
+    frame = title(frame, "EN DESARROLLO COMERCIAL · PRÓXIMAMENTE", t, 41.6, 45.0, req_y, 26 if not VERT else 32, fade_out=0.8, color=SILVER, tracking=0.08, impact=False, max_chars=60)
     out = ease((local - 7.3) / 0.7)
     return blend(frame, Image.new("RGB", (W, H), (0, 0, 0)), out)
 
@@ -647,8 +657,8 @@ def main():
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-"]
     audio = WORK / "audio.wav"
     if audio.exists() and not args.no_audio:
-        cmd += ["-i", str(audio), "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
-    cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "17", "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", "-r", str(FPS), str(target)]
+        cmd += ["-i", str(audio), "-af", "loudnorm=I=-15:TP=-2:LRA=11,alimiter=limit=0.8:level=disabled", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
+    cmd += ["-c:v", "libx264", "-preset", "slow", "-crf", "22", "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", "-r", str(FPS), str(target)]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     for n in range(total):
         proc.stdin.write(frame_at(n / FPS).tobytes())
