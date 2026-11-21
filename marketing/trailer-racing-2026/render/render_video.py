@@ -612,8 +612,8 @@ def panel_rect(detail=False):
     if not VERT:
         return (W - 1440) // 2, 62, (W - 1440) // 2 + 1440, 62 + 810
     if detail:
-        return 90, 520, 990, 1280  # plano de detalle: 900x760, zona segura Reels/TikTok
-    return (W - 523) // 2, 470, (W - 523) // 2 + 523, 470 + 930  # plano general
+        return 60, 450, 1020, 1380  # plano de detalle: 960x930, dentro de la zona segura Reels/TikTok
+    return (W - 574) // 2, 410, (W - 574) // 2 + 574, 410 + 1020  # plano general
 
 
 def shots_scene(t, t0, t1, shots, title_text, chip_items=None, entry=None):
@@ -683,8 +683,8 @@ def scene4(t):
             dict(name="h-reservas.png", a=0.0, b=1.5, label="RESERVAS", z0=1.0, z1=1.25, pan=(0.5, 0.30, 0.5, 0.40)),
             dict(name="h-form-1-cliente-buscando.png", a=1.5, b=2.5, label="BUSCA AL CLIENTE", z0=2.2, z1=2.3, pan=(0.34, 0.30, 0.34, 0.30), focus=[(0.185, 0.205, 0.45, 0.34)]),
             dict(name="h-form-2-cliente.png", a=2.5, b=3.5, label="CLIENTE SELECCIONADO", z0=2.3, z1=2.2, pan=(0.34, 0.30, 0.40, 0.30)),
-            dict(name="h-form-3-vehiculo-buscando.png", a=3.5, b=4.5, label="ELIGE LA UNIDAD", z0=2.2, z1=2.3, pan=(0.80, 0.29, 0.80, 0.29), focus=[(0.71, 0.20, 0.965, 0.33)]),
-            dict(name="h-form-4-vehiculo.png", a=4.5, b=6.0, label="TARIFA AUTOCOMPLETADA", z0=2.0, z1=1.8, pan=(0.80, 0.30, 0.74, 0.34), focus=[(0.71, 0.20, 0.97, 0.28), (0.71, 0.30, 0.97, 0.37)]),
+            dict(name="h-form-3-vehiculo-buscando.png", a=3.5, b=4.5, label="ELIGE LA UNIDAD", z0=1.8, z1=1.9, pan=(0.72, 0.36, 0.72, 0.36), focus=[(0.71, 0.20, 0.965, 0.33)]),
+            dict(name="h-form-4-vehiculo.png", a=4.5, b=6.0, label="TARIFA AUTOCOMPLETADA", z0=1.8, z1=1.7, pan=(0.72, 0.38, 0.72, 0.40), focus=[(0.71, 0.20, 0.97, 0.28), (0.71, 0.30, 0.97, 0.37)]),
             dict(name="h-alquileres.png", a=6.0, b=7.0, label="ALQUILERES", z0=1.0, z1=1.3, pan=(0.5, 0.30, 0.55, 0.34)),
             dict(name="h-inspecciones.png", a=7.0, b=8.0, label="INSPECCIONES", z0=1.0, z1=1.3, pan=(0.5, 0.30, 0.45, 0.34)),
         ]
