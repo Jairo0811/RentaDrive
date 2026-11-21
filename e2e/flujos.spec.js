@@ -105,7 +105,7 @@ test('recuperar la contraseña con un enlace válido', async ({ browser }) => {
     const { email } = credentials();
     const newPassword = `${process.env.E2E_ADMIN_PASSWORD}-nueva`;
     const logFile = process.env.E2E_MAIL_LOG ?? 'storage/logs/laravel.log';
-    const context = await browser.newContext(); // sin sesión
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } }); // sin sesión
     const page = await context.newPage();
 
     await page.goto('/forgot-password');
