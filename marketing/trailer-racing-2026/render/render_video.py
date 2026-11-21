@@ -792,7 +792,7 @@ def main():
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-"]
     audio = WORK / "audio.wav"
     if audio.exists() and not args.no_audio:
-        cmd += (["-ss", "37", "-t", "8"] if args.final else []) + ["-i", str(audio), "-af", "loudnorm=I=-15:TP=-2:LRA=11,alimiter=limit=0.8:level=disabled", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
+        cmd += (["-ss", "37", "-t", "8"] if args.final else []) + ["-i", str(audio), "-af", "loudnorm=I=-15:TP=-2.5:LRA=11,alimiter=limit=0.7:level=disabled", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
     cmd += ["-c:v", "libx264", "-preset", "slow", "-crf", "22", "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", "-r", str(FPS), str(target)]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     for n in range(total):

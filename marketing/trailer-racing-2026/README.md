@@ -9,9 +9,9 @@ Materiales y proyecto de edición **reproducible** del tráiler de 45 s de Renta
 |---|---|
 | `docs/` | Guion técnico, storyboard, voz en off, lista de recursos y prompts generativos |
 | `capture/` | Playwright: prepara datos ficticios y captura pantallas reales (16:9 y 9:16) |
-| `assets/demo-vehicles/` | Fotos de demostración derivadas del arte oficial de la marca |
+| `assets/demo-vehicles/` | Fotos genéricas generadas (sedán compacto gris, SUV azul, sedán blanco); ver `docs/04-recursos.md` |
 | `captures/` | PNG de la interfaz real (resultado del workflow `Marketing captures`) |
-| `render/` | `make_voiceover.py`, `build_audio.py`, `render_video.py` |
+| `render/` | `make_voiceover.py`, `build_audio.py`, `render_video.py`, `qa_video.py` |
 | `out/` | MP4 finales (ignorados por git; ver «Distribución») |
 
 ## Seguridad de las capturas
@@ -26,13 +26,17 @@ Materiales y proyecto de edición **reproducible** del tráiler de 45 s de Renta
    `python render/make_voiceover.py --model kokoro-v1.0.onnx --voices voices-v1.0.bin`
 4. **Audio:** `python render/build_audio.py` → `render/.work/audio.wav`.
 5. **Video:**  
-   `python render/render_video.py --format h` → `out/rentadrive-trailer-16x9-1920x1080.mp4`  
-   `python render/render_video.py --format v` → `out/rentadrive-trailer-9x16-1080x1920.mp4`  
+   `python render/render_video.py --format h` → `out/rentadrive-trailer-v1.1-16x9-1920x1080.mp4`  
+   `python render/render_video.py --format v` → `out/rentadrive-trailer-v1.1-9x16-1080x1920.mp4`  
+   Cierres: `--final` → `out/rentadrive-final-v1.1-16x9.mp4` y `-9x16.mp4`. Verificación: `python render/qa_video.py`.  
    Pruebas rápidas: `--preview 8` (primeros 8 s) o `--frame 11.0` (un fotograma PNG en `render/.work/`).
 
 Salida: MP4 H.264 (High, yuv420p, CRF 22, preset slow), AAC 192 kb/s a 48 kHz, 30 fps, `+faststart`, sin marcas de agua. El audio se normaliza con `loudnorm` y un limitador de pico. El render completo tarda unos 7 minutos por formato en 2 CPU.
 
-## Resultado verificado (render del 20-11-2026)
+## Versión 1.1 (21-11-2026)
+Mejoras sobre la v1.0: fotos de vehículos diferenciadas, escenas de software dinámicas y vertical reencuadrada. Detalle, comparación y verificación en [`docs/06-version-1.1.md`](docs/06-version-1.1.md). La voz en off sigue siendo sintética de referencia (pendiente locutor real).
+
+## Resultado verificado de la v1.0 (render del 20-11-2026)
 | Archivo | Formato | Verificación (ffprobe/ffmpeg) |
 |---|---|---|
 | `out/rentadrive-trailer-16x9-1920x1080.mp4` | 1920×1080, 30 fps, H.264 High yuv420p, AAC 48 kHz estéreo, 45,0 s, ≈ 60 MB | decodifica sin errores; −14,1 LUFS integrados, pico −0,8 dBFS |
