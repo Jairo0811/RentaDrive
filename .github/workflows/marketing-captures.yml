@@ -4,6 +4,10 @@ name: Marketing captures
 # Usa una base descartable (RentaDriveE2E) del servicio SQL Server del runner; nunca RentaDriveDb.
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'marketing/**'
+      - '.github/workflows/marketing-captures.yml'
 
 permissions:
   contents: read
