@@ -78,11 +78,13 @@ test('preparar datos ficticios', async ({ browser }) => {
         await page.locator('#vehicle_category_id').selectOption(value);
         await pick(page, 'vehicle_id', plate);
         if (!(await page.locator('#daily_rate').inputValue())) await page.locator('#daily_rate').fill('2600');
+        const posted = page.waitForResponse((r) => r.request().method() === 'POST' && r.url().includes('/reservations'), { timeout: 10_000 }).catch(() => null);
         await page.getByRole('button', { name: 'Crear reserva' }).click();
+        const response = await posted;
         await page.waitForLoadState('networkidle');
         if (!/\/reservations\/\d+$/.test(page.url())) {
             const errors = (await page.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ').slice(0, 1400);
-            throw new Error(`Reserva ${customer}/${plate} no creada: ${errors}`);
+            throw new Error(`Reserva ${customer}/${plate} no creada: POST=${response ? response.status() + ' -> ' + (response.headers().location ?? '') : 'sin petición'} | ${errors.slice(-300)} | url=${page.url()}`);
         }
         firstUrl ||= page.url();
     }

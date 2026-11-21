@@ -123,6 +123,7 @@ jobs:
           name: trailer-captures
           path: |
             marketing/trailer-racing-2026/captures/*.png
+            marketing/trailer-racing-2026/captures/.pw-output
             serve.log
             storage/logs/laravel.log
           retention-days: 7
