@@ -53,4 +53,10 @@ return [
         // Proxies de confianza (IPs/CIDR separados por coma). Nunca '*': ver ProductionReadiness.
         'trusted_proxies' => env('TRUSTED_PROXIES'),
     ],
+
+    // Datos ficticios de staging (ver App\Support\Operations\StagingGuard).
+    'staging' => [
+        'allow_seed' => (bool) env('RENTADRIVE_ALLOW_STAGING_SEED', false),
+        'admin_password' => env('RENTADRIVE_STAGING_ADMIN_PASSWORD'),
+    ],
 ];

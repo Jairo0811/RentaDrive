@@ -19,9 +19,18 @@ use Illuminate\Support\Facades\DB;
 
 final class OperationalReferenceSeeder extends Seeder
 {
+    private string $companySlug = 'rentadrive-legacy';
+
+    public function forCompanySlug(string $slug): static
+    {
+        $this->companySlug = $slug;
+
+        return $this;
+    }
+
     public function run(): void
     {
-        $company = Company::query()->where('slug', 'rentadrive-legacy')->firstOrFail();
+        $company = Company::query()->where('slug', $this->companySlug)->firstOrFail();
         $branch = Branch::query()
             ->where('company_id', $company->getKey())
             ->where('is_primary', true)

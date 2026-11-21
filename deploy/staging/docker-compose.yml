@@ -1,0 +1,119 @@
+# Staging privado de RentaDrive: aislado, datos ficticios, sin puertos públicos.
+# Uso: ver docs/staging-private.md. Siempre con --env-file .env.staging (generado por scripts/gen-env.sh).
+name: rentadrive-staging
+
+x-app: &app
+  build:
+    context: ../..
+    dockerfile: deploy/Dockerfile
+    target: runtime
+  image: rentadrive-staging:${RELEASE_TAG:-local}
+  env_file: .env.app
+  environment:
+    SSL_CERT_FILE: /certs/ca.crt   # CA interna: permite DB_ENCRYPT=yes con verificación de certificado
+  volumes:
+    - ./secrets/tls/ca.crt:/certs/ca.crt:ro
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+  networks: [internal]
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?define MSSQL_SA_PASSWORD}
+    volumes:
+      - sqldata:/var/opt/mssql/data
+      - sqlbackup:/var/opt/mssql/backup
+      - ./sql/mssql.conf:/var/opt/mssql/mssql.conf:ro
+      - ./secrets/tls:/certs:ro
+      - ./sql/01-init.sql:/init/01-init.sql:ro
+    # SIN "ports": SQL Server no se publica en el host ni en Internet.
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    networks: [internal]
+
+  app:
+    <<: *app
+    depends_on:
+      sqlserver: {condition: service_healthy}
+    volumes:
+      - ./secrets/tls/ca.crt:/certs/ca.crt:ro
+      - appstorage:/var/www/html/storage
+      - appcache:/var/www/html/bootstrap/cache
+
+  queue:
+    <<: *app
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=60", "--sleep=3", "--max-time=3600"]
+    depends_on: [app]
+    volumes:
+      - ./secrets/tls/ca.crt:/certs/ca.crt:ro
+      - appstorage:/var/www/html/storage
+      - appcache:/var/www/html/bootstrap/cache
+
+  scheduler:
+    <<: *app
+    command: ["php", "artisan", "schedule:work"]
+    depends_on: [app]
+    volumes:
+      - ./secrets/tls/ca.crt:/certs/ca.crt:ro
+      - appstorage:/var/www/html/storage
+      - appcache:/var/www/html/bootstrap/cache
+
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/Dockerfile
+      target: web
+    image: rentadrive-staging-web:${RELEASE_TAG:-local}
+    depends_on: [app]
+    ports:
+      - "127.0.0.1:8080:8080"   # solo loopback; el túnel se conecta desde la misma red o equipo
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/up >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp", "/var/cache/nginx"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    networks: [internal]
+
+  # Opcional: túnel con nombre de Cloudflare. docker compose --profile tunnel up -d cloudflared
+  # Requiere CLOUDFLARE_TUNNEL_TOKEN y una aplicación Access YA creada (ver docs/cloudflare-private-staging.md).
+  cloudflared:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:2026.11.0
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?define CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on: [web]
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    networks: [internal]
+
+volumes:
+  sqldata:
+  sqlbackup:
+  appstorage:
+  appcache:
+
+networks:
+  internal:
+    ipam:
+      config:
+        - subnet: 172.29.80.0/24

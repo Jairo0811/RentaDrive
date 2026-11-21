@@ -28,3 +28,9 @@ Thumbs.db
 
 /test-results/
 /playwright-report/
+
+# Staging privado: secretos y estado local generados por deploy/staging/scripts
+/deploy/staging/.env.staging
+/deploy/staging/.env.app
+/deploy/staging/secrets/
+/deploy/staging/backups/
