@@ -447,17 +447,22 @@ def clip_frame(name, t, fade_in=0.7):
     return img if k >= 1 else ImageEnhance_brightness(img, ease(k))
 
 
+CUT1 = 3.2  # corte del tacómetro al clip A (destello + golpe de audio)
+
+
 def scene1(t):
-    """0–6 s: Apertura con clip generativo (auto genérico en garaje, faros LED azules que encienden).
-    Clip: assets/clips/clipA-garaje.mp4 (generado en Google Flow, audio descartado). Título al final."""
-    frame = clip_frame("clipA-garaje", t)
+    """0–6 s: Tacómetro que despierta y sube de RPM (0–3,2 s, tiempo comprimido x1,6) → destello → clip A:
+    auto genérico, faros LED azules encienden (assets/clips/clipA-garaje.mp4, audio descartado) → título."""
+    if t < CUT1:
+        return scene1_tacometro(t * 1.6, with_title=False)
+    frame = clip_frame("clipA-garaje", 1.6 + (t - CUT1), fade_in=0.01)
     frame = vignette(frame, 0.55)
-    frame = flash(frame, 0.5 * max(0, 1 - abs(t - 2.1) / 0.1))
-    frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.1, 6.0, H * (0.88 if not VERT else 0.2), 60, fade_out=0.15)
+    frame = flash(frame, 0.9 * max(0, 1 - (t - CUT1) / 0.25))
+    frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.3, 6.0, H * (0.88 if not VERT else 0.2), 60, fade_out=0.15)
     return frame
 
 
-def scene1_tacometro(t):
+def scene1_tacometro(t, with_title=True):
     """0–6 s: El despertar. Negro → arranque → tacómetro que despierta → destello azul → texto.
     Sin planos de auto: el auto real queda pendiente de un clip generativo/filmado (ver docs)."""
     frame = Image.new("RGB", (W, H), (0, 0, 0))
@@ -485,7 +490,8 @@ def scene1_tacometro(t):
     frame = light_sweep(frame, (t - 3.6) / 0.7)
     frame = light_sweep(frame, (t - 4.6) / 0.9, width=0.22, alpha=1.0, angle=0.0)
     frame = vignette(frame, 0.8)
-    frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.1, 6.0, H * (0.15 if not VERT else 0.2), 60, fade_out=0.15)
+    if with_title:
+        frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.1, 6.0, H * (0.15 if not VERT else 0.2), 60, fade_out=0.15)
     return frame
 
 
@@ -514,8 +520,8 @@ def scene2(t):
         glow = dark_bg(t)
         frame = blend(bg, glow, 0.5 * ease(k * 2))
         frame = speed_lines(frame, t, 0.35 * (1 - ease(k)), speed=1500, seed=6)
-        lw = int((W * 0.40 if not VERT else W * 0.88) * (0.94 + 0.06 * ease(k)))
-        frame = paste_logo(frame, lw, (W // 2, int(H * (0.43 if not VERT else 0.40))), alpha=ease_out(k * 2.5))
+        lw = int((W * 0.36 if not VERT else W * 0.86) * (0.94 + 0.06 * ease(k)))
+        frame = paste_logo(frame, lw, (W // 2, int(H * (0.42 if not VERT else 0.40))), alpha=ease_out(k * 2.5), glow_amount=0.6, logo=futurist_logo())
         frame = light_sweep(frame, (local - 3.5) / 0.9, alpha=0.6)
         frame = flash(frame, 0.5 * max(0, 1 - (local - 3.4) / 0.2))
         frame = title(frame, "TECNOLOGÍA QUE IMPULSA TU NEGOCIO", t, 10.2, 12.0, H * (0.82 if not VERT else 0.64), 38 if not VERT else 50, fade_out=0.15, tracking=0.06)

@@ -69,8 +69,8 @@ def swept_noise(duration, f0, f1, q_bw=0.6):
 def rpm_profile(t):
     """RPM del motor deportivo a lo largo del tráiler (arranque, aceleraciones, cierre)."""
     pts = [
-        (0.0, 0), (0.6, 260), (1.3, 760), (1.8, 1100), (3.8, 1000),
-        (4.4, 3600), (5.0, 6200), (5.4, 6400), (5.7, 2600), (6.0, 1500), (8.0, 1300),
+        (0.0, 0), (0.5, 260), (1.0, 760), (1.4, 1100), (2.3, 1000),
+        (2.7, 3600), (3.1, 6200), (3.25, 6400), (3.35, 2600), (3.7, 1500), (8.0, 1300),
         (11.5, 1500), (12.0, 1000), (36.0, 1000), (37.0, 1800), (38.0, 5200),
         (38.7, 3500), (39.4, 6600), (40.2, 4200), (41.0, 7000), (42.0, 5200),
         (43.0, 7200), (43.5, 3000), (44.2, 1200), (45.0, 0),
@@ -206,14 +206,14 @@ def music(mix):
 
 def sfx(mix):
     # destello azul / aceleración (4,2–6,0) y barridos de luz
-    add(mix, 4.2, swept_noise(1.8, 400, 6500) * np.linspace(0, 1, int(1.8 * SR)) ** 1.5, 0.5)
+    add(mix, 2.2, swept_noise(1.1, 400, 6500) * np.linspace(0, 1, int(1.1 * SR)) ** 1.5, 0.5)
     for start, dur in [(11.2, 0.9), (19.2, 0.9), (27.0, 1.0), (35.0, 2.0), (6.0, 0.6)]:
         add(mix, start, swept_noise(dur, 600, 5000) * np.linspace(0, 1, int(dur * SR)) ** 2, 0.35)
     # impactos sincronizados con textos y escenas
-    for hit, g in [(6.0, 0.9), (12.0, 0.7), (20.0, 0.7), (28.0, 0.75), (37.0, 1.0), (40.0, 0.7)]:
+    for hit, g in [(3.2, 0.8), (6.0, 0.9), (12.0, 0.7), (20.0, 0.7), (28.0, 0.75), (37.0, 1.0), (40.0, 0.7)]:
         add(mix, hit, impact(), g)
     # cambios de marcha (bajada de rpm + soplido)
-    for tt in [5.7, 39.4, 41.0, 43.0]:
+    for tt in [3.3, 39.4, 41.0, 43.0]:
         add(mix, tt, highpass(swept_noise(0.35, 3000, 1200), 800) * np.exp(-t_of(int(0.35 * SR)) * 7), 0.5)
     # cierre: golpe final y cola
     add(mix, 43.4, impact(1.6), 1.0)
