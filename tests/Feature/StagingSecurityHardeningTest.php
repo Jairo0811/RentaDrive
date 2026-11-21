@@ -10,9 +10,11 @@ use App\Support\Security\DemoCredentials;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\PlatformAdminSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Tests\TestCase;
@@ -77,6 +79,7 @@ final class StagingSecurityHardeningTest extends TestCase
         }
 
         $this->useEnvironment('local', 'http://localhost:8000');
+        $this->seed(RolePermissionSeeder::class);
         $this->seed(AdminUserSeeder::class);
 
         $this->assertDatabaseHas('users', ['email' => config('rentadrive.seed.admin_email')]);
@@ -155,33 +158,34 @@ final class StagingSecurityHardeningTest extends TestCase
 
     public function test_forwarded_proto_is_only_trusted_from_configured_proxies(): void
     {
-        Route::get('/__proxy-probe', fn () => response()->json(['secure' => request()->isSecure()]));
-
         config()->set('trustedproxy.proxies', '10.0.0.1');
+        $middleware = app(TrustProxies::class);
+        $probe = static fn (Request $request) => response()->json(['secure' => $request->isSecure()]);
 
-        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.1'])
-            ->withHeaders(['X-Forwarded-Proto' => 'https'])
-            ->getJson('/__proxy-probe')
-            ->assertJson(['secure' => true]);
+        $make = static fn (string $remote): Request => Request::create('http://staging.example.com/up', 'GET', [], [], [], [
+            'REMOTE_ADDR' => $remote,
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+        ]);
 
-        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.9'])
-            ->withHeaders(['X-Forwarded-Proto' => 'https'])
-            ->getJson('/__proxy-probe')
-            ->assertJson(['secure' => false]);
+        $this->assertTrue($middleware->handle($make('10.0.0.1'), $probe)->getData(true)['secure']);
+        $this->assertFalse($middleware->handle($make('203.0.113.9'), $probe)->getData(true)['secure']);
+
+        config()->set('trustedproxy.proxies', null);
+        $this->assertFalse($middleware->handle($make('10.0.0.1'), $probe)->getData(true)['secure']);
     }
 
     public function test_production_password_policy_is_stricter_than_local(): void
     {
-        $rules = ['password' => ['required', 'confirmed', Password::defaults()]];
+        $rules = static fn (): array => ['password' => ['required', 'confirmed', Password::defaults()]];
         $weak = ['password' => 'abcd1234', 'password_confirmation' => 'abcd1234'];
         $strong = ['password' => 'Contraseña-Larga#2026x', 'password_confirmation' => 'Contraseña-Larga#2026x'];
 
         $this->useEnvironment('local');
-        $this->assertTrue(Validator::make($weak, $rules)->passes());
+        $this->assertTrue(Validator::make($weak, $rules())->passes());
 
         $this->useEnvironment('production');
-        $this->assertTrue(Validator::make($weak, $rules)->fails());
-        $this->assertTrue(Validator::make($strong, $rules)->passes());
+        $this->assertTrue(Validator::make($weak, $rules())->fails());
+        $this->assertTrue(Validator::make($strong, $rules())->passes());
     }
 
     public function test_tracked_files_contain_no_known_leaked_secrets(): void
