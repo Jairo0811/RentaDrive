@@ -21,9 +21,32 @@ export default defineConfig({
     projects: [
         { name: 'setup', testMatch: /auth\.setup\.js/ },
         {
+            // Pantallas, acceso y selectores en móvil (no necesita facturas previas).
+            name: 'mobile',
+            testMatch: /movil\.spec\.js/,
+            grep: /^(?!.*pago con facturas)/,
+            dependencies: ['setup'],
+            use: { ...devices['Pixel 5'], storageState: 'test-results/.auth/admin.json' },
+        },
+        {
             name: 'desktop',
             testMatch: /flujos\.spec\.js/,
-            dependencies: ['setup'],
+            dependencies: ['setup', 'mobile'],
+            use: { ...devices['Desktop Chrome'], storageState: 'test-results/.auth/admin.json' },
+        },
+        {
+            // Necesita facturas abiertas, que crea el flujo de escritorio.
+            name: 'mobile-pagos',
+            testMatch: /movil\.spec\.js/,
+            grep: /pago con facturas/,
+            dependencies: ['desktop'],
+            use: { ...devices['Pixel 5'], storageState: 'test-results/.auth/admin.json' },
+        },
+        {
+            // Cambia la contraseña del administrador E2E: siempre al final.
+            name: 'recovery',
+            testMatch: /recuperacion\.spec\.js/,
+            dependencies: ['mobile-pagos'],
             use: { ...devices['Desktop Chrome'], storageState: 'test-results/.auth/admin.json' },
         },
     ],
