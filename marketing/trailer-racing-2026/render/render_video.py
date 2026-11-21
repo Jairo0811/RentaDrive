@@ -37,6 +37,7 @@ ap.add_argument("--fps", type=int, default=30)
 ap.add_argument("--preview", type=float, default=0, help="renderiza solo hasta N segundos (prueba rápida)")
 ap.add_argument("--frame", type=float, default=None, help="guarda un solo fotograma en este segundo (PNG)")
 ap.add_argument("--no-audio", action="store_true")
+ap.add_argument("--final", action="store_true", help="video final de 8 s: solo la escena de cierre (clip D + logo)")
 args = ap.parse_args()
 
 VERT = args.format == "v"
@@ -297,8 +298,8 @@ def logo_rgba():
     return CACHE["logo"]
 
 
-def paste_logo(base, width, center, alpha=1.0, glow_amount=1.0):
-    logo = logo_rgba()
+def paste_logo(base, width, center, alpha=1.0, glow_amount=1.0, logo=None):
+    logo = logo if logo is not None else logo_rgba()
     h = int(logo.height * width / logo.width)
     lg = logo.resize((width, h), Image.LANCZOS)
     layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
@@ -609,43 +610,30 @@ def scene5(t):
     return split_scene(t, 28.0, 37.0, shots, "PRECISIÓN PARA CADA DECISIÓN", ["INDICADORES", "REPORTES", "FACTURACIÓN INTERNA", "PAGOS MANUALES"] if not VERT else ["INDICADORES", "FACTURACIÓN INTERNA"])
 
 
+def futurist_logo():
+    """Logotipo oficial futurista (PNG transparente, trae el lema integrado): assets/brand/."""
+    if "flogo" not in CACHE:
+        im = Image.open(BASE / "assets" / "brand" / "logo-futurista-con-slogan.png").convert("RGBA")
+        bbox = im.getchannel("A").point(lambda v: 255 if v > 20 else 0).getbbox()
+        CACHE["flogo"] = im.crop(bbox) if bbox else im
+    return CACHE["flogo"]
+
+
 def scene6(t):
-    """37–45 s: Cierre. El arte oficial asciende y revela el logotipo; el lema va en una banda propia."""
+    """37–45 s: Cierre. Clip D (el auto se aleja por el circuito) → logotipo oficial con lema → estado comercial."""
     local = t - 37.0
-    art = ART()
-    crop_h = 800  # recorta el arte sobre su propio lema para no duplicarlo
-    if VERT:
-        rect_w, rect_h = W, int(W * crop_h / art.width)
-        top = int(H * 0.30)
-    else:
-        rect_w, rect_h = W, int(W * crop_h / art.width)
-        top = 0
-    zoom = (1.9 - 0.9 * ease(local / 3.2)) if local < 3.2 else 1.0 + 0.03 * (local - 3.2) / 4.8
-    cy_n = (0.78 - 0.28 * ease(local / 3.2)) if local < 3.2 else 0.5
-    bw, bh = art.width / zoom, crop_h / zoom
-    cx0 = art.width / 2
-    cy0 = cy_n * crop_h
-    box = (cx0 - bw / 2, min(max(cy0 - bh / 2, 0), crop_h - bh), cx0 + bw / 2, min(max(cy0 - bh / 2, 0), crop_h - bh) + bh)
-    strip = art.resize((rect_w, rect_h), Image.BILINEAR, box=box)
-    strip = ImageEnhance_brightness(strip, 0.5 + 0.5 * ease(local / 2.0))
-    # fondo: arte desenfocado y oscuro; sobre él, la franja nítida con degradado hacia negro
-    frame = dark_bg(t)
-    frame = blend(frame, Image.new("RGB", (W, H), (0, 0, 0)), 0.35)
-    fade = np.ones((rect_h, rect_w), dtype=np.float32)
-    edge = int(rect_h * 0.22)
-    fade[-edge:, :] = np.linspace(1, 0, edge)[:, None]
-    if VERT:
-        fade[:edge, :] = np.minimum(fade[:edge, :], np.linspace(0, 1, edge)[:, None])
-    mask = Image.fromarray((fade * 255).astype(np.uint8))
-    frame.paste(strip, (0, top), mask)
-    frame = speed_lines(frame, t, max(0.0, 1.0 - local / 3.5), speed=3600, seed=17)
-    frame = vignette(frame, 0.7)
-    frame = flash(frame, 0.8 * max(0, 1 - local / 0.3))
-    frame = light_sweep(frame, (local - 0.1) / 0.8, alpha=0.9)
-    slogan_y = H * 0.865 if not VERT else 0.30 * H + rect_h + 90
-    req_y = H * 0.94 if not VERT else 0.30 * H + rect_h + 215
-    frame = title(frame, "GESTIONA TU FLOTA. IMPULSA TU NEGOCIO.", t, 40.0, 45.0, slogan_y, 40 if not VERT else 54, fade_out=0.8, tracking=0.05)
-    frame = title(frame, "EN DESARROLLO COMERCIAL · PRÓXIMAMENTE", t, 41.6, 45.0, req_y, 26 if not VERT else 32, fade_out=0.8, color=SILVER, tracking=0.08, impact=False, max_chars=60)
+    frame = clip_frame("clipD-cierre", local, fade_in=0.01)
+    frame = vignette(frame, 0.6)
+    frame = flash(frame, 0.7 * max(0, 1 - local / 0.3))
+    k = clamp01((local - 3.6) / 1.2)
+    if k > 0:
+        lw = int((W * 0.40 if not VERT else W * 0.86) * (0.95 + 0.05 * ease(k)))
+        logo = futurist_logo()
+        frame = paste_logo(frame, lw, (W // 2, int(H * (0.31 if not VERT else 0.34))), alpha=ease_out(k), glow_amount=0.6, logo=logo)
+        frame = flash(frame, 0.35 * max(0, 1 - abs(local - 3.7) / 0.12))
+        frame = light_sweep(frame, (local - 3.8) / 0.9, alpha=0.5)
+    req_y = H * 0.93 if not VERT else H * 0.56
+    frame = title(frame, "EN DESARROLLO COMERCIAL · PRÓXIMAMENTE", t, 41.6, 45.0, req_y, 28 if not VERT else 34, fade_out=0.8, color=SILVER, tracking=0.08, impact=False, max_chars=60)
     out = ease((local - 7.3) / 0.7)
     return blend(frame, Image.new("RGB", (W, H), (0, 0, 0)), out)
 
@@ -669,17 +657,19 @@ def main():
         frame_at(args.frame).save(WORK / f"frame-{args.format}-{args.frame:.2f}.png")
         print("frame guardado")
         return
-    total = int((args.preview or DURATION) * FPS)
-    name = "rentadrive-trailer-16x9-1920x1080.mp4" if not VERT else "rentadrive-trailer-9x16-1080x1920.mp4"
+    T0 = 37.0 if args.final else 0.0
+    total = int((8.0 if args.final else (args.preview or DURATION)) * FPS)
+    kind = "final" if args.final else "trailer"
+    name = f"rentadrive-{kind}-16x9-1920x1080.mp4" if not VERT else f"rentadrive-{kind}-9x16-1080x1920.mp4"
     target = OUT / name if not args.preview else WORK / f"preview-{args.format}.mp4"
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-"]
     audio = WORK / "audio.wav"
     if audio.exists() and not args.no_audio:
-        cmd += ["-i", str(audio), "-af", "loudnorm=I=-15:TP=-2:LRA=11,alimiter=limit=0.8:level=disabled", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
+        cmd += (["-ss", "37", "-t", "8"] if args.final else []) + ["-i", str(audio), "-af", "loudnorm=I=-15:TP=-2:LRA=11,alimiter=limit=0.8:level=disabled", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
     cmd += ["-c:v", "libx264", "-preset", "slow", "-crf", "22", "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", "-r", str(FPS), str(target)]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     for n in range(total):
-        proc.stdin.write(frame_at(n / FPS).tobytes())
+        proc.stdin.write(frame_at(T0 + n / FPS).tobytes())
         if n % FPS == 0:
             print(f"\r{n / FPS:5.1f}s / {total / FPS:.0f}s", end="", flush=True, file=sys.stderr)
     proc.stdin.close()
