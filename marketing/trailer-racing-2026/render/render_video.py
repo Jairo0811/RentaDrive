@@ -695,7 +695,7 @@ def scene4(t):
             dict(name="v-form-1-cliente-buscando.png", a=1.5, b=3.5, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.17, 0.5, 0.17)),
             dict(name="v-form-3-vehiculo-buscando.png", a=3.5, b=5.0, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.17, 0.5, 0.17)),
             dict(name="v-form-4-vehiculo.png", a=5.0, b=6.5, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.22, 0.5, 0.30), focus=[(0.05, 0.27, 0.95, 0.37)]),
-            dict(name="v-reservas.png", a=6.5, b=8.0, z0=1.0, z1=1.06, pan=(0.5, 0.5, 0.5, 0.6)),
+            dict(name="v-reservas.png", a=6.5, b=8.0, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.30, 0.5, 0.36)),
         ]
         chips_ = ["RESERVAS", "ALQUILERES", "INSPECCIONES"]
     return shots_scene(t, 20.0, 28.0, shots, "CADA RESERVA. CADA VEHÍCULO. TODO CONECTADO", chips_)
@@ -717,7 +717,7 @@ def scene5(t):
     if not VERT:
         shots = [
             dict(name="h-dashboard.png", a=2.5, b=4.5, label="INDICADORES", z0=1.0, z1=1.7, pan=(0.5, 0.30, 0.40, 0.42), focus=[(0.175, 0.17, 0.975, 0.66)]),
-            dict(name="h-dashboard-graficos.png", a=4.5, b=5.5, label="GRÁFICOS", z0=1.0, z1=1.35, pan=(0.5, 0.45, 0.5, 0.58)),
+            dict(name="h-dashboard-graficos.png", a=4.5, b=5.5, label="GRÁFICOS", z0=1.05, z1=1.5, pan=(0.5, 0.32, 0.36, 0.34), focus=[(0.16, 0.15, 0.57, 0.54)]),
             dict(name="h-reportes.png", a=5.5, b=6.5, label="REPORTES", z0=1.0, z1=1.5, pan=(0.5, 0.35, 0.45, 0.42), focus=[(0.18, 0.28, 0.98, 0.41)]),
             dict(name="h-facturas.png", a=6.5, b=7.5, label="FACTURACIÓN INTERNA", z0=1.0, z1=1.6, pan=(0.40, 0.32, 0.55, 0.34), focus=[(0.175, 0.30, 0.97, 0.37)]),
             dict(name="h-pagos.png", a=7.5, b=9.0, label="PAGOS MANUALES", z0=1.0, z1=1.6, pan=(0.45, 0.32, 0.60, 0.34), focus=[(0.58, 0.31, 0.97, 0.38)]),
@@ -784,7 +784,10 @@ def main():
     T0 = 37.0 if args.final else 0.0
     total = int((8.0 if args.final else (args.preview or DURATION)) * FPS)
     kind = "final" if args.final else "trailer"
-    name = f"rentadrive-{kind}-16x9-1920x1080.mp4" if not VERT else f"rentadrive-{kind}-9x16-1080x1920.mp4"
+    if args.final:
+        name = "rentadrive-final-v1.1-16x9.mp4" if not VERT else "rentadrive-final-v1.1-9x16.mp4"
+    else:
+        name = f"rentadrive-trailer-v1.1-16x9-1920x1080.mp4" if not VERT else f"rentadrive-trailer-v1.1-9x16-1080x1920.mp4"
     target = OUT / name if not args.preview else WORK / f"preview-{args.format}.mp4"
     cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-"]
     audio = WORK / "audio.wav"
