@@ -10,7 +10,8 @@ const state = { reservationUrl: '', rentalUrl: '', rentalCode: '' };
 test('reservar un vehículo', async ({ page }) => {
     await page.goto('/reservations/create');
     await pick(page, 'customer_id', 'Rodríguez');
-    await page.locator('#vehicle_category_id').selectOption({ label: /Sedán/ });
+    const sedan = await page.locator('#vehicle_category_id option', { hasText: 'Sedán' }).getAttribute('value');
+    await page.locator('#vehicle_category_id').selectOption(sedan);
     await pick(page, 'vehicle_id', 'A123456');
     if (!(await page.locator('#daily_rate').inputValue())) {
         await page.locator('#daily_rate').fill('2600');
