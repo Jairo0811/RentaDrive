@@ -18,7 +18,7 @@ export async function pick(page, id, text) {
     const input = page.locator(`#${id}`);
     await input.click();
     await input.fill(text);
-    const option = page.getByRole('option').first();
+    const option = page.locator(`#${id}-list [role=option]`).first();
     await expect(option).toBeVisible();
     await option.click();
     await expect(page.locator(`input[type=hidden][name="${await input.evaluate((el) => el.closest('[x-data]').querySelector('input[type=hidden]').name)}"]`)).not.toHaveValue('');
