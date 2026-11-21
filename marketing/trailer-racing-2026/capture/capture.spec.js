@@ -145,6 +145,18 @@ test('preparar datos ficticios', async ({ browser }) => {
     await context.close();
 });
 
+
+// Lleva los gráficos del dashboard a la parte superior de la vista (el scroll puede estar en un contenedor interno).
+async function scrollToCharts(page) {
+    await page.getByText('Rendimiento financiero').first().evaluate((el) => {
+        el.scrollIntoView({ block: 'start' });
+        let node = el.parentElement;
+        while (node && !(node.scrollHeight > node.clientHeight + 50 && /(auto|scroll)/.test(getComputedStyle(node).overflowY))) node = node.parentElement;
+        (node ?? document.scrollingElement).scrollBy(0, -110);
+    });
+    await page.waitForTimeout(1500);
+}
+
 async function shoot(page, name, url, opts = {}) {
     await page.goto(url);
     await settle(page, opts.wait);
@@ -178,13 +190,7 @@ test('capturas 16:9 (1920x1080)', async ({ browser }) => {
     await shoot(page, 'h-facturas.png', '/invoices');
     await shoot(page, 'h-pagos.png', '/payments');
     await shoot(page, 'h-reportes.png', rangeUrl, { wait: 2500 });
-    await shoot(page, 'h-dashboard-graficos.png', '/dashboard', {
-        wait: 2500,
-        before: async (p) => {
-            await p.evaluate(() => { const el = [...document.querySelectorAll('*')].find((e) => e.scrollHeight > e.clientHeight + 200 && getComputedStyle(e).overflowY !== 'visible') ?? document.scrollingElement; el.scrollTo(0, el.scrollHeight); window.scrollTo(0, document.body.scrollHeight); });
-            await p.waitForTimeout(1200);
-        },
-    });
+    await shoot(page, 'h-dashboard-graficos.png', '/dashboard', { wait: 2500, before: (p) => scrollToCharts(p) });
     await context.close();
 });
 
@@ -202,13 +208,7 @@ test('capturas 9:16 (540x960 a 2x = 1080x1920)', async ({ browser }) => {
     await shoot(page, 'v-reserva-formulario.png', '/reservations/create');
     await shoot(page, 'v-facturas.png', '/invoices');
     await shoot(page, 'v-reportes.png', rangeUrl, { wait: 2500 });
-    await shoot(page, 'v-dashboard-graficos.png', '/dashboard', {
-        wait: 2500,
-        before: async (p) => {
-            await p.evaluate(() => { window.scrollTo(0, 1500); });
-            await p.waitForTimeout(1200);
-        },
-    });
+    await shoot(page, 'v-dashboard-graficos.png', '/dashboard', { wait: 2500, before: (p) => scrollToCharts(p) });
     await context.close();
 });
 
