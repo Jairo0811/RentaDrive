@@ -433,13 +433,16 @@ def car_crop(box, size, zoom=1.0, shift=(0, 0)):
     return art.resize(size, Image.BICUBIC, box=(cx - bw / 2, cy - bh / 2, cx + bw / 2, cy + bh / 2))
 
 
-def clip_frame(name, t, fade_in=0.7):
+def clip_frame(name, t, fade_in=0.7, vfit=False):
     """Fotograma del clip generativo (pre-extraído por ffmpeg a 30 fps, recorte 'cover')."""
-    d = WORK / f"{name}-{args.format}"
+    d = WORK / f"{name}-{args.format}{'-fit' if vfit and VERT else ''}"
     if not d.exists():
         d.mkdir(parents=True)
         src = BASE / "assets" / "clips" / f"{name}.mp4"
-        vf = f"fps={FPS},scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,crop={W}:{H}:" + ("'(iw-ow)*0.35':0" if VERT else "(iw-ow)/2:(ih-oh)/2")
+        if vfit and VERT:  # clip oscuro: se centra sobre negro en vertical (sin recortar el instrumento)
+            vf = f"fps={FPS},scale=1700:956:flags=lanczos,crop={W}:956:(iw-ow)/2:0,pad={W}:{H}:0:{(H-956)//2}:black"
+        else:
+            vf = f"fps={FPS},scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,crop={W}:{H}:" + ("'(iw-ow)*0.35':0" if VERT else "(iw-ow)/2:(ih-oh)/2")
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(src), "-an", "-vf", vf, "-q:v", "2", str(d / "%04d.jpg")], check=True)
     n = min(int(t * FPS) + 1, len(list(d.glob("*.jpg"))))
     img = Image.open(d / f"{n:04d}.jpg").convert("RGB")
@@ -451,10 +454,13 @@ CUT1 = 3.2  # corte del tacómetro al clip A (destello + golpe de audio)
 
 
 def scene1(t):
-    """0–6 s: Tacómetro que despierta y sube de RPM (0–3,2 s, tiempo comprimido x1,6) → destello → clip A:
+    """0–6 s: Clip E del tacómetro que sube de RPM (0–3,2 s, a 1,6x) → destello → clip A:
     auto genérico, faros LED azules encienden (assets/clips/clipA-garaje.mp4, audio descartado) → título."""
     if t < CUT1:
-        return scene1_tacometro(t * 1.6, with_title=False)
+        # clip E (tacómetro 800→6000 RPM, generado en Google Flow, audio descartado) a 1,6x
+        frame = clip_frame("clipE-tacometro", t * 1.6, fade_in=0.5, vfit=True)
+        frame = vignette(frame, 0.5)
+        return flash(frame, 0.5 * max(0, 1 - abs(t - 3.0) / 0.1))
     frame = clip_frame("clipA-garaje", 1.6 + (t - CUT1), fade_in=0.01)
     frame = vignette(frame, 0.55)
     frame = flash(frame, 0.9 * max(0, 1 - (t - CUT1) / 0.25))
