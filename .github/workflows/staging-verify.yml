@@ -73,7 +73,7 @@ jobs:
 
       - name: Trabajador de colas procesa un trabajo
         run: |
-          docker compose --env-file .env.staging exec -T app php artisan tinker --execute='dispatch(function () { logger()->warning("queue-ping"); }); echo "despachado", PHP_EOL;' 2>&1 | tail -5 || true
+          docker compose --env-file .env.staging exec -T app php -r 'require "vendor/autoload.php"; $a = require "bootstrap/app.php"; $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); dispatch(function () { logger()->warning("queue-ping"); }); echo "despachado", PHP_EOL;'
           ok=0
           for i in $(seq 1 30); do
             if docker compose --env-file .env.staging logs --no-color queue 2>&1 | grep -q 'queue-ping'; then ok=1; break; fi
