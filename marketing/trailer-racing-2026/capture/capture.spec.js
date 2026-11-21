@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { credentials, pick } from '../../../e2e/helpers.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const photos = (n) => path.join(here, `../assets/demo-vehicles/vehiculo-demo-${n}.jpg`);
+const photos = (file) => path.join(here, `../assets/demo-vehicles/${file}`);
 const out = (name) => path.join(here, '../captures', name);
 
 test.describe.configure({ mode: 'serial' });
@@ -32,12 +32,37 @@ test('preparar datos ficticios', async ({ browser }) => {
     const page = await context.newPage();
     await login(page);
 
-    // Fotos de demostración (arte propio de la marca) en los tres vehículos sembrados.
-    await page.goto('/vehicles?view=table');
-    const hrefs = await page.locator('table a[href*="/vehicles/"]').evaluateAll((links) => [...new Set(links.map((a) => a.getAttribute('href').match(/\/vehicles\/(\d+)/)?.[1]).filter(Boolean))]);
-    for (const [index, id] of hrefs.slice(0, 3).entries()) {
+    // Marcas y modelos FICTICIOS: las fotos son vehículos genéricos generados (no son fotos de un modelo comercial),
+    // por eso no se muestran nombres de fabricantes reales en las fichas.
+    await page.goto('/fleet/catalogs');
+    const rename = async (from, to, extra) => {
+        await page.evaluate(([f, t]) => {
+            const form = [...document.querySelectorAll('form')].find((x) => x.querySelector('input[name=_method][value=PUT]') && x.querySelector('input[name=name]')?.value === f);
+            if (!form) throw new Error(`No se encontró «${f}» en catálogos`);
+            form.querySelector('input[name=name]').value = t;
+            form.requestSubmit();
+        }, [from, to]);
+        await page.waitForLoadState('networkidle');
+        await page.goto('/fleet/catalogs');
+    };
+    await rename('Hyundai', 'Aero');
+    await rename('Toyota', 'Orion');
+    await rename('Accent', 'Pulse');
+    await rename('RAV4', 'Terra');
+    await rename('Corolla', 'Vía');
+
+    // Foto distinta y coherente (carrocería y color de la ficha) para cada vehículo, localizada por placa.
+    const byPlate = [
+        ['A345678', 'sedan-compacto-gris.jpg'], // Económico · Gris
+        ['G234567', 'suv-azul.jpg'], // SUV · Azul
+        ['A123456', 'sedan-blanco.jpg'], // Sedán · Blanco
+    ];
+    for (const [plate, file] of byPlate) {
+        await page.goto('/vehicles?view=table');
+        const href = await page.locator('table tr', { hasText: plate }).locator('a[href*="/vehicles/"]').first().getAttribute('href');
+        const id = href.match(/\/vehicles\/(\d+)/)[1];
         await page.goto(`/vehicles/${id}/edit`);
-        await page.locator('#photo').setInputFiles(photos(index + 1));
+        await page.locator('#photo').setInputFiles(photos(file));
         await page.getByRole('button', { name: /guardar/i }).click();
         await expect(page).toHaveURL(/\/vehicles\/\d+$/);
     }
@@ -159,9 +184,65 @@ test('capturas 9:16 (540x960 a 2x = 1080x1920)', async ({ browser }) => {
 
     await shoot(page, 'v-dashboard.png', '/dashboard', { wait: 2500 });
     await shoot(page, 'v-flota-tarjetas.png', '/vehicles?view=cards');
+    await shoot(page, 'v-flota-tabla.png', '/vehicles?view=table');
+    const detailV = await page.locator('a[href*="/vehicles/"]').evaluateAll((links) => links.map((a) => a.getAttribute('href')).find((h) => /\/vehicles\/\d+$/.test(h)));
+    if (detailV) await shoot(page, 'v-vehiculo-detalle.png', detailV);
     await shoot(page, 'v-reservas.png', '/reservations');
     await shoot(page, 'v-reserva-formulario.png', '/reservations/create');
     await shoot(page, 'v-facturas.png', '/invoices');
     await shoot(page, 'v-reportes.png', '/reports', { wait: 2500 });
+    await context.close();
+});
+
+// Pasos REALES del formulario de reserva (selector inteligente de cliente y de vehículo, tarifa autocompletada).
+async function reservationSequence(page, prefix, focus) {
+    const day = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+    await page.goto('/reservations/create');
+    await settle(page, 800);
+    await page.locator('#start_at').fill(`${day(20)}T09:00`);
+    await page.locator('#end_at').fill(`${day(23)}T09:00`);
+    const shot = async (name, id) => {
+        if (focus && id) {
+            await page.evaluate((target) => {
+                const el = document.getElementById(target);
+                el.scrollIntoView({ block: 'start' });
+                window.scrollBy(0, -170);
+            }, id);
+        }
+        await page.waitForTimeout(450);
+        await page.screenshot({ path: out(`${prefix}-form-${name}.png`), fullPage: false });
+    };
+    await shot('0-inicio', null);
+    const customer = page.locator('#customer_id');
+    await customer.click();
+    await customer.fill('Rod');
+    await page.locator('#customer_id-list [role=option]').first().waitFor();
+    await shot('1-cliente-buscando', 'customer_id');
+    await page.locator('#customer_id-list [role=option]').first().click();
+    await shot('2-cliente', 'customer_id');
+    const category = await page.locator('#vehicle_category_id option', { hasText: 'Sedán' }).first().getAttribute('value');
+    await page.locator('#vehicle_category_id').selectOption(category);
+    const vehicle = page.locator('#vehicle_id');
+    await vehicle.click();
+    await vehicle.fill('A12');
+    await page.locator('#vehicle_id-list [role=option]').first().waitFor();
+    await shot('3-vehiculo-buscando', 'vehicle_id');
+    await page.locator('#vehicle_id-list [role=option]').first().click();
+    await shot('4-vehiculo', 'daily_rate');
+}
+
+test('secuencia de reserva 16:9', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: DESKTOP, deviceScaleFactor: 1 });
+    const page = await context.newPage();
+    await login(page);
+    await reservationSequence(page, 'h', false);
+    await context.close();
+});
+
+test('secuencia de reserva 9:16', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: MOBILE, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    await login(page);
+    await reservationSequence(page, 'v', true);
     await context.close();
 });
