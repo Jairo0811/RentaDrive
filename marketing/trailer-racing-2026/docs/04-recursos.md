@@ -27,6 +27,6 @@ Datos ficticios: clientes «María Rodríguez», «Carlos Méndez», «Ana Peña
 Inter Bold/SemiBold Italic (SIL OFL 1.1).
 
 ## Pendiente de herramientas externas (NO incluido en el render)
-- Clips cinematográficos reales/generativos de autos (circuito nocturno, garaje, asfalto mojado). Ver `05-prompts-generativos.md`. El render actual los sustituye con gráficos HUD procedurales (tacómetro, líneas de velocidad); NO hay planos de auto real en la apertura.
+- Clips cinematográficos reales/generativos de autos (circuito nocturno, garaje, asfalto mojado). Ver `05-prompts-generativos.md`. La apertura ya integra el clip A (`assets/clips/clipA-garaje.mp4`, 1280×720 24 fps, generado en Google Flow; se escala a 1920×1080 a 30 fps, por lo que se ve algo más suave que el resto). Faltan C (circuito, escena 2) y D (cierre); mientras tanto esas escenas siguen con gráficos procedurales. Los clips generativos deben revisarse a mano antes de publicar (logos, texto, deformaciones) y los términos de uso del servicio verificarse para uso comercial.
 - Locutor profesional (ver `03-voz-en-off.md`).
 - Mezcla/masterización final por un ingeniero de sonido si se usa en campaña pagada.

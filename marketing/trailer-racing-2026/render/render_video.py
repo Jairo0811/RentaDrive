@@ -432,7 +432,31 @@ def car_crop(box, size, zoom=1.0, shift=(0, 0)):
     return art.resize(size, Image.BICUBIC, box=(cx - bw / 2, cy - bh / 2, cx + bw / 2, cy + bh / 2))
 
 
+def clip_frame(name, t, fade_in=0.7):
+    """Fotograma del clip generativo (pre-extraído por ffmpeg a 30 fps, recorte 'cover')."""
+    d = WORK / f"{name}-{args.format}"
+    if not d.exists():
+        d.mkdir(parents=True)
+        src = BASE / "assets" / "clips" / f"{name}.mp4"
+        vf = f"fps={FPS},scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,crop={W}:{H}:" + ("'(iw-ow)*0.35':0" if VERT else "(iw-ow)/2:(ih-oh)/2")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(src), "-an", "-vf", vf, "-q:v", "2", str(d / "%04d.jpg")], check=True)
+    n = min(int(t * FPS) + 1, len(list(d.glob("*.jpg"))))
+    img = Image.open(d / f"{n:04d}.jpg").convert("RGB")
+    k = clamp01(t / fade_in)
+    return img if k >= 1 else ImageEnhance_brightness(img, ease(k))
+
+
 def scene1(t):
+    """0–6 s: Apertura con clip generativo (auto genérico en garaje, faros LED azules que encienden).
+    Clip: assets/clips/clipA-garaje.mp4 (generado en Google Flow, audio descartado). Título al final."""
+    frame = clip_frame("clipA-garaje", t)
+    frame = vignette(frame, 0.55)
+    frame = flash(frame, 0.5 * max(0, 1 - abs(t - 2.1) / 0.1))
+    frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.1, 6.0, H * (0.88 if not VERT else 0.2), 60, fade_out=0.15)
+    return frame
+
+
+def scene1_tacometro(t):
     """0–6 s: El despertar. Negro → arranque → tacómetro que despierta → destello azul → texto.
     Sin planos de auto: el auto real queda pendiente de un clip generativo/filmado (ver docs)."""
     frame = Image.new("RGB", (W, H), (0, 0, 0))
