@@ -1,0 +1,135 @@
+import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import { credentials, pick, solidPng } from './helpers.js';
+
+// Los flujos comparten datos (reserva -> alquiler -> factura -> pago), por eso van en serie.
+test.describe.configure({ mode: 'serial' });
+
+const state = { reservationUrl: '', rentalUrl: '', rentalCode: '' };
+
+test('reservar un vehículo', async ({ page }) => {
+    await page.goto('/reservations/create');
+    await pick(page, 'customer_id', 'Rodríguez');
+    await page.locator('#vehicle_category_id').selectOption({ label: /Sedán/ });
+    await pick(page, 'vehicle_id', 'A123456');
+    if (!(await page.locator('#daily_rate').inputValue())) {
+        await page.locator('#daily_rate').fill('2600');
+    }
+    await page.getByRole('button', { name: 'Crear reserva' }).click();
+
+    await expect(page).toHaveURL(/\/reservations\/\d+$/);
+    await expect(page.getByRole('link', { name: 'Convertir en alquiler' })).toBeVisible();
+    state.reservationUrl = page.url();
+});
+
+test('convertir la reserva en alquiler y generar factura', async ({ page }) => {
+    await page.goto(state.reservationUrl);
+    await page.getByRole('link', { name: 'Convertir en alquiler' }).click();
+    await expect(page).toHaveURL(/\/rentals\/create\?reservation=/);
+    await page.getByRole('button', { name: 'Abrir alquiler y generar factura' }).click();
+
+    await expect(page).toHaveURL(/\/rentals\/\d+$/);
+    state.rentalUrl = page.url();
+    state.rentalCode = (await page.locator('h1, h2').first().innerText()).trim();
+});
+
+test('registrar una inspección de entrega', async ({ page }) => {
+    await page.goto('/inspections/create');
+    await pick(page, 'rental_id', 'A123456');
+    await page.locator('#mileage').fill('18250');
+    await page.locator('#damages').fill('Sin daños visibles (prueba E2E).');
+    await page.getByRole('button', { name: 'Guardar inspección' }).click();
+
+    await expect(page).toHaveURL(/\/inspections\/\d+$/);
+});
+
+test('registrar un pago manual desde la factura', async ({ page }) => {
+    await page.goto('/invoices');
+    await page.locator('table a[href*="/invoices/"]').first().click();
+    await expect(page).toHaveURL(/\/invoices\/\d+$/);
+
+    await page.locator('#amount').fill('500');
+    await page.locator('#reference').fill('E2E-REF-1');
+    await page.getByRole('button', { name: 'Registrar pago' }).click();
+
+    await expect(page).toHaveURL(/\/invoices\/\d+$/);
+    await expect(page.getByText('E2E-REF-1')).toBeVisible();
+});
+
+test('aplicar un pago desde el módulo Pagos', async ({ page }) => {
+    await page.goto('/payments');
+    await page.getByRole('button', { name: /registrar|nuevo pago|cobro/i }).first().click();
+    await pick(page, 'invoice_id', 'F');
+    await page.locator('#amount').fill('100');
+    await page.locator('#reference').fill('E2E-REF-2');
+    await page.getByRole('button', { name: 'Aplicar pago' }).click();
+
+    await expect(page.getByText('E2E-REF-2')).toBeVisible();
+});
+
+test('descargar la factura interna en PDF', async ({ page }) => {
+    await page.goto('/invoices');
+    await page.locator('table a[href*="/invoices/"]').first().click();
+    const href = await page.getByRole('link', { name: 'Descargar PDF' }).getAttribute('href');
+    const response = await page.request.get(href);
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('pdf');
+    expect((await response.body()).subarray(0, 4).toString()).toBe('%PDF');
+});
+
+test('consultar reportes con un rango de fechas válido', async ({ page }) => {
+    const today = new Date().toISOString().slice(0, 10);
+    await page.goto(`/reports?from=${today.slice(0, 8)}01&to=${today}`);
+
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+    await expect(page.locator('#from')).toHaveValue(`${today.slice(0, 8)}01`);
+    await expect(page.locator('body')).not.toContainText(/server error|exception/i);
+});
+
+test('actualizar y quitar la foto de un vehículo', async ({ page }) => {
+    await page.goto('/vehicles');
+    await page.locator('a[href*="/vehicles/"][href$="/edit"], a:has-text("Editar")').first().click();
+    await expect(page).toHaveURL(/\/vehicles\/\d+\/edit$/);
+
+    await page.locator('#photo').setInputFiles({ name: 'foto-e2e.png', mimeType: 'image/png', buffer: solidPng() });
+    await page.getByRole('button', { name: /guardar/i }).click();
+    await expect(page).toHaveURL(/\/vehicles\/\d+$/);
+    await expect(page.locator('img[src*="vehicles"], img[alt*="Foto"]').first()).toBeVisible();
+});
+
+test('recuperar la contraseña con un enlace válido', async ({ browser }) => {
+    const { email } = credentials();
+    const newPassword = `${process.env.E2E_ADMIN_PASSWORD}-nueva`;
+    const logFile = process.env.E2E_MAIL_LOG ?? 'storage/logs/laravel.log';
+    const context = await browser.newContext(); // sin sesión
+    const page = await context.newPage();
+
+    await page.goto('/forgot-password');
+    await page.getByLabel(/correo/i).fill(email);
+    await page.getByRole('button', { name: /enviar enlace/i }).click();
+    await expect(page.locator('body')).toContainText(/enlace|correo/i);
+
+    // MAIL_MAILER=log escribe el correo en el log; no se envía ningún correo real.
+    let link = null;
+    await expect.poll(() => {
+        const raw = fs.existsSync(logFile) ? fs.readFileSync(logFile, 'utf8') : '';
+        const decoded = raw.replace(/=\r?\n/g, '').replace(/=3D/g, '=');
+        const matches = decoded.match(/https?:\/\/[^\s"<>]*reset-password\/[^\s"<>]+/g);
+        link = matches ? matches[matches.length - 1] : null;
+        return link;
+    }, { timeout: 15_000 }).not.toBeNull();
+
+    const url = new URL(link);
+    await page.goto(`${url.pathname}${url.search}`);
+    await page.locator('#password').fill(newPassword);
+    await page.locator('#password_confirmation').fill(newPassword);
+    await page.getByRole('button', { name: 'Restablecer contraseña' }).click();
+    await expect(page).toHaveURL(/login/);
+
+    await page.getByLabel(/correo/i).fill(email);
+    await page.locator('input[name=password]').fill(newPassword);
+    await page.getByRole('button', { name: /iniciar sesión|entrar|acceder/i }).click();
+    await expect(page).toHaveURL(/dashboard/);
+    await context.close();
+});
