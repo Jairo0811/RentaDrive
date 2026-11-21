@@ -73,17 +73,16 @@ jobs:
 
       - name: Trabajador de colas procesa un trabajo
         run: |
-          docker compose --env-file .env.staging exec -T app php -r 'require "vendor/autoload.php"; $a = require "bootstrap/app.php"; $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); dispatch(function () { logger()->warning("queue-ping"); }); echo "despachado", PHP_EOL;'
-          ok=0
-          for i in $(seq 1 30); do
-            if docker compose --env-file .env.staging logs --no-color queue 2>&1 | grep -q 'queue-ping'; then ok=1; break; fi
-            sleep 2
-          done
-          [ "$ok" = "1" ] || { echo "El trabajador no ejecutó el trabajo"; exit 1; }
-          n="$(./scripts/sql.sh "SET NOCOUNT ON; SELECT COUNT(*) FROM [RentaDriveStaging].dbo.jobs;")"
-          f="$(./scripts/sql.sh "SET NOCOUNT ON; SELECT COUNT(*) FROM [RentaDriveStaging].dbo.failed_jobs;")"
+          cnt() { ./scripts/sql.sh "SET NOCOUNT ON; SELECT COUNT(*) FROM [RentaDriveStaging].dbo.$1;"; }
+          docker compose --env-file .env.staging stop queue
+          docker compose --env-file .env.staging exec -T app php -r 'require "vendor/autoload.php"; $a = require "bootstrap/app.php"; $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); Illuminate\Support\Facades\Artisan::queue("about"); echo "despachado", PHP_EOL;'
+          n="$(cnt jobs)"; echo "pendientes con el trabajador parado: $n"
+          [ "$n" = "1" ] || { echo "El trabajo no quedó en la cola"; exit 1; }
+          docker compose --env-file .env.staging up -d queue
+          for i in $(seq 1 30); do n="$(cnt jobs)"; [ "$n" = "0" ] && break; sleep 2; done
+          f="$(cnt failed_jobs)"
           echo "pendientes=$n fallidos=$f"
-          [ "$n" = "0" ] && [ "$f" = "0" ] || { echo "Cola con pendientes o fallidos"; exit 1; }
+          [ "$n" = "0" ] && [ "$f" = "0" ] || { echo "La cola no se procesó sin fallos"; exit 1; }
           docker compose --env-file .env.staging ps queue --format '{{.State}}' | grep -q running
 
       - name: Respaldo y restauración en base distinta
