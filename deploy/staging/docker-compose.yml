@@ -31,7 +31,7 @@ services:
     volumes:
       - sqldata:/var/opt/mssql/data
       - sqlbackup:/var/opt/mssql/backup
-      - ./sql/mssql.conf:/var/opt/mssql/mssql.conf:ro
+      - ./sql/mssql.conf:/var/opt/mssql/mssql.conf
       - ./secrets/tls:/certs:ro
       - ./sql/01-init.sql:/init/01-init.sql:ro
     # SIN "ports": SQL Server no se publica en el host ni en Internet.

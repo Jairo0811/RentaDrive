@@ -45,7 +45,11 @@ jobs:
 
       - name: SQL Server con TLS y base de staging
         run: |
-          docker compose --env-file .env.staging up -d --wait sqlserver
+          if ! docker compose --env-file .env.staging up -d --wait sqlserver; then
+            echo '--- logs de sqlserver ---'
+            docker compose --env-file .env.staging logs --no-color --tail=80 sqlserver 2>&1 | sed -E 's/(PASSWORD|password)=[^ ]+/\1=***/g'
+            exit 1
+          fi
           ./scripts/init-db.sh
 
       - name: Migraciones no destructivas
