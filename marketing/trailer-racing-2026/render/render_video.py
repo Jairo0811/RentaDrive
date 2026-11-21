@@ -47,6 +47,8 @@ SAFE_L, SAFE_R = (70, W - 70)
 SAFE_TOP, SAFE_BOTTOM = (260, 1500) if VERT else (60, H - 60)  # Reels/TikTok: UI arriba y abajo
 
 rng = np.random.default_rng(7)
+TITLE_Y = 345 if VERT else 1008  # título fuera del panel (vertical: dentro del área segura superior)
+CHIPS_Y = 1455 if VERT else 948
 
 
 # ------------------------------------------------------------------ utilidades
@@ -156,7 +158,7 @@ def title(base, text, t, t0, t1, y, size, fade_out=0.4, color=WHITE, tracking=0.
     a_out = 1.0 - ease((t - (t1 - fade_out)) / fade_out)
     alpha = a_in * a_out
     pop = 1.0 + (0.06 * (1 - ease_out((t - t0) / 0.35)) if impact else 0)
-    lines = wrap_title(text, 18 if VERT else 38)
+    lines = wrap_title(text, 25 if VERT else 46)
     s = size * pop
     for i, line in enumerate(lines):
         yy = y + (i - (len(lines) - 1) / 2) * s * 1.18
@@ -372,7 +374,7 @@ def hud_panel(base, img, rect, t_local, zoom0=1.0, zoom1=1.08, pan=(0.5, 0.5, 0.
     ImageDraw.Draw(border).rounded_rectangle((x0, y0, x1, y1), radius=22, outline=ELECTRIC + (int(200 * alpha),), width=3)
     out = Image.alpha_composite(out.convert("RGBA"), border).convert("RGB")
     out = corner_brackets(out, (x0 - 18, y0 - 18, x1 + 18, y1 + 18), alpha=alpha)
-    if label:
+    if label and alpha > 0.6 and not VERT:
         d = ImageDraw.Draw(out)
         d.text((x0 + 6, y0 - 44), label, font=font(22, False), fill=SILVER)
     return out
@@ -503,20 +505,18 @@ def split_scene(t, t0, t1, shots, title_text, chip_items=None, title_y=None):
         fade_out_ = 1 - ease((local - b) / 0.35) if local >= b else 1.0
         alpha = fade_in * fade_out_
         if VERT:
-            pw, ph = 700, 1244
-            px, py = (W - pw) // 2, SAFE_TOP + 40
-            rect = (px, py, px + pw, py + ph)
-            frame = hud_panel(frame, capture(name), rect, k, 1.0, 1.07, pan, alpha, label)
+            pw, ph = 523, 930
+            px, py = (W - pw) // 2, 470
         else:
-            pw, ph = 1560, 878
-            px, py = (W - pw) // 2, 120
-            rect = (px, py, px + pw, py + ph)
-            frame = hud_panel(frame, capture(name), rect, k, 1.0, 1.1, pan, alpha, label)
+            pw, ph = 1440, 810
+            px, py = (W - pw) // 2, 62
+        rect = (px, py, px + pw, py + ph)
+        frame = hud_panel(frame, capture(name), rect, k, 1.0, 1.07 if VERT else 1.1, pan, alpha, label)
         # barrido de luz en cada corte
         frame = light_sweep(frame, (local - a) / 0.45, width=0.12, alpha=0.7)
-    frame = title(frame, title_text, t, t0 + 0.05, t1, title_y if title_y else (H - 74 if not VERT else 1395), 54 if not VERT else 62, fade_out=0.3)
+    frame = title(frame, title_text, t, t0 + 0.05, t1, TITLE_Y, 54 if not VERT else 60, fade_out=0.3)
     if chip_items:
-        frame = chips(frame, chip_items, (H - 150 if not VERT else 1475), t, t0 + 0.8, 24 if not VERT else 24)
+        frame = chips(frame, chip_items, (CHIPS_Y), t, t0 + 0.8, 24)
     return frame
 
 
@@ -549,7 +549,7 @@ def scene4(t):
             ("v-reservas.png", 0.0, 4.0, "RESERVAS", (0.5, 0.3, 0.5, 0.55)),
             ("v-reserva-formulario.png", 3.8, 8.0, "NUEVA RESERVA", (0.5, 0.3, 0.5, 0.55)),
         ]
-    return split_scene(t, 20.0, 28.0, shots, "CADA RESERVA. CADA VEHÍCULO. TODO CONECTADO", ["RESERVAS", "CLIENTES", "ALQUILERES", "INSPECCIONES"] if not VERT else ["RESERVAS", "ALQUILERES", "INSPECCIONES"], title_y=H - 74 if not VERT else 1395)
+    return split_scene(t, 20.0, 28.0, shots, "CADA RESERVA. CADA VEHÍCULO. TODO CONECTADO", ["RESERVAS", "CLIENTES", "ALQUILERES", "INSPECCIONES"] if not VERT else ["RESERVAS", "ALQUILERES", "INSPECCIONES"])
 
 
 def scene5(t):
@@ -563,7 +563,7 @@ def scene5(t):
         frame = speed_lines(frame, t, 0.5 * (1 - morph), speed=2500, seed=13)
         frame = flash(frame, 0.7 * max(0, 1 - local / 0.2))
         frame = light_sweep(frame, (local - 2.0) / 0.6, alpha=0.8)
-        frame = title(frame, "PRECISIÓN PARA CADA DECISIÓN", t, 28.1, 37.0, H * 0.14 if not VERT else 1395, 54 if not VERT else 62, fade_out=0.4)
+        frame = title(frame, "PRECISIÓN PARA CADA DECISIÓN", t, 28.1, 37.0, TITLE_Y, 54 if not VERT else 60, fade_out=0.3)
         return frame
     if not VERT:
         shots = [
