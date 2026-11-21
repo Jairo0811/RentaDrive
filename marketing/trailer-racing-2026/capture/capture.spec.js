@@ -44,11 +44,12 @@ test('preparar datos ficticios', async ({ browser }) => {
 
     // Clientes ficticios adicionales (documentos y correos de ejemplo).
     const customers = [
-        ['Carlos', 'Méndez', '001-0000002-2', 'carlos.mendez@example.test', '809-555-0102', 'Santiago'],
-        ['Ana', 'Peña', '001-0000003-3', 'ana.pena@example.test', '809-555-0103', 'Punta Cana'],
+        ['Carlos', 'Méndez', 'DEMO000002', 'carlos.mendez@example.test', '809-555-0102', 'Santiago'],
+        ['Ana', 'Peña', 'DEMO000003', 'ana.pena@example.test', '809-555-0103', 'Punta Cana'],
     ];
     for (const [first, last, doc, email, phone, city] of customers) {
         await page.goto('/customers/create');
+        await page.locator('#document_type').selectOption('passport');
         await page.locator('#document_number').fill(doc);
         await page.locator('#first_name').fill(first);
         await page.locator('#last_name').fill(last);
@@ -59,7 +60,7 @@ test('preparar datos ficticios', async ({ browser }) => {
         const expiry = new Date(Date.now() + 3 * 365 * 864e5).toISOString().slice(0, 10);
         await page.locator('#license_expiry').fill(expiry);
         await page.getByRole('button', { name: /registrar cliente|guardar/i }).click();
-        await expect(page).toHaveURL(/\/customers/);
+        await expect(page).toHaveURL(/\/customers\/\d+$/);
     }
 
     await page.goto('/customers');
