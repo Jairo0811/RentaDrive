@@ -4,8 +4,8 @@ Cada cuadro describe el plano inicial y el movimiento. Los fotogramas de referen
 
 | # | Tiempo | Plano inicial → final | Cámara / movimiento | Elemento clave |
 |---|---|---|---|---|
-| 1 | 0:00–0:06 | Negro absoluto → faro LED azul (0,9 s) → rueda (1,9 s) → carrocería (2,9 s) → tacómetro (3,9 s) | Empuje lento en cada primer plano; cortes con destello en 0,85 s y 3,9 s; líneas de velocidad aceleran a 5,0 s | Texto de la nueva era a 4,1 s |
-| 2 | 0:06–0:12 | Auto del arte oficial, ángulo bajo, líneas de velocidad → negro → logotipo | Zoom 1,15→1,5 con panorámica; barrido de luz; el logotipo se revela con halo azul a 9,4 s | Logotipo auténtico RentaDrive |
+| 1 | 0:00–0:06 | Negro absoluto → barra LED y tacómetro al ralentí (0,8 s) → subida de RPM (3,9 s) → destello azul (4,6 s) | Destellos en 0,85 s y 3,9 s; líneas de velocidad aceleran desde 3,9 s | Texto de la nueva era a 4,1 s. Primeros planos de auto: pendientes (clip generativo/filmado) |
+| 2 | 0:06–0:12 | Líneas de luz sobre el ambiente oscuro de circuito → negro → logotipo | Barridos de luz; el logotipo se revela con halo azul a 9,4 s | Logotipo auténtico RentaDrive |
 | 3 | 0:12–0:20 | Flota en tarjetas → Flota en listado → ficha del vehículo | Zoom lento 1,0→1,1 dentro de panel HUD; barrido de luz en cada corte | Fotos, categorías, estados, tarifas y kilometraje reales |
 | 4 | 0:20–0:28 | Reservas → Clientes → Formulario (selector abierto) → Alquileres → Inspecciones | Cortes de ~1,7 s a ritmo de corcheas | Selector con búsqueda funcionando |
 | 5 | 0:28–0:37 | Tacómetro al 93 % → sus segmentos viajan y forman barras → Dashboard → Reportes → Facturas → Pagos | Morfosis del velocímetro en gráfico (29,5–30,5 s) | «Facturación interna» y «pagos manuales» (sin e-CF ni cobros en línea) |

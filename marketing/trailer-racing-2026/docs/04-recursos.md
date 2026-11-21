@@ -3,7 +3,7 @@
 ## Marca (del repositorio, propios)
 | Recurso | Uso |
 |---|---|
-| `public/images/rentadrive-racing.png` (arte oficial racing 1672×941) | Escenas 1, 2 y 6: primeros planos (faro, rueda, carrocería), auto en circuito, cierre |
+| `public/images/rentadrive-racing.png` (arte oficial racing 1672×941) | Escena 6 (cierre, revelado del logotipo), fondo desenfocado en escenas 2–5 y fotos de demostración de los vehículos. Ya NO se usa como si fuera un auto real en las escenas 1 y 2 |
 | `public/images/rentadrive-logo-dark.png` | Logotipo auténtico con letras blancas para fondo oscuro (escena 2B) |
 | `public/images/rentadrive-mark.png` | Reservado para versiones futuras (marca de agua no usada) |
 
@@ -27,6 +27,6 @@ Datos ficticios: clientes «María Rodríguez», «Carlos Méndez», «Ana Peña
 Inter Bold/SemiBold Italic (SIL OFL 1.1).
 
 ## Pendiente de herramientas externas (NO incluido en el render)
-- Clips cinematográficos reales/generativos de autos (circuito nocturno, garaje, asfalto mojado). Ver `05-prompts-generativos.md`. El render actual los sustituye con el arte oficial animado y gráficos HUD procedurales.
+- Clips cinematográficos reales/generativos de autos (circuito nocturno, garaje, asfalto mojado). Ver `05-prompts-generativos.md`. El render actual los sustituye con gráficos HUD procedurales (tacómetro, líneas de velocidad); NO hay planos de auto real en la apertura.
 - Locutor profesional (ver `03-voz-en-off.md`).
 - Mezcla/masterización final por un ingeniero de sonido si se usa en campaña pagada.

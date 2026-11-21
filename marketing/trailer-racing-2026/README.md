@@ -42,7 +42,7 @@ Se revisaron fotogramas de ambos videos (cada escena) y se corrigieron solapes d
 
 ## Estado honesto
 - **Hecho y renderizado:** ambas versiones con capturas reales, arte y logotipo oficiales, música/efectos originales y voz sintética de referencia.
-- **Pendiente (herramientas externas):** clips generativos o filmados de autos (ver `docs/05-prompts-generativos.md`), locutor profesional y masterización de sonido. Los planos de autos del render son recortes y animaciones del arte oficial, no video de autos real.
+- **Pendiente (herramientas externas):** clips generativos o filmados de autos (ver `docs/05-prompts-generativos.md`), locutor profesional y masterización de sonido. El render NO contiene video de autos: la apertura usa tacómetro y gráficos HUD. Un primer render usaba recortes del auto del arte del logotipo y se retiró porque se confundía con el logo.
 
 ## Distribución
 Los MP4 no se suben al repositorio de código. Opciones: GitHub Release (adjunto), almacenamiento del equipo o Git LFS si se decide versionarlos.

@@ -433,39 +433,34 @@ def car_crop(box, size, zoom=1.0, shift=(0, 0)):
 
 
 def scene1(t):
-    """0–6 s: El despertar. Negro → primeros planos → tablero → texto."""
+    """0–6 s: El despertar. Negro → arranque → tacómetro que despierta → destello azul → texto.
+    Sin planos de auto: el auto real queda pendiente de un clip generativo/filmado (ver docs)."""
     frame = Image.new("RGB", (W, H), (0, 0, 0))
-    shots = [
-        (0.9, 1.9, (850, 455, 1010, 515), "faro"),
-        (1.9, 2.9, (1000, 470, 1110, 610), "rueda"),
-        (2.9, 3.9, (760, 400, 1100, 560), "carroceria"),
-    ]
-    for a, b, box, _ in shots:
-        if a <= t < b:
-            k = (t - a) / (b - a)
-            img = car_crop(box, (W, H), zoom=1.0 + 0.25 * k, shift=(10 * k, 0))
-            img = ImageEnhance_brightness(img, 0.35 + 0.65 * ease_out(k * 3) * (1 - 0.3 * ease(k * 1.0)))
-            frame = vignette(img, 0.9)
-            frame = glow_text(frame, "", 10, (0, 0))  # no-op estable
-            if not VERT:
-                frame = corner_brackets(frame, (120, 90, W - 120, H - 90), alpha=0.35 + 0.4 * k)
-            break
-    if 3.9 <= t < 5.0:
-        k = (t - 3.9) / 1.1
-        frame = Image.new("RGB", (W, H), (2, 6, 16))
-        rpm = 0.12 + 0.8 * ease(k)
-        frame = tach_gauge(frame, (W // 2, int(H * 0.5)), int(min(W, H) * 0.4), rpm)
-        frame = speed_lines(frame, t, 0.25 + 0.5 * k, speed=2200, seed=3)
-    if t >= 5.0:
-        k = (t - 5.0) / 1.0
+    cy = int(H * (0.6 if not VERT else 0.5))
+    radius = int(min(W, H) * 0.33)
+    if t >= 0.8:
+        wake = ease_out((t - 0.8) / 1.2)
+        if t < 3.9:
+            jitter = 0.012 * math.sin(t * 38) + 0.008 * math.sin(t * 61)
+            value = 0.07 + 0.03 * ease((t - 1.6) / 1.2) + jitter
+        elif t < 5.0:
+            value = 0.1 + 0.82 * ease((t - 3.9) / 1.1)
+        else:
+            value = 0.95
         base = Image.new("RGB", (W, H), (2, 6, 16))
-        frame = tach_gauge(base, (W // 2, int(H * 0.5)), int(min(W, H) * 0.4), 0.97, alpha=1 - 0.4 * ease(k))
-        frame = speed_lines(frame, t, 0.8 + 0.2 * k, speed=3400, seed=3)
-    frame = flash(frame, 0.9 * max(0, 1 - abs(t - 3.9) / 0.1) + 0.8 * max(0, 1 - abs(t - 0.85) / 0.1))
+        frame = tach_gauge(base, (W // 2, cy), radius, max(0.02, value), alpha=wake * (1.0 if t < 5.0 else 1 - 0.4 * ease(t - 5.0)))
+        # barra LED horizontal que se enciende desde el centro (arranque)
+        led = ease_out((t - 0.8) / 0.9)
+        d = ImageDraw.Draw(frame)
+        half = int(W * 0.42 * led)
+        d.line([(W // 2 - half, cy + radius + 60), (W // 2 + half, cy + radius + 60)], fill=ELECTRIC, width=3)
+    if t >= 3.9:
+        frame = speed_lines(frame, t, min(1.0, 0.25 + 0.75 * ease((t - 3.9) / 1.6)), speed=2200 + 1200 * ease((t - 3.9) / 2.0), seed=3)
+    frame = flash(frame, 0.55 * max(0, 1 - abs(t - 0.85) / 0.12) + 0.9 * max(0, 1 - abs(t - 3.9) / 0.1))
     frame = light_sweep(frame, (t - 3.6) / 0.7)
-    # destello azul que cruza la pantalla antes del texto
     frame = light_sweep(frame, (t - 4.6) / 0.9, width=0.22, alpha=1.0, angle=0.0)
-    frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.1, 6.0, H * (0.22 if not VERT else 0.2), 60 if not VERT else 74, fade_out=0.15)
+    frame = vignette(frame, 0.8)
+    frame = title(frame, "UNA NUEVA ERA DE GESTIÓN AUTOMOTRIZ", t, 4.1, 6.0, H * (0.15 if not VERT else 0.2), 60, fade_out=0.15)
     return frame
 
 
@@ -477,13 +472,15 @@ def ImageEnhance_brightness(img, f):
 def scene2(t):
     """6–12 s: Identidad. Auto del arte oficial en el circuito → logotipo auténtico."""
     local = t - 6.0
-    # fase A (6–9.2): el arte oficial avanza con cámara baja y líneas de velocidad
+    # fase A (6–9.4): velocidad abstracta (sin auto): líneas de luz sobre el ambiente oscuro del circuito
     if local < 3.4:
         k = local / 3.4
-        frame = cover(ART(), (W, H), zoom=1.15 + 0.35 * ease(k), cx=0.62 - 0.1 * k, cy=0.62 - 0.05 * k)
-        frame = ImageEnhance_brightness(frame, 0.55 + 0.35 * min(1, k * 2))
-        frame = speed_lines(frame, t, 0.9 - 0.4 * k, speed=2600, seed=5)
+        frame = dark_bg(t)
+        frame = ImageEnhance_brightness(frame, 0.7 + 0.3 * k)
+        frame = speed_lines(frame, t, 1.0 - 0.3 * k, speed=3000 + 800 * k, seed=5)
+        frame = speed_lines(frame, t * 1.3, 0.7, speed=2100, seed=9)
         frame = light_sweep(frame, (t - 6.0) / 0.8, alpha=0.9)
+        frame = light_sweep(frame, (local - 1.7) / 1.0, width=0.1, alpha=0.8, angle=0.0)
         frame = vignette(frame, 0.8)
         frame = flash(frame, 0.6 * max(0, 1 - (t - 6.0) / 0.25))
         out_to_black = ease((local - 2.6) / 0.8)
