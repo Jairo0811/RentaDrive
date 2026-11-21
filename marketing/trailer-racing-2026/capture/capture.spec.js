@@ -68,15 +68,22 @@ test('preparar datos ficticios', async ({ browser }) => {
         ['Peña', 'Económico', 'A345678'],
     ];
     let firstUrl = '';
-    for (const [customer, category, plate] of reservations) {
+    for (const [index, [customer, category, plate]] of reservations.entries()) {
         await page.goto('/reservations/create');
+        const day = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+        await page.locator('#start_at').fill(`${day(1 + index)}T09:00`);
+        await page.locator('#end_at').fill(`${day(3 + index)}T09:00`);
         await pick(page, 'customer_id', customer);
         const value = await page.locator('#vehicle_category_id option', { hasText: category }).first().getAttribute('value');
         await page.locator('#vehicle_category_id').selectOption(value);
         await pick(page, 'vehicle_id', plate);
         if (!(await page.locator('#daily_rate').inputValue())) await page.locator('#daily_rate').fill('2600');
         await page.getByRole('button', { name: 'Crear reserva' }).click();
-        await expect(page).toHaveURL(/\/reservations\/\d+$/);
+        await page.waitForLoadState('networkidle');
+        if (!/\/reservations\/\d+$/.test(page.url())) {
+            const errors = (await page.locator('.text-red-400, .text-red-500, .text-red-600, [role=alert]').allInnerTexts()).join(' | ');
+            throw new Error(`Reserva ${customer}/${plate} no creada: ${errors}`);
+        }
         firstUrl ||= page.url();
     }
 
