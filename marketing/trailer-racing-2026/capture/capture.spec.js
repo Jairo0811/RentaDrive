@@ -8,6 +8,7 @@ const photos = (n) => path.join(here, `../assets/demo-vehicles/vehiculo-demo-${n
 const out = (name) => path.join(here, '../captures', name);
 
 test.describe.configure({ mode: 'serial' });
+const debug = [];
 
 const DESKTOP = { width: 1920, height: 1080 };
 const MOBILE = { width: 540, height: 960 };
@@ -61,6 +62,9 @@ test('preparar datos ficticios', async ({ browser }) => {
         await expect(page).toHaveURL(/\/customers/);
     }
 
+    await page.goto('/customers');
+    debug.push('clientes: ' + (await page.locator('main').innerText()).replace(/\s+/g, ' ').slice(0, 500));
+
     // Tres reservas; la primera se convierte en alquiler con inspección y pago.
     const reservations = [
         ['Rodríguez', 'Sedán', 'A123456'],
@@ -74,6 +78,7 @@ test('preparar datos ficticios', async ({ browser }) => {
         await page.locator('#start_at').fill(`${day(1 + index)}T09:00`);
         await page.locator('#end_at').fill(`${day(3 + index)}T09:00`);
         await pick(page, 'customer_id', customer);
+        debug.push(`${customer}: cliente=${await page.locator('input[name=customer_id]').inputValue()} texto=${await page.locator('#customer_id').inputValue()}`);
         const value = await page.locator('#vehicle_category_id option', { hasText: category }).first().getAttribute('value');
         await page.locator('#vehicle_category_id').selectOption(value);
         await pick(page, 'vehicle_id', plate);
@@ -85,7 +90,7 @@ test('preparar datos ficticios', async ({ browser }) => {
         await page.waitForLoadState('networkidle');
         if (!/\/reservations\/\d+$/.test(page.url())) {
             const errors = (await page.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ').slice(0, 1400);
-            throw new Error(`Reserva ${customer}/${plate} no creada: form=${formValues} POST=${response ? response.status() + ' -> ' + (response.headers().location ?? '') : 'sin petición'} | ${errors.slice(-300)} | url=${page.url()}`);
+            throw new Error(`Reserva ${customer}/${plate} no creada: DEBUG=${debug.join(' // ')} form=${formValues} POST=${response ? response.status() + ' -> ' + (response.headers().location ?? '') : 'sin petición'} | ${errors.slice(-300)} | url=${page.url()}`);
         }
         firstUrl ||= page.url();
     }
