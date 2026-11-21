@@ -100,7 +100,7 @@ services:
     image: cloudflare/cloudflared:2026.11.0
     command: ["tunnel", "--no-autoupdate", "run"]
     environment:
-      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?define CLOUDFLARE_TUNNEL_TOKEN}
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}  # solo con --profile tunnel; debe definirse en .env.staging
     depends_on: [web]
     restart: unless-stopped
     security_opt: ["no-new-privileges:true"]
