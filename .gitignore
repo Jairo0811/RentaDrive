@@ -28,3 +28,7 @@ Thumbs.db
 
 /test-results/
 /playwright-report/
+
+marketing/trailer-racing-2026/captures/.pw-output/
+marketing/trailer-racing-2026/out/
+marketing/trailer-racing-2026/render/.work/

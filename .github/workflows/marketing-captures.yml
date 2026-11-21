@@ -1,0 +1,124 @@
+name: Marketing captures
+
+# Manual: genera capturas reales de la interfaz con datos ficticios para el tráiler.
+# Usa una base descartable (RentaDriveE2E) del servicio SQL Server del runner; nunca RentaDriveDb.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  captures:
+    runs-on: ubuntu-24.04
+
+    env:
+      DB_CONNECTION: sqlsrv
+      DB_HOST: 127.0.0.1
+      DB_PORT: 1433
+      DB_DATABASE: RentaDriveE2E
+      DB_USERNAME: sa
+      DB_PASSWORD: CI_RentaDrive_2026!
+      DB_ENCRYPT: 'no'
+      DB_TRUST_SERVER_CERTIFICATE: 'true'
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: http://127.0.0.1:8000
+      MAIL_MAILER: log
+      LOG_CHANNEL: single
+      CACHE_STORE: file
+      PHP_CLI_SERVER_WORKERS: '4'
+      E2E_BASE_URL: http://127.0.0.1:8000
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: CI_RentaDrive_2026!
+        ports:
+          - 1433:1433
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Microsoft ODBC Driver 18
+        run: |
+          curl -sSL -o /tmp/packages-microsoft-prod.deb \
+            https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, fileinfo, gd, mbstring, pdo_sqlsrv, sqlsrv, xml, zip
+          coverage: none
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install and build
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress
+          npm ci
+          npm run build
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          PASSWORD="$(openssl rand -hex 16)Aa1!"
+          echo "::add-mask::$PASSWORD"
+          echo "RENTADRIVE_ADMIN_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+          echo "E2E_ADMIN_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+          echo "RENTADRIVE_ADMIN_EMAIL=demo-admin@rentadrive.test" >> "$GITHUB_ENV"
+          echo "E2E_ADMIN_EMAIL=demo-admin@rentadrive.test" >> "$GITHUB_ENV"
+
+      - name: Create throwaway database
+        run: |
+          php <<'PHP'
+          <?php
+          $deadline = time() + 90;
+          do {
+              try {
+                  $c = new PDO('sqlsrv:Server=127.0.0.1,1433;Database=master;Encrypt=no;TrustServerCertificate=yes', getenv('DB_USERNAME'), getenv('DB_PASSWORD'), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                  $c->exec("IF DB_ID(N'RentaDriveE2E') IS NULL CREATE DATABASE [RentaDriveE2E]");
+                  exit(0);
+              } catch (Throwable $e) {
+                  if (time() >= $deadline) { fwrite(STDERR, $e->getMessage().PHP_EOL); exit(1); }
+                  sleep(3);
+              }
+          } while (true);
+          PHP
+
+      - name: Migrate and seed fictitious data
+        run: |
+          php artisan migrate --force
+          php artisan db:seed --force
+          php artisan storage:link
+
+      - name: Start application
+        run: |
+          nohup php artisan serve --host=127.0.0.1 --port=8000 > serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS -o /dev/null http://127.0.0.1:8000/login && exit 0; sleep 2; done
+          cat serve.log; exit 1
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Capture screens
+        run: npx playwright test -c marketing/trailer-racing-2026/capture/playwright.config.js
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trailer-captures
+          path: |
+            marketing/trailer-racing-2026/captures/*.png
+            serve.log
+            storage/logs/laravel.log
+          retention-days: 7
