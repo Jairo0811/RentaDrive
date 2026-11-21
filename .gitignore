@@ -37,3 +37,4 @@ marketing/trailer-racing-2026/render/.work/
 /deploy/staging/.env.app
 /deploy/staging/secrets/
 /deploy/staging/backups/
+marketing/trailer-racing-2026/render/__pycache__/
