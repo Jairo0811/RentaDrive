@@ -41,6 +41,7 @@
             },
         }"
         @keydown.escape.window="sidebarOpen = false"
+        @resize.window.debounce.100ms="desktop = window.matchMedia('(min-width: 1024px)').matches; if (desktop) sidebarOpen = false"
     >
         <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
         <a href="#primary-navigation" class="skip-link left-56">Saltar a la navegación</a>
