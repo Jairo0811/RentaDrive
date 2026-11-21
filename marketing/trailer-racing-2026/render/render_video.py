@@ -494,18 +494,15 @@ def ImageEnhance_brightness(img, f):
 
 
 def scene2(t):
-    """6–12 s: Identidad. Auto del arte oficial en el circuito → logotipo auténtico."""
+    """6–12 s: Identidad. Clip C (auto en el circuito) → logotipo auténtico."""
     local = t - 6.0
-    # fase A (6–9.4): velocidad abstracta (sin auto): líneas de luz sobre el ambiente oscuro del circuito
+    # fase A (6–9.4): clip C del auto en el circuito
     if local < 3.4:
-        k = local / 3.4
-        frame = dark_bg(t)
-        frame = ImageEnhance_brightness(frame, 0.7 + 0.3 * k)
-        frame = speed_lines(frame, t, 1.0 - 0.3 * k, speed=3000 + 800 * k, seed=5)
-        frame = speed_lines(frame, t * 1.3, 0.7, speed=2100, seed=9)
-        frame = light_sweep(frame, (t - 6.0) / 0.8, alpha=0.9)
-        frame = light_sweep(frame, (local - 1.7) / 1.0, width=0.1, alpha=0.8, angle=0.0)
-        frame = vignette(frame, 0.8)
+        # clip generativo C (auto genérico en circuito mojado, travelling lateral); audio descartado
+        frame = clip_frame("clipC-circuito", local, fade_in=0.01)
+        frame = speed_lines(frame, t, 0.25, speed=3000, seed=5)
+        frame = light_sweep(frame, (t - 6.0) / 0.8, alpha=0.7)
+        frame = vignette(frame, 0.6)
         frame = flash(frame, 0.6 * max(0, 1 - (t - 6.0) / 0.25))
         out_to_black = ease((local - 2.6) / 0.8)
         frame = blend(frame, Image.new("RGB", (W, H), (0, 0, 0)), out_to_black)
