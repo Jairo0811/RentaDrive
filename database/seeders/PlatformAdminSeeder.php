@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Support\Security\DemoCredentials;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,8 +13,14 @@ final class PlatformAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
-            $this->command?->warn('El SuperAdmin de plataforma no se crea fuera de entornos local/testing.');
+        if (($reason = DemoCredentials::refusalReason()) !== null) {
+            $this->command?->warn($reason);
+
+            return;
+        }
+
+        if (! self::hasConfiguredPassword()) {
+            $this->command?->warn('No hay contraseña configurada para la cuenta de demostración; no se crea.');
 
             return;
         }
@@ -33,5 +40,10 @@ final class PlatformAdminSeeder extends Seeder
         ])->save();
 
         $user->syncRoles([]);
+    }
+
+    private static function hasConfiguredPassword(): bool
+    {
+        return (string) config('rentadrive.seed.platform_admin_password') !== '';
     }
 }

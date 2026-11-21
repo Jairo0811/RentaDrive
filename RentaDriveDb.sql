@@ -1,9 +1,24 @@
+/*
+  Creación inicial de la base y del login de aplicación para un servidor SQL Server de DESARROLLO.
+
+  Uso (la contraseña se entrega por variable; NO se guarda en el repositorio):
+      sqlcmd -S <servidor> -E -i RentaDriveDb.sql -v RENTADRIVE_DB_NAME="RentaDriveDb" RENTADRIVE_APP_PASSWORD="<contraseña-larga-única>"
+
+  Ambas variables son obligatorias (sin valores por defecto). Para staging usa RENTADRIVE_DB_NAME="RentaDriveStaging".
+
+  Reglas:
+  - No reutilices la contraseña entre entornos ni la subas a Git.
+  - El script NO modifica la contraseña de un login existente (solo lo crea si falta).
+  - db_ddladmin permite ejecutar migraciones. En staging/producción usa preferiblemente un login de migración
+    separado y deja al login de la aplicación solo con db_datareader/db_datawriter (ver docs/staging-private.md).
+*/
+:on error exit
 USE [master];
 GO
 
-IF DB_ID(N'RentaDriveDb') IS NULL
+IF DB_ID(N'$(RENTADRIVE_DB_NAME)') IS NULL
 BEGIN
-    CREATE DATABASE [RentaDriveDb];
+    CREATE DATABASE [$(RENTADRIVE_DB_NAME)];
 END;
 GO
 
@@ -14,20 +29,13 @@ IF NOT EXISTS (
 )
 BEGIN
     CREATE LOGIN [rentadrive_app]
-    WITH PASSWORD = 'RentaDrive_Local_2026!',
+    WITH PASSWORD = '$(RENTADRIVE_APP_PASSWORD)',
          CHECK_POLICY = ON,
          CHECK_EXPIRATION = OFF;
-END
-ELSE
-BEGIN
-    ALTER LOGIN [rentadrive_app]
-    WITH PASSWORD = 'RentaDrive_Local_2026!';
-
-    ALTER LOGIN [rentadrive_app] ENABLE;
 END;
 GO
 
-USE [RentaDriveDb];
+USE [$(RENTADRIVE_DB_NAME)];
 GO
 
 IF NOT EXISTS (

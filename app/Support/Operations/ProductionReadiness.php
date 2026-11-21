@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support\Operations;
 
+use App\Support\Security\DemoCredentials;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
@@ -63,6 +65,59 @@ final class ProductionReadiness
             $problems[] = 'Las automatizaciones necesitan un proveedor real de correo.';
         }
 
+        return [...$problems, ...$this->hardeningProblems()];
+    }
+
+    /**
+     * Controles de endurecimiento adicionales (sesión, claves, proxies, logs, credenciales de base de datos).
+     *
+     * @return list<string>
+     */
+    public function hardeningProblems(): array
+    {
+        $problems = [];
+
+        if (! in_array(strtolower((string) config('session.same_site')), ['lax', 'strict'], true)) {
+            $problems[] = 'SESSION_SAME_SITE debe ser lax o strict.';
+        }
+
+        if (in_array(config('session.driver'), ['array', 'null'], true)) {
+            $problems[] = 'SESSION_DRIVER debe utilizar un backend persistente.';
+        }
+
+        $key = (string) config('app.key');
+        $rawKey = str_starts_with($key, 'base64:') ? base64_decode(substr($key, 7), true) : $key;
+        if ($key !== '' && (! is_string($rawKey) || strlen($rawKey) < 32)) {
+            $problems[] = 'APP_KEY debe tener al menos 32 bytes (php artisan key:generate).';
+        }
+
+        $username = (string) config('database.connections.sqlsrv.username');
+        if (strtolower($username) === 'sa') {
+            $problems[] = 'DB_USERNAME no debe ser la cuenta sa; usa una cuenta de mínimos privilegios.';
+        }
+
+        if ((string) config('database.connections.sqlsrv.password') === '') {
+            $problems[] = 'DB_PASSWORD no puede estar vacío.';
+        }
+
+        if (in_array(strtolower((string) config('logging.channels.single.level')), ['debug', 'info'], true)) {
+            $problems[] = 'LOG_LEVEL debe ser warning o superior para no registrar datos innecesarios.';
+        }
+
+        $proxies = trim((string) config('rentadrive.security.trusted_proxies'));
+        if (in_array($proxies, ['*', '**'], true)) {
+            $problems[] = 'TRUSTED_PROXIES no debe ser comodín; lista las IP/CIDR del proxy o túnel.';
+        }
+
+        if ((string) config('services.rentadrive_gateway.webhook_secret', '') !== '') {
+            $problems[] = 'RENTA_PAYMENT_WEBHOOK_SECRET es solo para sandbox local/testing; elimínalo.';
+        }
+
+        $allowedOrigins = (array) config('cors.allowed_origins', []);
+        if (in_array('*', $allowedOrigins, true) || config('cors.supports_credentials') === true) {
+            $problems[] = 'CORS no debe permitir cualquier origen ni credenciales.';
+        }
+
         return $problems;
     }
 
@@ -76,6 +131,8 @@ final class ProductionReadiness
         } catch (Throwable) {
             $problems[] = 'No se pudo verificar la conexión a la base de datos.';
         }
+
+        $problems = [...$problems, ...$this->predictableCredentialProblems()];
 
         $key = 'rentadrive:readiness:'.Str::uuid();
         try {
@@ -114,5 +171,43 @@ final class ProductionReadiness
         }
 
         return $problems;
+    }
+
+    /**
+     * Solo lectura: detecta cuentas de demostración previsibles aún activas (p. ej. una base restaurada desde local).
+     *
+     * @return list<string>
+     */
+    public function predictableCredentialProblems(): array
+    {
+        try {
+            $users = DB::table('users')
+                ->whereIn('email', DemoCredentials::KNOWN_DEFAULT_EMAILS)
+                ->get(['email', 'password']);
+        } catch (Throwable) {
+            return [];
+        }
+
+        $problems = [];
+        foreach ($users as $user) {
+            foreach (DemoCredentials::KNOWN_DEFAULT_PASSWORDS as $password) {
+                if (is_string($user->password) && self::passwordMatches($password, $user->password)) {
+                    $problems[] = 'La cuenta '.$user->email.' conserva una contraseña de demostración conocida; cámbiala o elimínala.';
+
+                    continue 2;
+                }
+            }
+        }
+
+        return $problems;
+    }
+
+    private static function passwordMatches(string $plain, string $hash): bool
+    {
+        try {
+            return Hash::check($plain, $hash);
+        } catch (Throwable) {
+            return false;
+        }
     }
 }

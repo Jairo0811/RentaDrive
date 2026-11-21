@@ -190,6 +190,8 @@ Estado verificado al 20-11-2026 sobre `main` (`e739023`, CI verde). Solo se list
 | PR #43 | Fusionado. Menú lateral móvil inerte cuando está cerrado y gestión de foco. |
 | PR #12 | **Cerrado sin fusionar el 19-11-2026; la rama `feature/commercial-booking-ui` se conserva.** Sus piezas útiles se recuperan una a una en ramas nuevas con CI (ver «Piezas pendientes de extraer»). La calidad y la seguridad de ese código no se han revisado. |
 
+| Seguridad previa a staging | Implementado y probado en CI en la PR de endurecimiento (ver `docs/security-audit.md`). Pendiente: rotar el login SQL local, CSP, MFA y escaneo de secretos en CI. |
+
 ### Piezas pendientes de extraer de la rama de #12
 
 Cada una irá en un PR propio, con pruebas y revisión de seguridad previa. Ninguna está en `main`.

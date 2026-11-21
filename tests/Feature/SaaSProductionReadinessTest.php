@@ -131,6 +131,13 @@ final class SaaSProductionReadinessTest extends TestCase
                 'queue.default' => 'database',
                 'cache.default' => 'database',
                 'rentadrive.automation.enabled' => false,
+                'session.same_site' => 'lax',
+                'session.driver' => 'database',
+                'database.connections.sqlsrv.username' => 'rentadrive_app',
+                'database.connections.sqlsrv.password' => 'x-not-a-real-password',
+                'logging.channels.single.level' => 'warning',
+                'rentadrive.security.trusted_proxies' => '127.0.0.1',
+                'services.rentadrive_gateway.webhook_secret' => '',
             ]);
 
             $this->assertSame([], app(ProductionReadiness::class)->configurationProblems());

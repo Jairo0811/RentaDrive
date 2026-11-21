@@ -27,6 +27,13 @@ El preflight comprueba configuración, SQL Server, cache y lectura/escritura en 
 
 Si existe proxy inverso, configurar y restringir proxies de confianza para que HTTPS sea detectado correctamente antes de habilitar HSTS. Publicar exclusivamente el directorio public/.
 
+## Proxies, CORS y contraseñas
+
+- `TRUSTED_PROXIES` (IP/CIDR separados por coma) define qué proxy puede declarar `X-Forwarded-Proto`. Con un túnel local usa `127.0.0.1`. El comodín `*` se rechaza en `production-check`.
+- `config/cors.php` no admite ningún origen ni credenciales: no hay API pública para navegadores.
+- En producción/staging las contraseñas exigen 12+ caracteres con mayúsculas, números y símbolos.
+- Los seeders de usuarios solo corren en local/testing con `APP_URL` local; `production-check` detecta cuentas demo con contraseña conocida. Ver `docs/security-audit.md`.
+
 ## Operación continua
 
 Ejecutar php artisan schedule:run cada minuto desde un scheduler controlado. Supervisar php artisan queue:work --tries=3 --timeout=60 con systemd/Supervisor, reinicios y alertas. El comando rentadrive:expire-trials suspende trials vencidos de forma idempotente y deja historial. rentadrive:automations requiere opt-in de entorno y de empresa.

@@ -8,6 +8,7 @@ use App\Domain\Security\Enums\RoleName;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\Security\DemoCredentials;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,8 +16,14 @@ final class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
-            $this->command?->warn('El usuario de demostración no se crea fuera de entornos local/testing.');
+        if (($reason = DemoCredentials::refusalReason()) !== null) {
+            $this->command?->warn($reason);
+
+            return;
+        }
+
+        if (! self::hasConfiguredPassword()) {
+            $this->command?->warn('No hay contraseña configurada para la cuenta de demostración; no se crea.');
 
             return;
         }
@@ -58,5 +65,10 @@ final class AdminUserSeeder extends Seeder
         ])->save();
 
         $administrator->syncRoles([RoleName::ADMINISTRATOR->value]);
+    }
+
+    private static function hasConfiguredPassword(): bool
+    {
+        return (string) config('rentadrive.seed.admin_password') !== '';
     }
 }
