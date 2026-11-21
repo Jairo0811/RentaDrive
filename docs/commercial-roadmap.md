@@ -177,16 +177,18 @@ RentaDrive no considera intentos sandbox ni borradores fiscales como cobros o co
 
 ## Registro de revisión (noviembre de 2026)
 
-Estado verificado al 19-11-2026 sobre `main` (`4656b5b`). Solo se listan hechos comprobados.
+Estado verificado al 20-11-2026 sobre `main` (`e739023`, CI verde). Solo se listan hechos comprobados. El detalle de pruebas automatizadas, verificaciones visuales y pendientes está en [`docs/responsive-test-matrix.md`](responsive-test-matrix.md).
 
 | Elemento | Estado |
 | --- | --- |
-| PR #21 a #26, #28 | Fusionados. Interfaz de flota y dashboard, accesibilidad de filtros y estados vacíos, enmascarado del documento en el listado de clientes, contraste, validación del rango de Reportes y correcciones de tablas. |
-| PR #27 | Fusionado. El correo del administrador ya no se precarga en el login fuera de `local` y `testing`. |
+| PR #21 a #28 | Fusionados. Interfaz de flota y dashboard, accesibilidad de filtros y estados vacíos, enmascarado del documento en el listado de clientes, contraste, validación del rango de Reportes, correcciones de tablas y correo del administrador sin precarga fuera de `local`/`testing`. |
 | PR #29 a #31 | Fusionados. Base e-CF desacoplada (sin emisión), lista de habilitación y optimización móvil de Fiscal RD. |
-| PR #12 | **Cerrado sin fusionar el 19-11-2026; la rama `feature/commercial-booking-ui` se conserva.** Tenía 234 commits propios, 37 archivos en conflicto con `main` y reimplementaba las fases 3 a 7 de otra manera (cinco archivos añadidos por ambos lados). Sus piezas útiles se recuperan una a una en ramas nuevas con CI (ver «Piezas pendientes de extraer»). La calidad y la seguridad de ese código no se han revisado. |
-| PR #33 | Borrador con CI verde. Foto principal del vehículo, implementación propia (no copiada de #12). Requiere `php artisan migrate` y `php artisan storage:link`. |
-| PR #34 y #35 | Fusionados. Altura táctil mínima en botones de componentes, enlace del login y toggles «Ver detalle»/«Editar». Medido en navegador local: 0 objetivos menores de 24 px en Auditoría y Catálogos a 320 y 1280 px. |
+| PR #33 | Fusionado. Foto principal del vehículo (migración `photo_path`, disco configurable). Requiere `php artisan migrate` y `php artisan storage:link`. |
+| PR #34, #35, #37, #38 | Fusionados. Alturas táctiles mínimas, Flota en tarjetas en móvil y tabla desde `md`, Pagos sin formulario cuando no hay facturas con balance. |
+| PR #39 a #41 | Fusionados. Recuperación de contraseña en español, portal público de reservas responsive y fotografías uniformes en Flota. |
+| PR #42 | Fusionado. Selectores con búsqueda en el servidor (clientes, vehículos, alquileres, facturas) con límite de 15 resultados, permisos por operación y aislamiento entre empresas. |
+| PR #43 | Fusionado. Menú lateral móvil inerte cuando está cerrado y gestión de foco. |
+| PR #12 | **Cerrado sin fusionar el 19-11-2026; la rama `feature/commercial-booking-ui` se conserva.** Sus piezas útiles se recuperan una a una en ramas nuevas con CI (ver «Piezas pendientes de extraer»). La calidad y la seguridad de ese código no se han revisado. |
 
 ### Piezas pendientes de extraer de la rama de #12
 
@@ -200,10 +202,10 @@ Cada una irá en un PR propio, con pruebas y revisión de seguridad previa. Ning
 - [ ] `Dockerfile`
 - [ ] Calendario de flota
 
-### Verificado en navegador (administrador, 809 px, entorno local)
+### Verificado en navegador (administrador, entorno local)
 
-Dashboard, Flota, Clientes, Reservas, Alquileres, Inspecciones, Facturas, Pagos, Reportes y Catálogos: sin imágenes sin `alt` ni botones sin nombre, y con contraste medido por script (WCAG AA). Los cambios del PR #28 se verificaron con CI, no volviendo a medir en navegador.
+Ver la matriz por ancho en `docs/responsive-test-matrix.md`: 320, 360, 390, 640, 768, 844 × 390, 1280 y 1920 px en las pantallas allí listadas, sin desbordamiento horizontal ni contraste fallido según el script de medición, más pruebas con clic y teclado del selector con búsqueda y del menú móvil.
 
 ### Sin verificar
 
-Anchos 360, 390 y 1920 px en casi todas las pantallas, y 320, 768 y 1280 px en las no medidas (Pagos, Facturas, Reportes, detalles, portal público); navegación por teclado y lector de pantalla; formularios de edición; portal público y recuperación de contraseña; Safari iOS; pruebas de navegador automatizadas.
+Recuperación de contraseña y login a 360/390 px; estados de error de los selectores con búsqueda; disponibilidad, cotización y confirmación del portal público con datos reales; zoom real al 200 % y 400 %; lector de pantalla; Safari iOS y Chrome Android reales; pruebas E2E de navegador automatizadas en CI.

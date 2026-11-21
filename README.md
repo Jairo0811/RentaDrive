@@ -404,7 +404,7 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 | 6 — Automation | 🟡 Email opt-in y deduplicación; WhatsApp pendiente |
 | 7 — SaaS Production | 🟡 Preparación y preflight; infraestructura real pendiente |
 
-Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico y el registro de revisión de noviembre de 2026 (estado de los pull requests y de lo verificado en navegador).
+Consulta [`docs/commercial-roadmap.md`](docs/commercial-roadmap.md) para el detalle técnico y el registro de revisión de noviembre de 2026 (estado de los pull requests y de lo verificado en navegador). Las pruebas automatizadas, las verificaciones visuales y los pendientes de responsive y accesibilidad están separados en [`docs/responsive-test-matrix.md`](docs/responsive-test-matrix.md).
 
 ## 🎓 Información académica
 
