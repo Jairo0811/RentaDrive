@@ -4,6 +4,9 @@ use App\Domain\Automation\Services\AutomationDispatcher;
 use App\Models\User;
 use App\Support\Commercial\CompanyLifecycle;
 use App\Support\Operations\ProductionReadiness;
+use App\Support\Operations\StagingGuard;
+use App\Support\Security\DemoCredentials;
+use Database\Seeders\StagingFictionalSeeder;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -100,3 +103,38 @@ Artisan::command('rentadrive:platform-admin {email} {--name=SuperAdmin RentaDriv
 
     return Command::SUCCESS;
 })->purpose('Provisiona o actualiza un SuperAdmin de RentaDrive sin exponer la contraseña.');
+
+Artisan::command('rentadrive:staging-seed {--admin-email=admin@staging.rentadrive.test}', function (): int {
+    if (($reason = StagingGuard::refusalReason()) !== null) {
+        $this->error($reason);
+
+        return Command::FAILURE;
+    }
+
+    $email = (string) $this->option('admin-email');
+    $password = (string) config('rentadrive.staging.admin_password');
+    if ($password === '') {
+        $password = (string) $this->secret('Contraseña del administrador ficticio');
+    }
+
+    $validator = Validator::make(
+        ['email' => $email, 'password' => $password],
+        [
+            'email' => ['required', 'email', 'max:255'],
+            'password' => ['required', Password::min(12)->mixedCase()->numbers()->symbols()],
+        ],
+    );
+
+    if ($validator->fails() || DemoCredentials::isKnownDefaultPassword($password)
+        || in_array($email, DemoCredentials::KNOWN_DEFAULT_EMAILS, true)) {
+        $this->error('Correo o contraseña no válidos (mínimo 12 caracteres con mayúsculas, números y símbolos; no se admiten las cuentas ni contraseñas de demostración).');
+
+        return Command::FAILURE;
+    }
+
+    app(StagingFictionalSeeder::class)->configure($email, $password)->run();
+
+    $this->info('Datos ficticios de staging cargados. La contraseña no se muestra ni se registra.');
+
+    return Command::SUCCESS;
+})->purpose('Carga una empresa y datos ficticios en una base de staging (rechaza RentaDriveDb).');

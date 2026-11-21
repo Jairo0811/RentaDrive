@@ -32,3 +32,8 @@ Thumbs.db
 marketing/trailer-racing-2026/captures/.pw-output/
 marketing/trailer-racing-2026/out/
 marketing/trailer-racing-2026/render/.work/
+# Staging privado: secretos y estado local generados por deploy/staging/scripts
+/deploy/staging/.env.staging
+/deploy/staging/.env.app
+/deploy/staging/secrets/
+/deploy/staging/backups/
