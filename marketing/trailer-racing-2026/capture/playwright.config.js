@@ -10,6 +10,7 @@ export default defineConfig({
     reporter: [['list']],
     outputDir: '../captures/.pw-output',
     use: {
+        actionTimeout: 15_000,
         baseURL: process.env.E2E_BASE_URL ?? 'http://127.0.0.1:8000',
         locale: 'es-DO',
         timezoneId: 'America/Santo_Domingo',

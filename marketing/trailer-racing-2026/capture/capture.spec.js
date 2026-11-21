@@ -57,7 +57,7 @@ test('preparar datos ficticios', async ({ browser }) => {
         await page.locator('#license_number').fill(`LIC-DEMO-${doc.slice(-3)}`);
         const expiry = new Date(Date.now() + 3 * 365 * 864e5).toISOString().slice(0, 10);
         await page.locator('#license_expiry').fill(expiry);
-        await page.getByRole('button', { name: /guardar|crear/i }).click();
+        await page.getByRole('button', { name: /registrar cliente|guardar/i }).click();
         await expect(page).toHaveURL(/\/customers/);
     }
 
