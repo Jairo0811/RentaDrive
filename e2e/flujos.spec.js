@@ -90,7 +90,9 @@ test('consultar reportes con un rango de fechas válido', async ({ page }) => {
 
 test('actualizar y quitar la foto de un vehículo', async ({ page }) => {
     await page.goto('/vehicles');
-    await page.locator('a[href*="/vehicles/"][href$="/edit"], a:has-text("Editar")').first().click();
+    const href = await page.locator('table a[href*="/vehicles/"]').first().getAttribute('href');
+    const id = href.match(/\/vehicles\/(\d+)/)[1];
+    await page.goto(`/vehicles/${id}/edit`);
     await expect(page).toHaveURL(/\/vehicles\/\d+\/edit$/);
 
     await page.locator('#photo').setInputFiles({ name: 'foto-e2e.png', mimeType: 'image/png', buffer: solidPng() });
