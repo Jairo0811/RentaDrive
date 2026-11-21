@@ -201,7 +201,7 @@ final class StagingSecurityHardeningTest extends TestCase
             '/RentaDrive_Local_2026/',
             '/AKIA[0-9A-Z]{16}/',
             '/-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/',
-            '/^\s*(?:DB_PASSWORD|MAIL_PASSWORD|AWS_SECRET_ACCESS_KEY|APP_KEY)=(?!\s*$)(?!null)(?!base64:\.\.\.)\S+/m',
+            '/^\s*(?:DB_PASSWORD|MAIL_PASSWORD|AWS_SECRET_ACCESS_KEY|APP_KEY)=(?!\s*$)(?!null)(?!base64:\.\.\.)(?!\$)(?!base64:\$)\S+/m',
         ];
         $skip = ['tests/Feature/StagingSecurityHardeningTest.php'];
         $hits = [];

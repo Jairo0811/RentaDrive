@@ -1,0 +1,104 @@
+name: Staging verify (disposable)
+
+# Levanta el stack de staging (deploy/staging) en un runner DESCARTABLE con secretos aleatorios y datos
+# ficticios, y comprueba salud, migraciones, cola, respaldo/restauración y ausencia de secretos.
+# No despliega nada, no usa RentaDriveDb y no requiere secretos del repositorio.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'deploy/**'
+      - '.dockerignore'
+      - '.github/workflows/staging-verify.yml'
+      - 'composer.lock'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: deploy/staging
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Generar secretos aleatorios y certificados TLS internos
+        run: |
+          STAGING_HOSTNAME=staging.invalid ./scripts/gen-env.sh
+          ./scripts/gen-sql-tls.sh
+          # Enmascarar valores sensibles en los logs del workflow
+          for k in APP_KEY DB_PASSWORD DB_MIGRATOR_PASSWORD MSSQL_SA_PASSWORD RENTADRIVE_STAGING_ADMIN_PASSWORD; do
+            v="$(grep "^$k=" .env.staging | cut -d= -f2-)"; echo "::add-mask::${v#base64:}"
+          done
+
+      - name: Construir imágenes (app y web)
+        run: docker compose --env-file .env.staging build app web
+
+      - name: Versión de PHP en la imagen (>= 8.4.27)
+        run: |
+          docker run --rm --entrypoint php rentadrive-staging:local -r 'echo PHP_VERSION, PHP_EOL; exit(version_compare(PHP_VERSION, "8.4.27", "<") ? 1 : 0);'
+
+      - name: SQL Server con TLS y base de staging
+        run: |
+          if ! docker compose --env-file .env.staging up -d --wait sqlserver; then
+            echo '--- logs de sqlserver ---'
+            docker compose --env-file .env.staging logs --no-color --tail=80 sqlserver 2>&1 | sed -E 's/(PASSWORD|password)=[^ ]+/\1=***/g'
+            exit 1
+          fi
+          ./scripts/init-db.sh
+
+      - name: Migraciones no destructivas
+        run: ./scripts/migrate.sh
+
+      - name: Levantar app, web, cola y scheduler
+        run: |
+          docker compose --env-file .env.staging up -d --wait web
+          docker compose --env-file .env.staging up -d queue scheduler
+
+      - name: Conexión SQL Server verificada y preflight de producción
+        run: |
+          docker compose --env-file .env.staging exec -T app php artisan tinker --execute='echo DB::connection()->selectOne("SELECT @@VERSION AS v")->v, PHP_EOL; echo "encrypt=", config("database.connections.sqlsrv.encrypt"), " trust=", config("database.connections.sqlsrv.trust_server_certificate"), PHP_EOL;' | head -3
+          docker compose --env-file .env.staging exec -T app php artisan rentadrive:production-check
+
+      - name: Datos ficticios de staging
+        run: docker compose --env-file .env.staging exec -T app php artisan rentadrive:staging-seed
+
+      - name: Pruebas de humo HTTP
+        run: ./scripts/smoke.sh
+
+      - name: Trabajador de colas procesa un trabajo
+        run: |
+          cnt() { ./scripts/sql.sh "SET NOCOUNT ON; SELECT COUNT(*) FROM [RentaDriveStaging].dbo.$1;"; }
+          docker compose --env-file .env.staging stop queue
+          docker compose --env-file .env.staging exec -T app php -r 'require "vendor/autoload.php"; $a = require "bootstrap/app.php"; $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); Illuminate\Support\Facades\Artisan::queue("about"); echo "despachado", PHP_EOL;'
+          n="$(cnt jobs)"; echo "pendientes con el trabajador parado: $n"
+          [ "$n" = "1" ] || { echo "El trabajo no quedó en la cola"; exit 1; }
+          docker compose --env-file .env.staging up -d queue
+          for i in $(seq 1 30); do n="$(cnt jobs)"; [ "$n" = "0" ] && break; sleep 2; done
+          f="$(cnt failed_jobs)"
+          echo "pendientes=$n fallidos=$f"
+          [ "$n" = "0" ] && [ "$f" = "0" ] || { echo "La cola no se procesó sin fallos"; exit 1; }
+          docker compose --env-file .env.staging ps queue --format '{{.State}}' | grep -q running
+
+      - name: Respaldo y restauración en base distinta
+        run: |
+          BAK="$(./scripts/backup.sh | tail -1)"
+          ./scripts/restore-test.sh "$BAK"
+
+      - name: Ausencia de secretos en logs, imagen y archivos .env
+        run: ./scripts/scan-secrets.sh
+
+      - name: Estado y logs ante fallo (sin secretos)
+        if: failure()
+        run: |
+          docker compose --env-file .env.staging ps
+          docker compose --env-file .env.staging logs --no-color --tail=60 app web queue 2>&1 | sed -E 's/(password|secret|key)=[^ ]+/\1=***/Ig'
+
+      - name: Limpieza
+        if: always()
+        run: docker compose --env-file .env.staging down -v --remove-orphans || true
