@@ -81,7 +81,7 @@ test('preparar datos ficticios', async ({ browser }) => {
         await page.getByRole('button', { name: 'Crear reserva' }).click();
         await page.waitForLoadState('networkidle');
         if (!/\/reservations\/\d+$/.test(page.url())) {
-            const errors = (await page.locator('.text-red-400, .text-red-500, .text-red-600, [role=alert]').allInnerTexts()).join(' | ');
+            const errors = ((await page.locator('main').innerText()).replace(/\s+/g, ' ')).slice(0, 700);
             throw new Error(`Reserva ${customer}/${plate} no creada: ${errors}`);
         }
         firstUrl ||= page.url();
