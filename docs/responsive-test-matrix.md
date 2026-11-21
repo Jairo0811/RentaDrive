@@ -19,6 +19,23 @@ PHPUnit, Pint, `composer audit` y `npm audit` se ejecutan en cada PR. Pruebas re
 
 Las pruebas no verifican el aspecto visual ni el comportamiento de teclado; para eso están las secciones 2 y 3.
 
+## 1b. Pruebas E2E de navegador (Playwright, job `e2e` del CI)
+
+Se ejecutan en GitHub Actions sobre una base SQL Server **descartable** (`RentaDriveE2E`) con datos ficticios (`APP_ENV=testing`), contraseña aleatoria por ejecución y correo por `log` (no se envía correo real; el enlace de recuperación se lee del log). Nunca tocan `RentaDriveDb`. Archivos: `playwright.config.js`, `e2e/`.
+
+Flujos cubiertos (Chromium de escritorio, 10 pruebas en verde):
+- inicio de sesión del administrador;
+- reservar un vehículo (selectores con búsqueda de cliente y vehículo);
+- convertir la reserva en alquiler y generar la factura;
+- inspección de entrega;
+- pago manual desde la factura y desde el módulo Pagos;
+- descarga del PDF de la factura interna;
+- reportes con rango de fechas válido;
+- subida de la foto principal de un vehículo desde el navegador;
+- recuperación de contraseña con enlace válido y nuevo inicio de sesión.
+
+No cubierto: envío real por SMTP (requiere un servidor de correo, se verifica aparte), otros navegadores y anchos móviles, pasarela de pagos y e-CF (bloqueados por dependencia externa).
+
 ## 2. Verificaciones visuales en navegador
 
 Método: navegador integrado de Claude Desktop con emulación de ventana, app local (`php artisan serve`, base `RentaDriveDb`, sesión de administrador, compilada con `npm run build`) y un script propio que mide, por página: desbordamiento horizontal, contraste WCAG AA de texto, campos sin nombre accesible, imágenes sin `alt`, botones sin nombre y objetivos menores de 24 px y de 44 px. El script mide; no sustituye una revisión humana.
@@ -52,8 +69,8 @@ Limitación conocida del entorno de prueba: al redimensionar una página ya carg
 - Zoom real del navegador al 200 % y 400 % (solo se emuló el ancho equivalente).
 - Lector de pantalla (NVDA, VoiceOver, TalkBack): no probado.
 - Safari en iOS y Chrome en Android reales: no probados; solo la emulación del navegador integrado.
-- Pruebas E2E automatizadas con Playwright en CI: no implementadas.
-- Subida, sustitución y eliminación de fotografías desde el navegador: cubiertas por `VehiclePhotoTest`; la subida real de un archivo desde el navegador no se ha podido ejecutar con el navegador integrado.
+- Pruebas E2E con Playwright: implementadas (sección 1b). Cubren flujos funcionales en Chromium de escritorio; no sustituyen las pruebas en dispositivos reales ni en otros navegadores.
+- Fotografías de vehículo: subida cubierta por `VehiclePhotoTest` y por E2E en CI; sustitución y «Quitar foto» siguen verificadas solo por `VehiclePhotoTest`.
 
 ## 4. Flota: fotografías
 
