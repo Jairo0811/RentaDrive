@@ -17,7 +17,11 @@ export const credentials = () => {
 export async function pick(page, id, text) {
     const input = page.locator(`#${id}`);
     await input.click();
+    // Espera la búsqueda filtrada (la lista inicial sin filtro puede seguir visible hasta que llega).
+    const filtered = page.waitForResponse((r) => r.url().includes('/lookups/') && r.url().includes('q='), { timeout: 10_000 });
     await input.fill(text);
+    await filtered;
+    await page.waitForTimeout(200); // render de Alpine tras la respuesta
     const option = page.locator(`#${id}-list [role=option]`).first();
     await expect(option).toBeVisible();
     await option.click();

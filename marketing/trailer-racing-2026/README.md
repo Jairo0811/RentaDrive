@@ -1,0 +1,52 @@
+# RentaDrive — Official Racing Trailer 2026
+
+Materiales y proyecto de edición **reproducible** del tráiler de 45 s de RentaDrive. Separado del código operativo (la aplicación no depende de esta carpeta).
+
+> RentaDrive está **en desarrollo comercial**; no está disponible como SaaS de producción. El tráiler lo dice en pantalla.
+
+## Contenido
+| Ruta | Qué es |
+|---|---|
+| `docs/` | Guion técnico, storyboard, voz en off, lista de recursos y prompts generativos |
+| `capture/` | Playwright: prepara datos ficticios y captura pantallas reales (16:9 y 9:16) |
+| `assets/demo-vehicles/` | Fotos genéricas generadas (sedán compacto gris, SUV azul, sedán blanco); ver `docs/04-recursos.md` |
+| `captures/` | PNG de la interfaz real (resultado del workflow `Marketing captures`) |
+| `render/` | `make_voiceover.py`, `build_audio.py`, `render_video.py`, `qa_video.py` |
+| `out/` | MP4 finales (ignorados por git; ver «Distribución») |
+
+## Seguridad de las capturas
+- Solo contra una base **descartable** (`RentaDriveE2E`) del servicio SQL Server del runner de GitHub Actions. **No se toca `RentaDriveDb`.** No se usa `migrate:fresh`, `db:wipe` ni seeders de demostración sobre instalaciones existentes.
+- La contraseña del administrador ficticio se genera al azar en cada ejecución y se enmascara en los logs; las capturas no muestran contraseñas, tokens ni datos reales.
+- Si quieres capturar localmente, hazlo contra una base nueva y aparte, nunca contra la base de trabajo.
+
+## Cómo reproducirlo
+1. **Capturas:** GitHub → Actions → *Marketing captures* → Run workflow (o abre un PR que toque `marketing/**`). Descarga el artefacto `trailer-captures` y copia los PNG a `captures/`.
+2. **Dependencias de render** (Python 3.11+): `pip install pillow numpy scipy soundfile kokoro-onnx` y `ffmpeg` con `libx264`. Fuente: Inter (OFL) en `/usr/share/fonts/opentype/inter/` (ajusta `FONT_BOLD/FONT_REG` si está en otra ruta).
+3. **Voz de referencia (opcional):** descarga `kokoro-v1.0.onnx` y `voices-v1.0.bin` de https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0 y ejecuta  
+   `python render/make_voiceover.py --model kokoro-v1.0.onnx --voices voices-v1.0.bin`
+4. **Audio:** `python render/build_audio.py` → `render/.work/audio.wav`.
+5. **Video:**  
+   `python render/render_video.py --format h` → `out/rentadrive-trailer-v1.1-16x9-1920x1080.mp4`  
+   `python render/render_video.py --format v` → `out/rentadrive-trailer-v1.1-9x16-1080x1920.mp4`  
+   Cierres: `--final` → `out/rentadrive-final-v1.1-16x9.mp4` y `-9x16.mp4`. Verificación: `python render/qa_video.py`.  
+   Pruebas rápidas: `--preview 8` (primeros 8 s) o `--frame 11.0` (un fotograma PNG en `render/.work/`).
+
+Salida: MP4 H.264 (High, yuv420p, CRF 22, preset slow), AAC 192 kb/s a 48 kHz, 30 fps, `+faststart`, sin marcas de agua. El audio se normaliza con `loudnorm` y un limitador de pico. El render completo tarda unos 7 minutos por formato en 2 CPU.
+
+## Versión 1.1 (21-11-2026)
+Mejoras sobre la v1.0: fotos de vehículos diferenciadas, escenas de software dinámicas y vertical reencuadrada. Detalle, comparación y verificación en [`docs/06-version-1.1.md`](docs/06-version-1.1.md). La voz en off sigue siendo sintética de referencia (pendiente locutor real).
+
+## Resultado verificado de la v1.0 (render del 20-11-2026)
+| Archivo | Formato | Verificación (ffprobe/ffmpeg) |
+|---|---|---|
+| `out/rentadrive-trailer-16x9-1920x1080.mp4` | 1920×1080, 30 fps, H.264 High yuv420p, AAC 48 kHz estéreo, 45,0 s, ≈ 60 MB | decodifica sin errores; −14,1 LUFS integrados, pico −0,8 dBFS |
+| `out/rentadrive-trailer-9x16-1080x1920.mp4` | 1080×1920, 30 fps, H.264 High yuv420p, AAC 48 kHz estéreo, 45,0 s, ≈ 60 MB | decodifica sin errores; −14,1 LUFS integrados, pico −0,8 dBFS |
+
+Se revisaron fotogramas de ambos videos (cada escena) y se corrigieron solapes de texto y recortes de título en la versión vertical. No se ha probado la reproducción en dispositivos reales ni la subida a Reels/TikTok.
+
+## Estado honesto
+- **Hecho y renderizado:** ambas versiones con capturas reales, arte y logotipo oficiales, música/efectos originales y voz sintética de referencia.
+- **Pendiente (herramientas externas):** clips generativos o filmados de autos (ver `docs/05-prompts-generativos.md`), locutor profesional y masterización de sonido. Los planos de auto son clips generativos reales (Google Flow, imágenes de referencia propias, audio descartado; auto genérico, placa en blanco, sin logos): A `assets/clips/clipA-garaje.mp4` (apertura 0–6 s), C `clipC-circuito.mp4` (escena 2) y D `clipD-cierre.mp4` (cierre 37–45 s). El cierre usa el logotipo oficial con lema `assets/brand/logo-futurista-con-slogan.png`. Video final aparte de 8 s: `python render/render_video.py --format h --final` (y `--format v`), salida `out/rentadrive-final-*.mp4`. Un primer render usaba recortes del auto del arte del logotipo y se retiró porque se confundía con el logo.
+
+## Distribución
+Los MP4 no se suben al repositorio de código. Opciones: GitHub Release (adjunto), almacenamiento del equipo o Git LFS si se decide versionarlos.
