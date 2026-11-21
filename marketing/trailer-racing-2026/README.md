@@ -30,7 +30,15 @@ Materiales y proyecto de edición **reproducible** del tráiler de 45 s de Renta
    `python render/render_video.py --format v` → `out/rentadrive-trailer-9x16-1080x1920.mp4`  
    Pruebas rápidas: `--preview 8` (primeros 8 s) o `--frame 11.0` (un fotograma PNG en `render/.work/`).
 
-Salida: MP4 H.264 (High, yuv420p, CRF 17), AAC 192 kb/s a 48 kHz, 30 fps, `+faststart`, sin marcas de agua. El audio se normaliza a ≈ −14 LUFS (`loudnorm`).
+Salida: MP4 H.264 (High, yuv420p, CRF 22, preset slow), AAC 192 kb/s a 48 kHz, 30 fps, `+faststart`, sin marcas de agua. El audio se normaliza con `loudnorm` y un limitador de pico. El render completo tarda unos 7 minutos por formato en 2 CPU.
+
+## Resultado verificado (render del 20-11-2026)
+| Archivo | Formato | Verificación (ffprobe/ffmpeg) |
+|---|---|---|
+| `out/rentadrive-trailer-16x9-1920x1080.mp4` | 1920×1080, 30 fps, H.264 High yuv420p, AAC 48 kHz estéreo, 45,0 s, ≈ 45 MB | decodifica sin errores; −14,8 LUFS integrados, pico −0,9 dBFS |
+| `out/rentadrive-trailer-9x16-1080x1920.mp4` | 1080×1920, 30 fps, H.264 High yuv420p, AAC 48 kHz estéreo, 45,0 s, ≈ 60 MB | decodifica sin errores; −14,1 LUFS integrados, pico −0,8 dBFS |
+
+Se revisaron fotogramas de ambos videos (cada escena) y se corrigieron solapes de texto y recortes de título en la versión vertical. No se ha probado la reproducción en dispositivos reales ni la subida a Reels/TikTok.
 
 ## Estado honesto
 - **Hecho y renderizado:** ambas versiones con capturas reales, arte y logotipo oficiales, música/efectos originales y voz sintética de referencia.
