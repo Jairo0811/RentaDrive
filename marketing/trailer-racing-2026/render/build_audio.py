@@ -219,6 +219,23 @@ def sfx(mix):
     add(mix, 43.4, impact(1.6), 1.0)
 
 
+def tick(dur=0.09, f=2400):
+    t = t_of(int(dur * SR))
+    return np.sin(2 * np.pi * f * t) * np.exp(-t * 55) * 0.5 + highpass(rng.standard_normal(len(t)), 3000) * np.exp(-t * 90) * 0.3
+
+
+def ui_cuts(mix):
+    """Cortes de la interfaz sincronizados con la rejilla de 0,5 s: barrido corto + clic de interfaz.
+    Los clics de 21,5/22,5/23,5/24,5 s coinciden con los pasos reales del selector (buscar, elegir, tarifa)."""
+    cuts = [15.0, 16.0, 17.0, 18.5, 21.5, 22.5, 23.5, 24.5, 26.0, 27.0, 30.5, 32.5, 33.5, 34.5, 35.5]
+    for c in cuts:
+        add(mix, c - 0.12, swept_noise(0.22, 1200, 5200) * np.linspace(0, 1, int(0.22 * SR)) ** 2, 0.22)
+        add(mix, c, tick(), 0.55, pan=0.2)
+    for c in (21.55, 23.55):  # tecleo del selector
+        for j in range(3):
+            add(mix, c + 0.12 * j, tick(0.05, 3200 + 300 * j), 0.25, pan=-0.2)
+
+
 def voice(mix):
     timeline = work / "vo/timeline.json"
     if not timeline.exists():
@@ -243,6 +260,7 @@ def main():
     eng = engine()
     music(music_bus)
     sfx(music_bus)
+    ui_cuts(music_bus)
     music_bus[0] += eng * 0.9
     music_bus[1] += eng * 0.9
 

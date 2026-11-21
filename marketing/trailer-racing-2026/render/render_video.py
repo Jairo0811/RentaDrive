@@ -361,14 +361,15 @@ def tach_gauge(base, center, radius, value, glow_a=1.0, alpha=1.0, bars=0.0):
     return Image.alpha_composite(out, layer).convert("RGB")
 
 
-def hud_panel(base, img, rect, t_local, zoom0=1.0, zoom1=1.08, pan=(0.5, 0.5, 0.5, 0.5), alpha=1.0, label=None):
+def hud_panel(base, img, rect, t_local, zoom0=1.0, zoom1=1.08, pan=(0.5, 0.5, 0.5, 0.5), alpha=1.0, label=None, focus=None, ease_fn=None):
     """Captura real dentro de un panel tipo cabina: borde azul, esquinas HUD, zoom lento."""
     x0, y0, x1, y1 = [int(v) for v in rect]
     size = (x1 - x0, y1 - y0)
     k = clamp01(t_local)
-    z = zoom0 + (zoom1 - zoom0) * ease(k)
-    cx = pan[0] + (pan[2] - pan[0]) * ease(k)
-    cy = pan[1] + (pan[3] - pan[1]) * ease(k)
+    e = (ease_fn or ease)(k)
+    z = zoom0 + (zoom1 - zoom0) * e
+    cx = pan[0] + (pan[2] - pan[0]) * e
+    cy = pan[1] + (pan[3] - pan[1]) * e
     shot = cover(img, size, zoom=z, cx=cx, cy=cy)
     mask = rounded_mask(size, 22)
     glow = Image.new("RGBA", base.size, (0, 0, 0, 0))
@@ -381,6 +382,25 @@ def hud_panel(base, img, rect, t_local, zoom0=1.0, zoom1=1.08, pan=(0.5, 0.5, 0.
     out = Image.alpha_composite(out, gl).convert("RGB")
     m = mask.point(lambda v: int(v * alpha))
     out.paste(shot, (x0, y0), m)
+    if focus:
+        # corchetes HUD sobre regiones REALES de la captura (coordenadas normalizadas de la imagen)
+        iw, ih = img.size
+        scale = max(size[0] / iw, size[1] / ih) * z
+        bw, bh = size[0] / scale, size[1] / scale
+        ox = min(max(cx * iw - bw / 2, 0), iw - bw)
+        oy = min(max(cy * ih - bh / 2, 0), ih - bh)
+        for fx0, fy0, fx1, fy1 in focus:
+            a_f = ease_out((k - 0.18) / 0.22) * alpha
+            if a_f <= 0:
+                continue
+            rx0 = x0 + (fx0 * iw - ox) * scale - 10
+            ry0 = y0 + (fy0 * ih - oy) * scale - 10
+            rx1 = x0 + (fx1 * iw - ox) * scale + 10
+            ry1 = y0 + (fy1 * ih - oy) * scale + 10
+            rx0, ry0 = max(rx0, x0 + 6), max(ry0, y0 + 6)
+            rx1, ry1 = min(rx1, x1 - 6), min(ry1, y1 - 6)
+            if rx1 - rx0 > 30 and ry1 - ry0 > 20:
+                out = corner_brackets(out, (rx0, ry0, rx1, ry1), color=ELECTRIC, size=22, width=3, alpha=a_f)
     border = Image.new("RGBA", base.size, (0, 0, 0, 0))
     ImageDraw.Draw(border).rounded_rectangle((x0, y0, x1, y1), radius=22, outline=ELECTRIC + (int(200 * alpha),), width=3)
     out = Image.alpha_composite(out.convert("RGBA"), border).convert("RGB")
@@ -561,40 +581,128 @@ def split_scene(t, t0, t1, shots, title_text, chip_items=None, title_y=None):
     return frame
 
 
+def motion_blur_h(img, px):
+    """Desenfoque de movimiento horizontal moderado (promedio de copias desplazadas)."""
+    if px < 1:
+        return img
+    arr = np.asarray(img, dtype=np.float32)
+    acc = np.zeros_like(arr)
+    n = 5
+    for i in range(n):
+        acc += np.roll(arr, int((i - n // 2) * px / (n // 2 or 1)), axis=1)
+    return Image.fromarray(np.clip(acc / n, 0, 255).astype(np.uint8))
+
+
+def hud_rails(frame, t, rect):
+    """Líneas HUD discretas (reglas con marcas que avanzan) fuera del panel; no tapan la interfaz."""
+    x0, y0, x1, y1 = rect
+    layer = Image.new("RGBA", frame.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    for y, direction in ((y0 - 34, 1), (y1 + 30, -1)):
+        d.line([(x0, y), (x1, y)], fill=ELECTRIC + (70,), width=1)
+        off = (t * 90 * direction) % 40
+        for i in range(-1, int((x1 - x0) / 40) + 2):
+            x = x0 + i * 40 + off
+            if x0 <= x <= x1:
+                d.line([(x, y - (6 if i % 4 == 0 else 3)), (x, y + (6 if i % 4 == 0 else 3))], fill=ELECTRIC + (110,), width=1)
+    return Image.alpha_composite(frame.convert("RGBA"), layer).convert("RGB")
+
+
+def panel_rect(detail=False):
+    if not VERT:
+        return (W - 1440) // 2, 62, (W - 1440) // 2 + 1440, 62 + 810
+    if detail:
+        return 90, 520, 990, 1280  # plano de detalle: 900x760, zona segura Reels/TikTok
+    return (W - 523) // 2, 470, (W - 523) // 2 + 523, 470 + 930  # plano general
+
+
+def shots_scene(t, t0, t1, shots, title_text, chip_items=None, entry=None):
+    """Escena con capturas reales en paneles HUD. Cada plano: dict(name, a, b, label, z0, z1, pan, focus, detail)."""
+    local = t - t0
+    frame = dark_bg(t)
+    frame = speed_lines(frame, t, 0.16, speed=900, seed=11)
+    for sh in shots:
+        a, b = sh["a"], sh["b"]
+        if not (a <= local < b + 0.35):
+            continue
+        k = (local - a) / (b - a)
+        alpha = ease_out((local - a) / 0.26) * (1 - ease((local - b) / 0.3) if local >= b else 1.0)
+        rect = panel_rect(sh.get("detail", False))
+        pan = sh.get("pan", (0.5, 0.5, 0.5, 0.5))
+        frame = hud_rails(frame, t, rect)
+        frame = hud_panel(frame, capture(sh["name"]), rect, k, sh.get("z0", 1.0), sh.get("z1", 1.1), pan, alpha, sh.get("label"), focus=sh.get("focus"), ease_fn=ease)
+        frame = light_sweep(frame, (local - a) / 0.42, width=0.1, alpha=0.6)
+    if entry:
+        frame = entry(frame, local)
+    frame = title(frame, title_text, t, t0 + 0.05, t1, TITLE_Y, 54 if not VERT else 60, fade_out=0.3)
+    if chip_items:
+        frame = chips(frame, chip_items, CHIPS_Y, t, t0 + 0.8, 24)
+    return frame
+
+
+def car_entry(frame, local):
+    """Transición por movimiento: el auto de competición pasa a toda velocidad y deja paso a la interfaz."""
+    if local > 0.85:
+        return frame
+    k = local / 0.85
+    car = car_crop((700, 330, 1260, 640), (W, H), zoom=1.0 + 0.25 * k, shift=(-60 * k, 0))
+    car = ImageEnhance_brightness(car, 0.85)
+    car = motion_blur_h(car, 4 + 34 * k)
+    car = vignette(car, 0.5)
+    a = 1 - ease(k * 1.25)
+    out = blend(frame, car, a)
+    return light_sweep(out, k, width=0.14, alpha=0.9, angle=0.0)
+
+
 def scene3(t):
+    """12–20 s: Flota. Transición desde el auto, travelling sobre tarjetas, acercamiento a foto, tarifa y estado, tabla y ficha."""
     if not VERT:
         shots = [
-            ("h-flota-tarjetas.png", 0.0, 3.0, "FLOTA · VISTA TARJETAS", (0.5, 0.35, 0.5, 0.5)),
-            ("h-flota-tabla.png", 2.8, 5.6, "FLOTA · LISTADO", (0.5, 0.4, 0.5, 0.55)),
-            ("h-vehiculo-detalle.png", 5.4, 8.0, "FICHA DEL VEHÍCULO", (0.5, 0.45, 0.5, 0.5)),
+            dict(name="h-flota-tarjetas.png", a=0.0, b=3.0, label="FLOTA · TARJETAS", z0=1.5, z1=1.5, pan=(0.30, 0.55, 0.78, 0.55)),
+            dict(name="h-flota-tarjetas.png", a=3.0, b=4.0, label="FOTO DEL VEHÍCULO", z0=2.4, z1=2.6, pan=(0.57, 0.46, 0.57, 0.46)),
+            dict(name="h-flota-tarjetas.png", a=4.0, b=5.0, label="TARIFA Y ESTADO", z0=2.6, z1=2.6, pan=(0.57, 0.52, 0.57, 0.65), focus=[(0.575, 0.665, 0.64, 0.71), (0.652, 0.614, 0.695, 0.64)]),
+            dict(name="h-flota-tabla.png", a=5.0, b=6.5, label="FLOTA · LISTADO", z0=1.0, z1=1.4, pan=(0.5, 0.32, 0.62, 0.36), focus=[(0.17, 0.40, 0.97, 0.57)]),
+            dict(name="h-vehiculo-detalle.png", a=6.5, b=8.0, label="FICHA DEL VEHÍCULO", z0=1.0, z1=1.55, pan=(0.30, 0.38, 0.30, 0.62), focus=[(0.185, 0.19, 0.46, 0.47)]),
         ]
+        chips_ = ["CATEGORÍAS", "ESTADOS", "TARIFAS", "KILOMETRAJE"]
     else:
         shots = [
-            ("v-flota-tarjetas.png", 0.0, 4.0, "FLOTA · TARJETAS", (0.5, 0.3, 0.5, 0.6)),
-            ("v-dashboard.png", 3.8, 8.0, "PANORAMA OPERATIVO", (0.5, 0.3, 0.5, 0.5)),
+            dict(name="v-flota-tarjetas.png", a=0.0, b=2.0, label="FLOTA", z0=1.0, z1=1.08, pan=(0.5, 0.45, 0.5, 0.6)),
+            dict(name="v-flota-tarjetas.png", a=2.0, b=4.0, detail=True, z0=1.0, z1=1.12, pan=(0.5, 0.75, 0.5, 0.80)),
+            dict(name="v-vehiculo-detalle.png", a=4.0, b=6.0, detail=True, z0=1.0, z1=1.0, pan=(0.5, 0.30, 0.5, 0.78)),
+            dict(name="v-flota-tabla.png", a=6.0, b=8.0, z0=1.0, z1=1.08, pan=(0.5, 0.40, 0.5, 0.55)),
         ]
-    return split_scene(t, 12.0, 20.0, shots, "CONTROL TOTAL DE TU FLOTA", ["CATEGORÍAS", "ESTADOS", "TARIFAS", "KILOMETRAJE"] if not VERT else ["ESTADOS", "TARIFAS", "KILOMETRAJE"])
+        chips_ = ["ESTADOS", "TARIFAS", "KILOMETRAJE"]
+    return shots_scene(t, 12.0, 20.0, shots, "CONTROL TOTAL DE TU FLOTA", chips_, entry=car_entry)
 
 
 def scene4(t):
+    """20–28 s: Reservas y operaciones con los pasos REALES del selector inteligente y la tarifa autocompletada."""
     if not VERT:
         shots = [
-            ("h-reservas.png", 0.0, 1.8, "RESERVAS", (0.5, 0.35, 0.5, 0.45)),
-            ("h-clientes.png", 1.6, 3.2, "CLIENTES", (0.5, 0.35, 0.5, 0.45)),
-            ("h-reserva-formulario.png", 3.0, 4.8, "NUEVA RESERVA", (0.4, 0.3, 0.55, 0.5)),
-            ("h-alquileres.png", 4.6, 6.2, "ALQUILERES", (0.5, 0.35, 0.5, 0.45)),
-            ("h-inspecciones.png", 6.0, 8.0, "INSPECCIONES", (0.5, 0.35, 0.5, 0.45)),
+            dict(name="h-reservas.png", a=0.0, b=1.5, label="RESERVAS", z0=1.0, z1=1.25, pan=(0.5, 0.30, 0.5, 0.40)),
+            dict(name="h-form-1-cliente-buscando.png", a=1.5, b=2.5, label="BUSCA AL CLIENTE", z0=2.2, z1=2.3, pan=(0.34, 0.30, 0.34, 0.30), focus=[(0.185, 0.205, 0.45, 0.34)]),
+            dict(name="h-form-2-cliente.png", a=2.5, b=3.5, label="CLIENTE SELECCIONADO", z0=2.3, z1=2.2, pan=(0.34, 0.30, 0.40, 0.30)),
+            dict(name="h-form-3-vehiculo-buscando.png", a=3.5, b=4.5, label="ELIGE LA UNIDAD", z0=2.2, z1=2.3, pan=(0.80, 0.29, 0.80, 0.29), focus=[(0.71, 0.20, 0.965, 0.33)]),
+            dict(name="h-form-4-vehiculo.png", a=4.5, b=6.0, label="TARIFA AUTOCOMPLETADA", z0=2.0, z1=1.8, pan=(0.80, 0.30, 0.74, 0.34), focus=[(0.71, 0.20, 0.97, 0.28), (0.71, 0.30, 0.97, 0.37)]),
+            dict(name="h-alquileres.png", a=6.0, b=7.0, label="ALQUILERES", z0=1.0, z1=1.3, pan=(0.5, 0.30, 0.55, 0.34)),
+            dict(name="h-inspecciones.png", a=7.0, b=8.0, label="INSPECCIONES", z0=1.0, z1=1.3, pan=(0.5, 0.30, 0.45, 0.34)),
         ]
+        chips_ = ["RESERVAS", "CLIENTES", "ALQUILERES", "INSPECCIONES"]
     else:
         shots = [
-            ("v-reservas.png", 0.0, 4.0, "RESERVAS", (0.5, 0.3, 0.5, 0.55)),
-            ("v-reserva-formulario.png", 3.8, 8.0, "NUEVA RESERVA", (0.5, 0.3, 0.5, 0.55)),
+            dict(name="v-reservas.png", a=0.0, b=1.5, z0=1.0, z1=1.08, pan=(0.5, 0.35, 0.5, 0.5)),
+            dict(name="v-form-1-cliente-buscando.png", a=1.5, b=3.5, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.17, 0.5, 0.17)),
+            dict(name="v-form-3-vehiculo-buscando.png", a=3.5, b=5.0, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.17, 0.5, 0.17)),
+            dict(name="v-form-4-vehiculo.png", a=5.0, b=6.5, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.22, 0.5, 0.30), focus=[(0.05, 0.27, 0.95, 0.37)]),
+            dict(name="v-reservas.png", a=6.5, b=8.0, z0=1.0, z1=1.06, pan=(0.5, 0.5, 0.5, 0.6)),
         ]
-    return split_scene(t, 20.0, 28.0, shots, "CADA RESERVA. CADA VEHÍCULO. TODO CONECTADO", ["RESERVAS", "CLIENTES", "ALQUILERES", "INSPECCIONES"] if not VERT else ["RESERVAS", "ALQUILERES", "INSPECCIONES"])
+        chips_ = ["RESERVAS", "ALQUILERES", "INSPECCIONES"]
+    return shots_scene(t, 20.0, 28.0, shots, "CADA RESERVA. CADA VEHÍCULO. TODO CONECTADO", chips_)
 
 
 def scene5(t):
-    """28–37 s: Inteligencia operativa. Velocímetro → gráfico → dashboard real."""
+    """28–37 s: Precisión. Tacómetro → barras → indicadores del dashboard real, gráficos, facturación y pagos manuales."""
     local = t - 28.0
     if local < 2.6:
         base = Image.new("RGB", (W, H), (2, 6, 16))
@@ -608,18 +716,22 @@ def scene5(t):
         return frame
     if not VERT:
         shots = [
-            ("h-dashboard.png", 2.4, 5.2, "DASHBOARD OPERATIVO", (0.5, 0.35, 0.5, 0.5)),
-            ("h-reportes.png", 5.0, 6.8, "REPORTES", (0.5, 0.4, 0.5, 0.5)),
-            ("h-facturas.png", 6.6, 7.9, "FACTURACIÓN INTERNA", (0.5, 0.35, 0.5, 0.45)),
-            ("h-pagos.png", 7.7, 9.0, "PAGOS MANUALES", (0.5, 0.35, 0.5, 0.45)),
+            dict(name="h-dashboard.png", a=2.5, b=4.5, label="INDICADORES", z0=1.0, z1=1.7, pan=(0.5, 0.30, 0.40, 0.42), focus=[(0.175, 0.17, 0.975, 0.66)]),
+            dict(name="h-dashboard-graficos.png", a=4.5, b=5.5, label="GRÁFICOS", z0=1.0, z1=1.35, pan=(0.5, 0.45, 0.5, 0.58)),
+            dict(name="h-reportes.png", a=5.5, b=6.5, label="REPORTES", z0=1.0, z1=1.5, pan=(0.5, 0.35, 0.45, 0.42), focus=[(0.18, 0.28, 0.98, 0.41)]),
+            dict(name="h-facturas.png", a=6.5, b=7.5, label="FACTURACIÓN INTERNA", z0=1.0, z1=1.6, pan=(0.40, 0.32, 0.55, 0.34), focus=[(0.175, 0.30, 0.97, 0.37)]),
+            dict(name="h-pagos.png", a=7.5, b=9.0, label="PAGOS MANUALES", z0=1.0, z1=1.6, pan=(0.45, 0.32, 0.60, 0.34), focus=[(0.58, 0.31, 0.97, 0.38)]),
         ]
+        chips_ = ["INDICADORES", "REPORTES", "FACTURACIÓN INTERNA", "PAGOS MANUALES"]
     else:
         shots = [
-            ("v-dashboard.png", 2.4, 5.2, "DASHBOARD OPERATIVO", (0.5, 0.3, 0.5, 0.5)),
-            ("v-reportes.png", 5.0, 7.0, "REPORTES", (0.5, 0.3, 0.5, 0.5)),
-            ("v-facturas.png", 6.8, 9.0, "FACTURACIÓN INTERNA", (0.5, 0.3, 0.5, 0.5)),
+            dict(name="v-dashboard.png", a=2.5, b=4.5, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.25, 0.5, 0.30)),
+            dict(name="v-dashboard-graficos.png", a=4.5, b=6.0, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.45, 0.5, 0.5)),
+            dict(name="v-reportes.png", a=6.0, b=7.5, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.30, 0.5, 0.40)),
+            dict(name="v-facturas.png", a=7.5, b=9.0, detail=True, z0=1.0, z1=1.1, pan=(0.5, 0.30, 0.5, 0.36)),
         ]
-    return split_scene(t, 28.0, 37.0, shots, "PRECISIÓN PARA CADA DECISIÓN", ["INDICADORES", "REPORTES", "FACTURACIÓN INTERNA", "PAGOS MANUALES"] if not VERT else ["INDICADORES", "FACTURACIÓN INTERNA"])
+        chips_ = ["INDICADORES", "FACTURACIÓN INTERNA"]
+    return shots_scene(t, 28.0, 37.0, shots, "PRECISIÓN PARA CADA DECISIÓN", chips_)
 
 
 def futurist_logo():
