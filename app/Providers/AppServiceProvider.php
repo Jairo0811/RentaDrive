@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(static fn (): Password => app()->isProduction()
+            ? Password::min(12)->mixedCase()->numbers()->symbols()
+            : Password::min(8));
+
         Event::listen(
             ConnectionEstablished::class,
             static function (ConnectionEstablished $event): void {

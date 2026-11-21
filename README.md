@@ -374,6 +374,7 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 - Cabeceras HTTP de seguridad y política de no-cache para páginas autenticadas y tokens de reserva.
 - Disco privado configurable por inspección (`RENTA_EVIDENCE_DISK=local` o `s3`), con migración de evidencias antiguas pendiente.
 - Empaquetado de releases auditadas con SHA-256 y manual de backup, restauración y despliegue. **No despliega automáticamente**.
+- Endurecimiento previo a staging (21/11/2026): seeders sin cuentas previsibles fuera de local, `production-check` ampliado, proxies de confianza, CORS cerrado y contraseñas de 12+ caracteres en producción. Ver [auditoría de seguridad](docs/security-audit.md).
 - Ver [manual de producción](docs/production-operations.md).
 
 ## Fases 5 y 6: expediente y automatizaciones

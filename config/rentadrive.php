@@ -40,10 +40,17 @@ return [
         ],
     ],
 
+    // Solo para seeders local/testing. Fuera de esos entornos NO existe contraseña por defecto
+    // (ver App\Support\Security\DemoCredentials).
     'seed' => [
         'admin_email' => env('RENTADRIVE_ADMIN_EMAIL', 'admin@rentadrive.com.do'),
-        'admin_password' => env('RENTADRIVE_ADMIN_PASSWORD', 'RentaDrive123..'),
+        'admin_password' => env('RENTADRIVE_ADMIN_PASSWORD', in_array(env('APP_ENV'), ['local', 'testing'], true) ? 'RentaDrive123..' : null),
         'platform_admin_email' => env('RENTADRIVE_PLATFORM_ADMIN_EMAIL', 'platform@rentadrive.test'),
-        'platform_admin_password' => env('RENTADRIVE_PLATFORM_ADMIN_PASSWORD', 'RentaDrivePlatform123!'),
+        'platform_admin_password' => env('RENTADRIVE_PLATFORM_ADMIN_PASSWORD', in_array(env('APP_ENV'), ['local', 'testing'], true) ? 'RentaDrivePlatform123!' : null),
+    ],
+
+    'security' => [
+        // Proxies de confianza (IPs/CIDR separados por coma). Nunca '*': ver ProductionReadiness.
+        'trusted_proxies' => env('TRUSTED_PROXIES'),
     ],
 ];
