@@ -375,6 +375,7 @@ Además deben usarse credenciales propias, HTTPS, backups, observabilidad y una 
 - Disco privado configurable por inspección (`RENTA_EVIDENCE_DISK=local` o `s3`), con migración de evidencias antiguas pendiente.
 - Empaquetado de releases auditadas con SHA-256 y manual de backup, restauración y despliegue. **No despliega automáticamente**.
 - Endurecimiento previo a staging (21/11/2026): seeders sin cuentas previsibles fuera de local, `production-check` ampliado, proxies de confianza, CORS cerrado y contraseñas de 12+ caracteres en producción. Ver [auditoría de seguridad](docs/security-audit.md).
+- Staging privado reproducible (21/11/2026): Docker Compose con SQL Server 2022 (TLS), cola, scheduler y datos ficticios, sin puertos públicos. El CI lo levanta en un runner descartable y comprueba migraciones, cola, respaldo/restauración con CHECKDB y ausencia de secretos. No está desplegado: dominio, Cloudflare Access y túnel dependen de servicios externos. Ver [staging privado](docs/staging-private.md).
 - Ver [manual de producción](docs/production-operations.md).
 
 ## Fases 5 y 6: expediente y automatizaciones

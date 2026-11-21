@@ -68,3 +68,5 @@ Para desplegar: verificar checksum, hacer backup y probar restauración, activar
 - Provisionar DNS, TLS, secretos, SQL Server, S3, correo, alertas, backups y respuesta a incidentes.
 - Ejecutar pruebas de seguridad, carga, restauración y E2E en infraestructura real.
 - Definir SLA, soporte, privacidad, consentimiento y retención antes de pilotos pagados.
+
+Para el entorno de staging privado (instalación, actualización, rollback y restauración) ver [staging-private.md](staging-private.md).
