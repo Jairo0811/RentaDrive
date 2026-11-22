@@ -90,6 +90,40 @@ jobs:
           BAK="$(./scripts/backup.sh | tail -1)"
           ./scripts/restore-test.sh "$BAK"
 
+      - name: Respaldo cifrado, huella, retención y recuperación desde el exportado
+        run: |
+          umask 077
+          PASS="$RUNNER_TEMP/backup.pass"; head -c 48 /dev/urandom | base64 -w0 > "$PASS"
+          export BACKUP_PASSPHRASE_FILE="$PASS" BACKUP_EXPORT_DIR="$RUNNER_TEMP/exports"
+          BAK="$(./scripts/backup.sh | tail -1)"
+          ENC="$(./scripts/export-backup.sh "$BAK" | tail -1)"
+          ./scripts/verify-backup.sh "$ENC"
+
+          echo "--- una frase incorrecta NO debe descifrar"
+          head -c 48 /dev/urandom | base64 -w0 > "$RUNNER_TEMP/wrong.pass"
+          if BACKUP_PASSPHRASE_FILE="$RUNNER_TEMP/wrong.pass" ./scripts/verify-backup.sh "$ENC"; then echo "Descifró con una frase incorrecta"; exit 1; fi
+
+          echo "--- un archivo alterado NO debe verificarse"
+          mkdir "$RUNNER_TEMP/tamper"; cp "$ENC" "$ENC.sha256" "$RUNNER_TEMP/tamper/"
+          printf 'X' | dd of="$RUNNER_TEMP/tamper/$(basename "$ENC")" bs=1 seek=200 conv=notrunc 2>/dev/null
+          if ./scripts/verify-backup.sh "$RUNNER_TEMP/tamper/$(basename "$ENC")"; then echo "Aceptó un respaldo alterado"; exit 1; fi
+
+          echo "--- recuperación completa desde el archivo cifrado (otra base, CHECKDB, conteos)"
+          ./scripts/restore-from-export.sh "$ENC"
+
+          echo "--- una frase con permisos abiertos se rechaza"
+          chmod 644 "$RUNNER_TEMP/wrong.pass"
+          if BACKUP_PASSPHRASE_FILE="$RUNNER_TEMP/wrong.pass" ./scripts/export-backup.sh "$BAK"; then echo "Aceptó una frase legible por otros"; exit 1; fi
+
+          echo "--- retención: se conservan los más recientes aunque estén vencidos"
+          for i in 1 2 3 4; do touch -d '40 days ago' "$BACKUP_EXPORT_DIR/viejo$i.bak.gpg"; echo x > "$BACKUP_EXPORT_DIR/viejo$i.bak.gpg.sha256"; done
+          BACKUP_RETENTION_DAYS=14 BACKUP_MIN_KEEP=3 ./scripts/prune-backups.sh
+          n="$(ls -1 "$BACKUP_EXPORT_DIR"/*.gpg | wc -l)"; echo "exportados tras retención (mín. 3): $n"
+          [ "$n" = "3" ] || { echo "Retención incorrecta"; exit 1; }
+          BACKUP_RETENTION_DAYS=14 BACKUP_MIN_KEEP=1 ./scripts/prune-backups.sh
+          n="$(ls -1 "$BACKUP_EXPORT_DIR"/*.gpg | wc -l)"
+          [ "$n" = "1" ] && [ -f "$ENC" ] || { echo "Debe sobrevivir solo el reciente"; exit 1; }
+
       - name: Ausencia de secretos en logs, imagen y archivos .env
         run: ./scripts/scan-secrets.sh
 
