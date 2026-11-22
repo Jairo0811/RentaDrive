@@ -14,7 +14,9 @@ final class AuditLogController extends Controller
     {
         $logs = AuditLog::query()
             ->with('user')
-            ->when($request->filled('event'), fn ($query) => $query->where('event', $request->string('event')))
+            ->when($request->filled('event'), fn ($query) => $request->string('event')->value() === 'mfa'
+                ? $query->where('event', 'like', 'mfa%')
+                : $query->where('event', $request->string('event')))
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
                 $term = $request->string('q')->value();
                 $search = '%'.$term.'%';

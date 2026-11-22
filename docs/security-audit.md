@@ -31,7 +31,7 @@ Este documento separa lo corregido en esta PR de lo que sigue pendiente. No es u
 
 - **Rotar** la contraseña del login SQL local `rentadrive_app` (la anterior está en el historial). Acción del operador sobre su servidor; no se hizo.
 - **Content-Security-Policy**: no hay CSP. Alpine.js estándar requiere `unsafe-eval`; adoptar la build CSP de Alpine y una política con nonces es trabajo separado.
-- **Autenticación multifactor** no implementada. Recomendable antes de cuentas SuperAdmin reales.
+- **Autenticación multifactor**: implementada como TOTP (ver `docs/mfa.md`); `MFA_ENFORCE` está apagado por defecto y debe activarse antes de cuentas SuperAdmin reales.
 - **Contraseñas filtradas** (`Password::uncompromised()`): requiere salida a un servicio externo; no se activó.
 - **Cuenta de migraciones separada** (el login de aplicación del script conserva `db_ddladmin` para poder migrar). Ver `docs/staging-private.md`.
 - **Pasarela de pago real y e-CF**: siguen deshabilitados y **bloqueados por dependencia externa**.

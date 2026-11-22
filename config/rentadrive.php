@@ -52,6 +52,12 @@ return [
     'security' => [
         // Proxies de confianza (IPs/CIDR separados por coma). Nunca '*': ver ProductionReadiness.
         'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+        // MFA TOTP para SuperAdmin y Administradores. enforce=true obliga a activarlo antes de usar el panel.
+        'mfa' => [
+            'enforce' => (bool) env('MFA_ENFORCE', false),
+            'issuer' => env('MFA_ISSUER', 'RentaDrive'),
+        ],
     ],
 
     // Datos ficticios de staging (ver App\Support\Operations\StagingGuard).
