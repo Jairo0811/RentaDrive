@@ -221,11 +221,15 @@ final class DigitalRentalAutomationTest extends TestCase
     {
         $this->enableAutomationWithOverdueRental();
         $this->travelTo(now()->startOfDay()->addHours(8));
-        Mail::shouldReceive('raw')->once()->andThrow(new \RuntimeException('smtp caído'));
+        $calls = 0;
+        Mail::shouldReceive('raw')->twice()->andReturnUsing(function () use (&$calls): void {
+            if (++$calls === 1) {
+                throw new \RuntimeException('smtp caído');
+            }
+        });
 
         $this->assertSame(0, app(AutomationDispatcher::class)->run());
 
-        Mail::fake();
         $this->travel(16)->minutes();
 
         $this->assertSame(1, app(AutomationDispatcher::class)->run());
