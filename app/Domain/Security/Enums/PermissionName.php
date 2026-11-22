@@ -26,5 +26,6 @@ enum PermissionName: string
     case VIEW_INVOICES = 'view invoices';
     case MANAGE_INVOICES = 'manage invoices';
     case VIEW_PAYMENTS = 'view payments';
+    case RECORD_PAYMENTS = 'record payments';
     case MANAGE_PAYMENTS = 'manage payments';
 }

@@ -173,7 +173,8 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
 
     Route::resource('payments', PaymentController::class)->only(['index', 'store', 'destroy'])
         ->middlewareFor(['index'], 'permission:'.PermissionName::VIEW_PAYMENTS->value)
-        ->middlewareFor(['store', 'destroy'], 'permission:'.PermissionName::MANAGE_PAYMENTS->value);
+        ->middlewareFor(['store'], 'permission:'.PermissionName::RECORD_PAYMENTS->value.'|'.PermissionName::MANAGE_PAYMENTS->value)
+        ->middlewareFor(['destroy'], 'permission:'.PermissionName::MANAGE_PAYMENTS->value);
 
     Route::get('/reports', [ReportController::class, 'index'])
         ->middleware('permission:'.PermissionName::VIEW_REPORTS->value)
