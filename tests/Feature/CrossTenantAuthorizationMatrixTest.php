@@ -136,7 +136,7 @@ final class CrossTenantAuthorizationMatrixTest extends TestCase
             'scheduled_at' => now()->addDay(), 'cost' => 100, 'status' => 'scheduled',
         ]);
         $option = BookingOption::query()->create([
-            'company_id' => $this->companyA->getKey(), 'code' => 'OPT-A', 'name' => 'Opcion Alfa Secreta',
+            'company_id' => $this->companyA->getKey(), 'code' => 'OPT-A', 'name' => 'Opcion Alfa Secreta', 'type' => 'extra',
             'pricing_mode' => 'flat', 'price' => 10, 'is_active' => true,
         ]);
         $employee = User::factory()->create([
