@@ -26,13 +26,13 @@ final class DashboardController extends Controller
 
                 return [
                     'label' => ucfirst($date->translatedFormat('M')),
-                    'value' => (float) Payment::query()
+                    'value' => (float) Payment::query()->visibleToBranch()
                         ->whereBetween('paid_at', [$date->copy()->startOfMonth(), $date->copy()->endOfMonth()])
                         ->sum('amount'),
                 ];
             });
 
-        $calendarReservations = Reservation::query()
+        $calendarReservations = Reservation::query()->visibleToBranch()
             ->with(['customer', 'vehicle.model.brand', 'category'])
             ->whereIn('status', ['pending', 'confirmed'])
             ->whereBetween('start_at', [$monthStart, $monthEnd])
@@ -48,7 +48,7 @@ final class DashboardController extends Controller
                 'status' => $reservation->status,
             ]);
 
-        $fleetStatus = Vehicle::query()
+        $fleetStatus = Vehicle::query()->visibleToBranch()
             ->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
@@ -56,7 +56,7 @@ final class DashboardController extends Controller
 
         // Agregación en SQL: el volumen de alquileres no se carga en memoria.
         // TenantScope califica rentals.company_id, por lo que los joins no generan ambigüedad.
-        $topCategories = Rental::query()
+        $topCategories = Rental::query()->visibleToBranch()
             ->join('vehicles', 'vehicles.id', '=', 'rentals.vehicle_id')
             ->join('vehicle_categories', 'vehicle_categories.id', '=', 'vehicles.vehicle_category_id')
             ->whereBetween('rentals.start_at', [now()->subDays(90)->startOfDay(), now()])
@@ -71,43 +71,43 @@ final class DashboardController extends Controller
             'metrics' => [
                 'maintenance_vehicles' => (int) ($fleetStatus['maintenance'] ?? 0),
                 'occupancy' => $operableFleet > 0 ? round(((int) ($fleetStatus['rented'] ?? 0) / $operableFleet) * 100) : null,
-                'returns_today' => Rental::query()->where('status', 'open')->whereDate('expected_return_at', today())->count(),
-                'overdue_returns' => Rental::query()->where('status', 'open')->where('expected_return_at', '<', now())->count(),
-                'pending_reservations' => Reservation::query()->where('status', 'pending')->count(),
-                'available_vehicles' => Vehicle::query()->where('status', 'available')->count(),
-                'open_rentals' => Rental::query()->where('status', 'open')->count(),
-                'today_reservations' => Reservation::query()
+                'returns_today' => Rental::query()->visibleToBranch()->where('status', 'open')->whereDate('expected_return_at', today())->count(),
+                'overdue_returns' => Rental::query()->visibleToBranch()->where('status', 'open')->where('expected_return_at', '<', now())->count(),
+                'pending_reservations' => Reservation::query()->visibleToBranch()->where('status', 'pending')->count(),
+                'available_vehicles' => Vehicle::query()->visibleToBranch()->where('status', 'available')->count(),
+                'open_rentals' => Rental::query()->visibleToBranch()->where('status', 'open')->count(),
+                'today_reservations' => Reservation::query()->visibleToBranch()
                     ->whereDate('start_at', today())
                     ->whereIn('status', ['pending', 'confirmed'])
                     ->count(),
-                'month_collected' => Payment::query()
+                'month_collected' => Payment::query()->visibleToBranch()
                     ->whereBetween('paid_at', [$monthStart, $monthEnd])
                     ->sum('amount'),
-                'outstanding' => Invoice::query()->where('balance', '>', 0)->sum('balance'),
+                'outstanding' => Invoice::query()->visibleToBranch()->where('balance', '>', 0)->sum('balance'),
                 'active_customers' => Customer::query()->where('status', 'active')->count(),
             ],
             'fleetStatus' => $fleetStatus,
-            'reservationStatus' => Reservation::query()
+            'reservationStatus' => Reservation::query()->visibleToBranch()
                 ->selectRaw('status, COUNT(*) as total')
                 ->whereBetween('start_at', [$monthStart, $monthEnd])
                 ->groupBy('status')
                 ->pluck('total', 'status'),
             'topCategories' => $topCategories,
-            'overdueRentals' => Rental::query()
+            'overdueRentals' => Rental::query()->visibleToBranch()
                 ->with(['customer', 'vehicle.model.brand'])
                 ->where('status', 'open')
                 ->where('expected_return_at', '<', now())
                 ->orderBy('expected_return_at')
                 ->limit(5)
                 ->get(),
-            'upcomingReservations' => Reservation::query()
+            'upcomingReservations' => Reservation::query()->visibleToBranch()
                 ->with(['customer', 'vehicle.model.brand', 'category'])
                 ->whereIn('status', ['pending', 'confirmed'])
                 ->where('start_at', '>=', now()->startOfDay())
                 ->orderBy('start_at')
                 ->limit(6)
                 ->get(),
-            'activeRentals' => Rental::query()
+            'activeRentals' => Rental::query()->visibleToBranch()
                 ->with(['customer', 'vehicle.model.brand'])
                 ->where('status', 'open')
                 ->orderBy('expected_return_at')

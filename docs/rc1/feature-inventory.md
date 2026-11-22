@@ -37,4 +37,3 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 ## Elementos D pendientes (no dependen de terceros)
 1. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
 2. Firma electrónica certificada del cliente (depende de un proveedor externo, clase C).
-3. Dashboard y reportes siguen mostrando totales de toda la empresa a quien los ve (Administrador/Gerente; el Agente ve el dashboard con contadores de empresa).
