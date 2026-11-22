@@ -52,7 +52,7 @@
             <legend class="text-sm font-bold text-slate-800 dark:text-slate-200">Tamaño del texto</legend>
             <div class="mt-2 grid grid-cols-4 gap-2">
                 <template x-for="size in [100, 125, 150, 200]" :key="size">
-                    <button type="button" class="accessibility-choice" :class="$store.accessibility.fontScale === size ? 'accessibility-choice-active' : ''" @click="$store.accessibility.setFontScale(size)" :aria-pressed="$store.accessibility.fontScale === size" x-text="`${size}%`"></button>
+                    <button type="button" class="accessibility-choice" :class="$store.accessibility.fontScale === size ? 'accessibility-choice-active' : ''" @click="$store.accessibility.setFontScale(size)" :aria-pressed="$store.accessibility.fontScale === size" x-text="size + '%'"></button>
                 </template>
             </div>
         </fieldset>
@@ -61,7 +61,7 @@
             <legend class="text-sm font-bold text-slate-800 dark:text-slate-200">Escala de interfaz</legend>
             <div class="mt-2 grid grid-cols-3 gap-2">
                 <template x-for="scale in [100, 110, 125]" :key="scale">
-                    <button type="button" class="accessibility-choice" :class="$store.accessibility.interfaceScale === scale ? 'accessibility-choice-active' : ''" @click="$store.accessibility.setInterfaceScale(scale)" :aria-pressed="$store.accessibility.interfaceScale === scale" x-text="`${scale}%`"></button>
+                    <button type="button" class="accessibility-choice" :class="$store.accessibility.interfaceScale === scale ? 'accessibility-choice-active' : ''" @click="$store.accessibility.setInterfaceScale(scale)" :aria-pressed="$store.accessibility.interfaceScale === scale" x-text="scale + '%'"></button>
                 </template>
             </div>
         </fieldset>

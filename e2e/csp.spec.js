@@ -15,10 +15,12 @@ async function observeViolations(page) {
     });
     const consoleViolations = [];
     page.on('console', (message) => {
-        if (/content security policy/i.test(message.text())) {
+        // Con la build CSP de Alpine, una expresión no permitida solo avisa por consola: se trata como fallo.
+        if (/content security policy|alpine expression error|csp parser error|alpine warning/i.test(message.text())) {
             consoleViolations.push(message.text());
         }
     });
+    page.on('pageerror', (error) => consoleViolations.push(`pageerror: ${error.message}`));
     return consoleViolations;
 }
 
@@ -37,6 +39,7 @@ test.describe('CSP en el panel (sesión de administrador)', () => {
             const header = response?.headers()['content-security-policy'] ?? '';
             expect(header).toMatch(/script-src [^;]*'nonce-[A-Za-z0-9+/=]+'/);
             expect(header).not.toMatch(/script-src [^;]*'unsafe-inline'/);
+            expect(header).not.toContain('unsafe-eval');
             expect(header).toContain("object-src 'none'");
             expect(header).toContain("frame-ancestors 'none'");
 
@@ -52,6 +55,17 @@ test.describe('CSP en el panel (sesión de administrador)', () => {
         await page.waitForLoadState('networkidle');
         await page.getByRole('button', { name: /accesibilidad/i }).first().click();
         await expect(page.getByRole('dialog').first()).toBeVisible();
+
+        // Opciones del menú (x-for con plantillas migradas) y selector de búsqueda.
+        await page.getByRole('button', { name: '125%' }).first().click();
+        await expect(page.getByRole('button', { name: '125%' }).first()).toHaveAttribute('aria-pressed', 'true');
+        await page.keyboard.press('Escape');
+
+        const lookup = page.getByRole('combobox').first();
+        await lookup.click();
+        await expect(lookup).toHaveAttribute('aria-expanded', 'true');
+        await page.keyboard.press('Escape');
+        await expect(lookup).toHaveAttribute('aria-expanded', 'false');
         await assertClean(page, consoleViolations, 'interacción Alpine');
     });
 

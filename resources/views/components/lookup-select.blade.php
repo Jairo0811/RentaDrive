@@ -20,7 +20,7 @@
     @keydown.escape="close()"
     @click.outside="close()"
 >
-    <input type="hidden" name="{{ $name }}" x-bind:value="value ?? ''" value="{{ $current['id'] ?? '' }}">
+    <input type="hidden" name="{{ $name }}" x-bind:value="value || ''" value="{{ $current['id'] ?? '' }}">
     <input
         id="{{ $id }}"
         type="text"
@@ -42,7 +42,7 @@
         @blur="onBlur()"
         @keydown.arrow-down.prevent="move(1)"
         @keydown.arrow-up.prevent="move(-1)"
-        @keydown.enter="if (open && active >= 0) { $event.preventDefault(); choose(items[active]); }"
+        @keydown.enter="onEnter($event)"
         value="{{ $current['label'] ?? '' }}"
     >
     @if ($clearable)
@@ -59,7 +59,7 @@
             <li
                 role="option"
                 x-bind:id="'{{ $id }}-option-' + index"
-                x-bind:aria-selected="(String(item.id) === String(value)).toString()"
+                x-bind:aria-selected="isSelected(item)"
                 class="cursor-pointer px-3 py-2 text-sm text-slate-200"
                 x-bind:class="index === active ? 'bg-blue-950/60' : ''"
                 @mousedown.prevent="choose(item)"
