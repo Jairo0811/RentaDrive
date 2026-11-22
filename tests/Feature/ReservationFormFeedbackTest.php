@@ -8,6 +8,9 @@ use App\Domain\Security\Enums\RoleName;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Tests\TestCase;
 
 final class ReservationFormFeedbackTest extends TestCase
@@ -36,9 +39,22 @@ final class ReservationFormFeedbackTest extends TestCase
             ->assertRedirect('/reservations/create')
             ->assertSessionHasErrors(['customer_id', 'end_at']);
 
+        // The PHPUnit array session is intentionally non-persistent between HTTP
+        // requests. Provide an error bag to the view to assert the Blade output.
+        $errors = (new ViewErrorBag)->put('default', new MessageBag([
+            'customer_id' => ['Selecciona un cliente válido.'],
+            'end_at' => ['La devolución debe ser posterior al retiro.'],
+        ]));
+
+        View::composer('reservations.form', static function ($view) use ($errors): void {
+            $view->with('errors', $errors);
+        });
+
         $this->get('/reservations/create')
             ->assertOk()
             ->assertSee('Revisa los campos indicados antes de guardar la reserva.')
+            ->assertSee('Selecciona un cliente válido.')
+            ->assertSee('La devolución debe ser posterior al retiro.')
             ->assertSee('aria-describedby="customer_id-status customer_id-error"', false)
             ->assertSee('id="end_at-error"', false)
             ->assertSee('aria-invalid="true"', false);
