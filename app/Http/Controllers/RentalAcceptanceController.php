@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Rental;
 use App\Models\RentalAcceptance;
+use App\Support\Commercial\ContractIntegrity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,17 +36,17 @@ final class RentalAcceptanceController extends Controller
                 throw ValidationException::withMessages(['rental' => 'Este alquiler ya tiene un acuse de operador.']);
             }
 
+            $snapshot = ContractIntegrity::snapshot($rental);
+
             RentalAcceptance::query()->create([
                 'company_id' => $rental->company_id,
                 'rental_id' => $rental->getKey(),
                 'recorded_by' => auth()->id(),
                 'signer_role' => 'operator',
                 'signer_name' => $data['signer_name'],
-                'document_hash' => hash('sha256', json_encode([
-                    $rental->code, $rental->customer_id, $rental->vehicle_id,
-                    $rental->start_at->toIso8601String(),
-                    $rental->expected_return_at->toIso8601String(), (string) $rental->total,
-                ], JSON_THROW_ON_ERROR)),
+                'document_hash' => ContractIntegrity::hash($snapshot),
+                'hash_version' => ContractIntegrity::VERSION,
+                'document_snapshot' => json_encode($snapshot, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'accepted_at' => now(),

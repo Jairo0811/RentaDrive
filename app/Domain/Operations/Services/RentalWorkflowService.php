@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\Vehicle;
+use App\Support\Commercial\Money;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -42,11 +43,11 @@ final class RentalWorkflowService
             }
 
             $days = $this->availability->rentalDays($startAt, $endAt);
-            $subtotal = round($days * (float) $data['daily_rate'], 2);
-            $fees = round((float) ($data['fees'] ?? 0), 2);
+            $subtotal = Money::round($days * (float) $data['daily_rate']);
+            $fees = Money::round((float) ($data['fees'] ?? 0));
             $taxRate = (float) SettingValue::get('billing.tax_rate', '18');
-            $taxes = round(($subtotal + $fees) * ($taxRate / 100), 2);
-            $total = $subtotal + $fees + $taxes;
+            $taxes = Money::percentage(Money::sum($subtotal, $fees), $taxRate);
+            $total = Money::sum($subtotal, $fees, $taxes);
 
             $rental = Rental::query()->create([
                 ...$data,
@@ -98,11 +99,11 @@ final class RentalWorkflowService
 
             $returnedAt = Carbon::parse($data['returned_at']);
             $days = $this->availability->rentalDays($rental->start_at, $returnedAt);
-            $subtotal = round($days * (float) $rental->daily_rate, 2);
-            $fees = round((float) ($data['fees'] ?? $rental->fees), 2);
+            $subtotal = Money::round($days * (float) $rental->daily_rate);
+            $fees = Money::round((float) ($data['fees'] ?? $rental->fees));
             $taxRate = (float) SettingValue::get('billing.tax_rate', '18');
-            $taxes = round(($subtotal + $fees) * ($taxRate / 100), 2);
-            $total = $subtotal + $fees + $taxes;
+            $taxes = Money::percentage(Money::sum($subtotal, $fees), $taxRate);
+            $total = Money::sum($subtotal, $fees, $taxes);
 
             $invoice = $rental->invoice;
             if ($invoice !== null && round($total, 2) < round((float) $invoice->paid_amount, 2)) {

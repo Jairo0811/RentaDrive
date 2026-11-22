@@ -11,7 +11,7 @@ final class RentalAcceptance extends Model
 {
     protected $fillable = [
         'company_id', 'rental_id', 'recorded_by', 'signer_name', 'signer_role',
-        'document_hash', 'ip_address', 'user_agent', 'accepted_at',
+        'document_hash', 'hash_version', 'document_snapshot', 'ip_address', 'user_agent', 'accepted_at',
     ];
 
     protected function casts(): array
