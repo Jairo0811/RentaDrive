@@ -69,7 +69,7 @@ docker compose --env-file .env.staging --profile tunnel up -d cloudflared
 
 ## Respaldos, logs y monitoreo
 
-- **Respaldos:** el volumen `sqlbackup` guarda los `.bak`. Copiarlos cifrados fuera del equipo (retención externa) es responsabilidad del operador; no está automatizado. Programar `backup.sh` (cron/systemd timer) y vigilar su resultado.
+- **Respaldos:** el volumen `sqlbackup` guarda los `.bak`. Para copiarlos cifrados fuera del equipo y aplicar retención usa `export-backup.sh`, `verify-backup.sh`, `restore-from-export.sh` y `prune-backups.sh` (ver `docs/backup-recovery.md`); la subida al almacenamiento externo la define el operador con `BACKUP_UPLOAD_COMMAND`. Programar `backup.sh` (cron/systemd timer) y vigilar su resultado.
 - **Logs:** `LOG_CHANNEL=stderr`, `LOG_LEVEL=warning`; consultar con `docker compose logs`. No enviar datos personales ni secretos a servicios externos. `scripts/scan-secrets.sh` comprueba que los secretos generados no aparezcan en logs ni en la imagen.
 - **Monitoreo mínimo:** `GET /up` (healthcheck de `web`), estado de `queue`/`scheduler`, `jobs`/`failed_jobs`, espacio del volumen `sqldata`, caducidad de la CA interna (365 días). Alertas externas: pendiente.
 
