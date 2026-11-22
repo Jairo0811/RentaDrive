@@ -32,6 +32,12 @@
         'converted' => 'Convertida',
         'delivery' => 'Entrega',
         'return' => 'Devolución',
+        'mfa_enabled' => 'MFA activado',
+        'mfa_disabled' => 'MFA desactivado',
+        'mfa_failed' => 'MFA fallido',
+        'mfa_locked' => 'MFA bloqueado',
+        'mfa_recovery_used' => 'Código de recuperación usado',
+        'mfa_codes_regenerated' => 'Códigos MFA regenerados',
         default => ucfirst(str_replace('_', ' ', (string) $status)),
     };
 @endphp

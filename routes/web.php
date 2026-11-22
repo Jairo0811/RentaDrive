@@ -3,6 +3,7 @@
 use App\Domain\Security\Enums\PermissionName;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BookingOptionController;
+use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
@@ -23,13 +24,21 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TwoFactorSettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleMaintenanceController;
 use App\Support\Lookups\LookupCatalog;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+// Violaciones de CSP enviadas por el navegador: sin sesión, sin CSRF (no hay cookies en el envío), con límite de tasa.
+Route::post('/csp-report', CspReportController::class)
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->middleware('throttle:30,1')
+    ->name('csp.report');
 
 Route::prefix('book/{company:slug}')
     ->name('public-booking.')
@@ -54,6 +63,14 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // MFA: confirmar la contraseña (máx. 10 min) antes de iniciar, regenerar o desactivar el segundo factor.
+    Route::middleware('password.confirm:password.confirm,600')->group(function (): void {
+        Route::post('/profile/two-factor', [TwoFactorSettingsController::class, 'store'])->name('two-factor.enable');
+        Route::post('/profile/two-factor/confirm', [TwoFactorSettingsController::class, 'confirm'])->name('two-factor.confirm');
+        Route::post('/profile/two-factor/recovery-codes', [TwoFactorSettingsController::class, 'regenerate'])->name('two-factor.recovery-codes');
+        Route::delete('/profile/two-factor', [TwoFactorSettingsController::class, 'destroy'])->name('two-factor.disable');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'platform_admin'])

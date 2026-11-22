@@ -29,9 +29,16 @@ export default defineConfig({
             use: { ...devices['Pixel 5'], storageState: 'test-results/.auth/admin.json' },
         },
         {
+            // Verifica que la CSP en modo enforce no bloquee scripts, estilos ni fuentes legítimos.
+            name: 'csp',
+            testMatch: /csp\.spec\.js/,
+            dependencies: ['setup', 'mobile'],
+            use: { ...devices['Desktop Chrome'], storageState: 'test-results/.auth/admin.json' },
+        },
+        {
             name: 'desktop',
             testMatch: /flujos\.spec\.js/,
-            dependencies: ['setup', 'mobile'],
+            dependencies: ['setup', 'mobile', 'csp'],
             use: { ...devices['Desktop Chrome'], storageState: 'test-results/.auth/admin.json' },
         },
         {

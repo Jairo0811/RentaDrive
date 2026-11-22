@@ -174,4 +174,72 @@ final class DigitalRentalAutomationTest extends TestCase
             'index' => 0,
         ]))->assertNotFound();
     }
+
+    private function enableAutomationWithOverdueRental(): void
+    {
+        $user = $this->administrator();
+        $user->company->update(['email' => 'rentadora@example.test']);
+        $this->rental()->update(['expected_return_at' => now()->subDays(2)]);
+        config()->set('rentadrive.automation.enabled', true);
+        Setting::query()->create([
+            'group' => 'automation', 'key' => 'automation.email_opt_in', 'value' => '1', 'type' => 'string',
+        ]);
+    }
+
+    public function test_failed_delivery_is_retried_with_backoff_and_stops_after_three_attempts(): void
+    {
+        $this->enableAutomationWithOverdueRental();
+        $this->travelTo(now()->startOfDay()->addHours(8));
+        Mail::shouldReceive('raw')->times(3)->andThrow(new \RuntimeException('smtp caído'));
+        $dispatcher = app(AutomationDispatcher::class);
+
+        $this->assertSame(0, $dispatcher->run());
+        $delivery = AutomationDelivery::query()->firstOrFail();
+        $this->assertSame('failed', $delivery->status);
+        $this->assertSame(1, $delivery->attempts);
+
+        // Dentro del retroceso (15 min) no se reintenta.
+        $this->assertSame(0, $dispatcher->run());
+        $this->assertSame(1, $delivery->refresh()->attempts);
+
+        $this->travel(16)->minutes();
+        $dispatcher->run();
+        $this->assertSame(2, $delivery->refresh()->attempts);
+
+        $this->travel(31)->minutes();
+        $dispatcher->run();
+        $this->assertSame(3, $delivery->refresh()->attempts);
+
+        // Agotados los intentos no se vuelve a enviar (Mail::raw se llamó exactamente 3 veces).
+        $this->travel(3)->hours();
+        $dispatcher->run();
+        $this->assertSame(3, $delivery->refresh()->attempts);
+        $this->assertSame(1, AutomationDelivery::query()->count());
+    }
+
+    public function test_failed_delivery_recovers_when_mail_works_again(): void
+    {
+        $this->enableAutomationWithOverdueRental();
+        $this->travelTo(now()->startOfDay()->addHours(8));
+        $calls = 0;
+        Mail::shouldReceive('raw')->twice()->andReturnUsing(function () use (&$calls): void {
+            if (++$calls === 1) {
+                throw new \RuntimeException('smtp caído');
+            }
+        });
+
+        $this->assertSame(0, app(AutomationDispatcher::class)->run());
+
+        $this->travel(16)->minutes();
+
+        $this->assertSame(1, app(AutomationDispatcher::class)->run());
+        $delivery = AutomationDelivery::query()->firstOrFail();
+        $this->assertSame('sent', $delivery->status);
+        $this->assertSame(2, $delivery->attempts);
+        $this->assertNull($delivery->last_error);
+
+        // Una vez enviado, nunca se repite.
+        $this->travel(2)->hours();
+        $this->assertSame(0, app(AutomationDispatcher::class)->run());
+    }
 }

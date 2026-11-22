@@ -52,6 +52,33 @@ return [
     'security' => [
         // Proxies de confianza (IPs/CIDR separados por coma). Nunca '*': ver ProductionReadiness.
         'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+        // Content-Security-Policy (ver docs/csp.md). mode: enforce | report-only | off.
+        'csp' => [
+            'mode' => env('CSP_MODE', 'enforce'),
+            // Orígenes adicionales (https://host, separados por coma) para imágenes y conexiones fetch/XHR.
+            'img' => env('CSP_IMG_SRC', ''),
+            'connect' => env('CSP_CONNECT_SRC', ''),
+        ],
+
+        // MFA TOTP para SuperAdmin y Administradores. enforce=true obliga a activarlo antes de usar el panel.
+        'mfa' => [
+            'enforce' => (bool) env('MFA_ENFORCE', false),
+            'issuer' => env('MFA_ISSUER', 'RentaDrive'),
+        ],
+    ],
+
+    // Observabilidad y alertas (ver docs/operations-resilience.md).
+    'operations' => [
+        // Token Bearer para /api/health/details (≥ 32 caracteres; vacío = endpoint inexistente).
+        'health_token' => env('HEALTH_TOKEN'),
+        'max_queue_age_seconds' => (int) env('HEALTH_MAX_QUEUE_AGE', 900),
+        'max_failed_jobs' => (int) env('HEALTH_MAX_FAILED_JOBS', 5),
+        'max_scheduler_age_seconds' => (int) env('HEALTH_MAX_SCHEDULER_AGE', 180),
+        // En producción el scheduler es obligatorio; en local/testing no.
+        'require_scheduler' => (bool) env('HEALTH_REQUIRE_SCHEDULER', env('APP_ENV') === 'production'),
+        // Alertas por correo solo si se configura un destinatario (y un proveedor de correo real).
+        'alert_email' => env('RENTADRIVE_ALERT_EMAIL'),
     ],
 
     // Datos ficticios de staging (ver App\Support\Operations\StagingGuard).

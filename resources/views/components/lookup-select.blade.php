@@ -31,7 +31,8 @@
         placeholder="{{ $placeholder }}"
         aria-autocomplete="list"
         aria-controls="{{ $id }}-list"
-        aria-describedby="{{ $id }}-status"
+        aria-describedby="{{ $id }}-status{{ $errors->has($name) ? ' '.$id.'-error' : '' }}"
+        @if ($errors->has($name)) aria-invalid="true" @endif
         x-bind:aria-expanded="open.toString()"
         x-bind:aria-activedescendant="active >= 0 ? '{{ $id }}-option-' + active : null"
         x-bind:required="@js((bool) $required) && ! value"
@@ -72,5 +73,8 @@
         <li class="border-t border-slate-800 px-3 py-2 text-xs text-slate-400" x-show="more">Se muestran los primeros resultados. Escribe más para afinar la búsqueda.</li>
     </ul>
     <p id="{{ $id }}-status" class="sr-only" role="status" aria-live="polite" x-text="status"></p>
+    @if ($errors->has($name))
+        <p id="{{ $id }}-error" class="mt-2 text-sm text-red-400" role="alert">{{ $errors->first($name) }}</p>
+    @endif
     @if ($hint)<p class="mt-2 text-xs text-slate-400">{{ $hint }}</p>@endif
 </div>

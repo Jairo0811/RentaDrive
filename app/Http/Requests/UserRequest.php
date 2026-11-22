@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -12,6 +13,14 @@ final class UserRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        $target = $this->route('user');
+
+        // Defensa en profundidad: la validación no debe ejecutarse (ni revelar errores) sobre un usuario de otra empresa.
+        abort_if(
+            $target instanceof User && $this->user()?->company_id !== $target->company_id,
+            404,
+        );
+
         return true;
     }
 
