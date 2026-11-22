@@ -8,8 +8,6 @@ use App\Domain\Security\Enums\RoleName;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\ViewErrorBag;
 use Tests\TestCase;
 
 final class ReservationFormFeedbackTest extends TestCase
@@ -22,18 +20,25 @@ final class ReservationFormFeedbackTest extends TestCase
         $administrator = User::factory()->create();
         $administrator->assignRole(RoleName::ADMINISTRATOR->value);
 
-        $errors = (new ViewErrorBag)->put('default', new MessageBag([
-            'customer_id' => ['Selecciona un cliente válido.'],
-            'end_at' => ['La devolución debe ser posterior al retiro.'],
-        ]));
-
+        // Exercise the real validation + redirect flow; never create records.
         $this->actingAs($administrator)
-            ->withSession(['errors' => $errors])
-            ->get('/reservations/create')
+            ->from('/reservations/create')
+            ->post('/reservations', [
+                'customer_id' => '',
+                'vehicle_category_id' => '',
+                'start_at' => '2026-12-12T12:00',
+                'end_at' => '2026-12-11T12:00',
+                'daily_rate' => 2500,
+                'pickup_location' => 'Oficina principal',
+                'return_location' => 'Oficina principal',
+                'status' => 'pending',
+            ])
+            ->assertRedirect('/reservations/create')
+            ->assertSessionHasErrors(['customer_id', 'end_at']);
+
+        $this->get('/reservations/create')
             ->assertOk()
             ->assertSee('Revisa los campos indicados antes de guardar la reserva.')
-            ->assertSee('Selecciona un cliente válido.')
-            ->assertSee('La devolución debe ser posterior al retiro.')
             ->assertSee('aria-describedby="customer_id-status customer_id-error"', false)
             ->assertSee('id="end_at-error"', false)
             ->assertSee('aria-invalid="true"', false);
