@@ -115,4 +115,35 @@
             <button class="btn-primary">{{ $company->exists ? 'Guardar cambios' : 'Provisionar empresa' }}</button>
         </div>
     </form>
+
+    @if ($company->exists)
+        <section class="panel mt-6 p-5 sm:p-6">
+            <h2 class="font-black text-white">Administradores y verificación en dos pasos</h2>
+            <p class="mt-1 text-sm text-slate-400">Si un administrador perdió su dispositivo y sus códigos de recuperación, puedes restablecer su MFA tras verificar su identidad por un canal independiente. Se te pedirá tu contraseña y queda auditado.</p>
+            <div class="mt-4 overflow-x-auto">
+                <table class="data-table">
+                    <thead><tr><th>Administrador</th><th>Correo</th><th>MFA</th><th></th></tr></thead>
+                    <tbody>
+                        @forelse ($administrators as $administrator)
+                            <tr>
+                                <td>{{ $administrator->name }}</td>
+                                <td>{{ $administrator->email }}</td>
+                                <td>{{ $administrator->hasTwoFactorEnabled() ? 'Activo' : ($administrator->two_factor_secret ? 'Pendiente' : 'No configurado') }}</td>
+                                <td>
+                                    @if ($administrator->two_factor_secret)
+                                        <form method="POST" action="{{ route('platform.companies.users.mfa-reset', [$company, $administrator]) }}" data-confirm="¿Restablecer el MFA de este administrador?" data-confirm-label="Restablecer">
+                                            @csrf
+                                            <button class="focus-ring inline-flex min-h-11 items-center text-xs font-bold text-red-400 sm:min-h-6">Restablecer MFA</button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4">Esta empresa no tiene administradores.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @endif
 </x-app-layout>

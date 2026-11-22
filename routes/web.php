@@ -17,6 +17,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Platform\PlatformBranchController;
 use App\Http\Controllers\Platform\PlatformCompanyController;
 use App\Http\Controllers\Platform\PlatformDashboardController;
+use App\Http\Controllers\Platform\PlatformUserMfaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicBookingController;
 use App\Http\Controllers\RentalAcceptanceController;
@@ -86,6 +87,10 @@ Route::middleware(['auth', 'verified', 'platform_admin'])
         Route::put('/companies/{company}', [PlatformCompanyController::class, 'update'])->name('companies.update');
         Route::patch('/companies/{company}/suspend', [PlatformCompanyController::class, 'suspend'])->name('companies.suspend');
         Route::patch('/companies/{company}/activate', [PlatformCompanyController::class, 'activate'])->name('companies.activate');
+
+        Route::post('/companies/{company}/users/{user}/mfa-reset', [PlatformUserMfaController::class, 'reset'])
+            ->middleware('password.confirm:password.confirm,300')
+            ->name('companies.users.mfa-reset');
 
         Route::get('/companies/{company}/branches', [PlatformBranchController::class, 'index'])->name('companies.branches.index');
         Route::get('/companies/{company}/branches/create', [PlatformBranchController::class, 'create'])->name('companies.branches.create');

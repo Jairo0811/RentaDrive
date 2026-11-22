@@ -5,7 +5,7 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Módulo | Clase | Evidencia / observaciones |
 |---|:-:|---|
 | Acceso, recuperación de contraseña, sesiones | A | PHPUnit + Playwright (escritorio y móvil). Contraseñas 12+ en producción/staging |
-| MFA TOTP (admin de empresa y plataforma), códigos de recuperación, `rentadrive:mfa-reset` | A | `TwoFactorAuthenticationTest`, `TotpTest`. Con código QR generado en el servidor y clave manual alternativa |
+| MFA TOTP (admin de empresa y plataforma), códigos de recuperación, `rentadrive:mfa-reset`, restablecimiento web por SuperAdmin | A | `TwoFactorAuthenticationTest`, `TotpTest`, `PlatformMfaResetTest`. Con código QR generado en el servidor y clave manual alternativa |
 | Aislamiento multiempresa | A | `CrossTenantAuthorizationMatrixTest` (matriz negativa + guarda estructural `company_id`) |
 | Roles y permisos | A | [Matriz](../permission-matrix.md). Agente e Inspector limitados a su sucursal (listados, apertura por URL y selectores); Administrador y Gerente ven toda la empresa |
 | Clientes | A | CRUD, validación de cédula dominicana, selectores inteligentes |
@@ -35,5 +35,5 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Pasarela de pago | C | Proveedor externo; no activado |
 
 ## Elementos D pendientes (no dependen de terceros)
-1. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
+1. MFA: WebAuthn (el restablecimiento web por SuperAdmin ya existe).
 2. Firma electrónica certificada del cliente (depende de un proveedor externo, clase C).
