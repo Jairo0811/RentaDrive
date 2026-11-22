@@ -24,7 +24,7 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Portal público de reservas | A/B | Probado en CI; validación en dispositivo físico pendiente |
 | Admin SaaS (empresas, ciclo de vida, planes) | A | Pruebas de ciclo de vida y límites de plan |
 | Fiscal RD (preparación) | C | Borrador/validadores y base de proveedor e-CF (sandbox). Sin NCF/e-CF reales, sin certificación |
-| Seguridad HTTP (CSP, cabeceras, CORS cerrado, proxies) | A | `ContentSecurityPolicyTest`, Playwright `csp`. `unsafe-eval` temporal por Alpine estándar (D) |
+| Seguridad HTTP (CSP, cabeceras, CORS cerrado, proxies) | A | `ContentSecurityPolicyTest`, Playwright `csp`. Alpine build CSP: sin `unsafe-eval` |
 | Cola, planificador, reintentos, idempotencia, alertas | A | `OperationalResilienceTest`, `DigitalRentalAutomationTest` |
 | Salud y observabilidad (`/api/health`, logs JSON, `X-Request-Id`) | A | Pruebas de feature |
 | Respaldos cifrados, huella, retención, restauración | A (runner descartable) / B (staging real) | Ejecutado en `staging-verify`; pendiente ensayo en el staging real |
@@ -35,8 +35,6 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Pasarela de pago | C | Proveedor externo; no activado |
 
 ## Elementos D pendientes (no dependen de terceros)
-1. Build CSP de Alpine para retirar `'unsafe-eval'` (`docs/csp.md`).
-2. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
-3. Historial de versiones editable del contrato y descarga PDF con huella.
-
-5. Lectura restringida por sucursal dentro de una empresa — **requiere decisión de negocio**.
+1. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
+2. Historial de versiones editable del contrato y descarga PDF con huella.
+3. Lectura restringida por sucursal dentro de una empresa — **requiere decisión de negocio**.

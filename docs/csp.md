@@ -8,7 +8,7 @@ La aplicación envía una CSP con **nonce por petición** desde `App\Http\Middle
 | Directiva | Valor | Motivo |
 | --- | --- | --- |
 | `default-src` | `'self'` | Todo lo no listado queda restringido al propio origen. |
-| `script-src` | `'self'` `'nonce-…'` `'unsafe-eval'` | Sin scripts en línea sin nonce ni orígenes externos. **`'unsafe-eval'` sigue presente** (ver abajo). |
+| `script-src` | `'self'` `'nonce-…'` | Sin scripts en línea sin nonce, sin orígenes externos y **sin `'unsafe-eval'`** (Alpine usa su build CSP). |
 | `style-src-elem` | `'self'` `https://cdnjs.cloudflare.com` | Hojas propias y Font Awesome; sin `<style>` en línea. |
 | `style-src-attr` | `'unsafe-inline'` | Atributos `style=""` existentes (anchos de barras, visibilidad de componentes). |
 | `font-src` | `'self'` `data:` `https://cdnjs.cloudflare.com` | Iconos Font Awesome. |
@@ -39,16 +39,18 @@ Cualquier `<script>` en línea debe llevar `nonce="{{ \Illuminate\Support\Facade
 
 Las respuestas 404 (ruta inexistente o modelo no encontrado en una ruta con binding) también llevan CSP: `SecurityHeaders` es middleware global, no solo del grupo `web`.
 
-## Limitación conocida: `'unsafe-eval'`
+## Alpine con build CSP (sin `'unsafe-eval'`)
 
-Alpine.js estándar evalúa las expresiones de `x-data`, `@click`, `x-show`… con `new Function`. Quitar `'unsafe-eval'` exige migrar a la
-**build CSP de Alpine** (`@alpinejs/csp`) y reescribir ~240 expresiones en ~12 vistas como componentes registrados con `Alpine.data()`.
-Se deja como siguiente paso incremental y no se hizo aquí para no romper selectores, menús ni formularios sin pruebas de navegador por componente.
-Mientras tanto la CSP sigue bloqueando scripts inyectados en línea y de orígenes externos, que es el vector habitual de XSS.
+La interfaz usa `@alpinejs/csp`. Esta build no evalúa JavaScript desde atributos: solo admite expresiones simples (propiedades, llamadas a
+métodos, ternarios, asignaciones, literales). Las lógicas con funciones flecha, plantillas, sentencias `if` o acceso a `window/document` viven
+en componentes registrados en `resources/js/app.js` (`appShell`, `modalDialog`, `autoHide`, `lookupSelect`, stores `toast` y `accessibility`).
+Una expresión no permitida **no rompe la página**, pero esa interacción deja de funcionar y Alpine escribe `Alpine Expression Error` en consola;
+la prueba `e2e/csp.spec.js` falla si aparece alguno en las pantallas principales.
+
+Al añadir interactividad: usa `x-data="componente"`/`Alpine.data()`, no funciones ni `${}` en atributos.
 
 ## Pendiente
 
-- Migrar a `@alpinejs/csp` y eliminar `'unsafe-eval'` (y revisar `Chart.js`, que no lo necesita).
 - Sustituir los `style=""` por clases para retirar `'unsafe-inline'` de `style-src-attr`.
 - Alojar Font Awesome localmente para dejar de depender de cdnjs.
 - Reporting API (`report-to`) además de `report-uri`.

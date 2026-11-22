@@ -25,23 +25,9 @@
     </head>
     <body
         class="h-full antialiased"
-        x-data="{
-            sidebarOpen: false,
-            desktop: window.matchMedia('(min-width: 1024px)').matches,
-            init() {
-                const query = window.matchMedia('(min-width: 1024px)');
-                query.addEventListener('change', (event) => {
-                    this.desktop = event.matches;
-                    if (event.matches) this.sidebarOpen = false;
-                });
-                this.$watch('sidebarOpen', (open) => this.$nextTick(() => {
-                    if (open) this.$refs.drawerClose?.focus();
-                    else if (! this.desktop) this.$refs.menuToggle?.focus();
-                }));
-            },
-        }"
+        x-data="appShell"
         @keydown.escape.window="sidebarOpen = false"
-        @resize.window.debounce.100ms="desktop = window.matchMedia('(min-width: 1024px)').matches; if (desktop) sidebarOpen = false"
+        @resize.window.debounce.100ms="syncViewport()"
     >
         <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
         <a href="#primary-navigation" class="skip-link left-56">Saltar a la navegación</a>
@@ -70,11 +56,11 @@
         </div>
 
         @if (session('status'))
-            <div x-init="$nextTick(() => $store.toast.show(@js(session('status'))))"></div>
+            <div x-init="$store.toast.showLater(@js(session('status')))"></div>
         @endif
 
         @if ($errors->any())
-            <div x-init="$nextTick(() => $store.toast.show(@js('Revisa la información indicada en el formulario.'), 'error'))"></div>
+            <div x-init="$store.toast.showLater(@js('Revisa la información indicada en el formulario.'), 'error')"></div>
         @endif
 
         <div class="flex h-full overflow-hidden bg-slate-950">

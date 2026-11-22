@@ -11,9 +11,9 @@ use Throwable;
 /**
  * Política CSP con nonce por petición.
  *
- * Alpine.js estándar evalúa expresiones con `new Function`, por eso `script-src` conserva 'unsafe-eval'
- * (ver docs/csp.md: migrar a la build CSP de Alpine es el siguiente paso). Lo que SÍ se restringe: no hay
- * scripts en línea sin nonce, ni orígenes de script externos, ni `unsafe-inline` en scripts/hojas de estilo.
+ * La interfaz usa la build CSP de Alpine (`@alpinejs/csp`): no evalúa JavaScript desde atributos HTML, así que
+ * `script-src` NO incluye 'unsafe-eval'. No hay scripts en línea sin nonce, ni orígenes de script externos, ni
+ * `unsafe-inline` en scripts (ver docs/csp.md).
  */
 final class ContentSecurityPolicy
 {
@@ -50,7 +50,7 @@ final class ContentSecurityPolicy
     {
         $dev = $this->developmentOrigins();
 
-        $scriptSrc = ["'self'", "'nonce-{$nonce}'", "'unsafe-eval'", ...$dev['http']];
+        $scriptSrc = ["'self'", "'nonce-{$nonce}'", ...$dev['http']];
         $styleElem = ["'self'", self::FONT_AWESOME_HOST, ...$dev['http'], ...($dev['http'] !== [] ? ["'unsafe-inline'"] : [])];
         $connectSrc = ["'self'", ...$dev['http'], ...$dev['ws'], ...$this->configuredList('connect')];
         $imgSrc = ["'self'", 'data:', 'blob:', ...$this->photoOrigins(), ...$this->configuredList('img')];

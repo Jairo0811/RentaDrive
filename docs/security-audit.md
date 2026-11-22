@@ -30,7 +30,7 @@ Este documento separa lo corregido en esta PR de lo que sigue pendiente. No es u
 ## Pendiente o bloqueado (no resuelto aquí)
 
 - **Rotar** la contraseña del login SQL local `rentadrive_app` (la anterior está en el historial). Acción del operador sobre su servidor; no se hizo.
-- **Content-Security-Policy**: implementada con nonce por petición (ver `docs/csp.md`). Sigue permitiendo `'unsafe-eval'` por Alpine estándar; migrar a `@alpinejs/csp` es trabajo pendiente.
+- **Content-Security-Policy**: implementada con nonce por petición (ver `docs/csp.md`). Ya no permite `'unsafe-eval'`: Alpine usa su build CSP.
 - **Autenticación multifactor**: implementada como TOTP (ver `docs/mfa.md`); `MFA_ENFORCE` está apagado por defecto y debe activarse antes de cuentas SuperAdmin reales.
 - **Contraseñas filtradas** (`Password::uncompromised()`): requiere salida a un servicio externo; no se activó.
 - **Cuenta de migraciones separada** (el login de aplicación del script conserva `db_ddladmin` para poder migrar). Ver `docs/staging-private.md`.

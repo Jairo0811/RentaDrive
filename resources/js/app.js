@@ -1,4 +1,4 @@
-import Alpine from 'alpinejs';
+import Alpine from '@alpinejs/csp';
 import Chart from 'chart.js/auto';
 
 window.Alpine = Alpine;
@@ -152,6 +152,10 @@ Alpine.store('accessibility', {
 });
 
 Alpine.store('toast', {
+    showLater(message, type = 'success') {
+        Alpine.nextTick(() => this.show(message, type));
+    },
+
     visible: false,
     message: '',
     type: 'success',
@@ -169,6 +173,82 @@ Alpine.store('toast', {
 });
 
 Alpine.store('accessibility').apply();
+
+// Componentes registrados (build CSP de Alpine: no se evalúa JavaScript desde atributos HTML).
+Alpine.data('appShell', () => ({
+    sidebarOpen: false,
+    desktop: window.matchMedia('(min-width: 1024px)').matches,
+
+    init() {
+        const query = window.matchMedia('(min-width: 1024px)');
+        query.addEventListener('change', (event) => {
+            this.desktop = event.matches;
+            if (event.matches) this.sidebarOpen = false;
+        });
+        this.$watch('sidebarOpen', (open) => this.$nextTick(() => {
+            if (open) this.$refs.drawerClose?.focus();
+            else if (! this.desktop) this.$refs.menuToggle?.focus();
+        }));
+    },
+
+    syncViewport() {
+        this.desktop = window.matchMedia('(min-width: 1024px)').matches;
+        if (this.desktop) this.sidebarOpen = false;
+    },
+}));
+
+Alpine.data('autoHide', (delay = 2000) => ({
+    show: true,
+
+    init() {
+        window.setTimeout(() => {
+            this.show = false;
+        }, delay);
+    },
+}));
+
+Alpine.data('modalDialog', (config) => ({
+    show: config.show,
+
+    init() {
+        this.$watch('show', (value) => {
+            if (value) {
+                document.body.classList.add('overflow-y-hidden');
+                if (config.focusable) window.setTimeout(() => this.firstFocusable()?.focus(), 100);
+            } else {
+                document.body.classList.remove('overflow-y-hidden');
+            }
+        });
+    },
+
+    onOpen(event) {
+        if (event.detail === config.name) this.show = true;
+    },
+
+    onClose(event) {
+        if (event.detail === config.name) this.show = false;
+    },
+
+    focusables() {
+        const selector = 'a, button, input:not([type=\'hidden\']), textarea, select, details, [tabindex]:not([tabindex=\'-1\'])';
+        return [...this.$el.querySelectorAll(selector)].filter((el) => ! el.hasAttribute('disabled'));
+    },
+    firstFocusable() { return this.focusables()[0]; },
+    lastFocusable() { return this.focusables().slice(-1)[0]; },
+    nextFocusableIndex() { return (this.focusables().indexOf(document.activeElement) + 1) % (this.focusables().length + 1); },
+    prevFocusableIndex() { return Math.max(0, this.focusables().indexOf(document.activeElement)) - 1; },
+    nextFocusable() { return this.focusables()[this.nextFocusableIndex()] || this.firstFocusable(); },
+    prevFocusable() { return this.focusables()[this.prevFocusableIndex()] || this.lastFocusable(); },
+
+    onTab(event) {
+        if (! event.shiftKey) this.nextFocusable()?.focus();
+    },
+
+    onShiftTab() {
+        this.prevFocusable()?.focus();
+    },
+}));
+
 Alpine.data('lookupSelect', (config) => ({
     url: config.url,
     scope: config.scope,
@@ -207,6 +287,17 @@ Alpine.data('lookupSelect', (config) => ({
             if (this.query !== this.label) this.query = this.label;
             this.close();
         }, 120);
+    },
+
+    isSelected(item) {
+        return (String(item.id) === String(this.value)).toString();
+    },
+
+    onEnter(event) {
+        if (this.open && this.active >= 0) {
+            event.preventDefault();
+            this.choose(this.items[this.active]);
+        }
     },
 
     async search() {
