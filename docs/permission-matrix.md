@@ -24,9 +24,11 @@ Generada a partir de `PermissionName` y `database/seeders/RolePermissionSeeder.p
 | `view invoices` | ✔ | ✔ | ✔ | — |
 | `manage invoices` | ✔ | — | — | — |
 | `view payments` | ✔ | ✔ | ✔ | — |
-| `manage payments` | ✔ | — | — | — |
+| `record payments` | ✔ | — | ✔ | — |
+| `manage payments` (anular) | ✔ | — | — | — |
 
 Notas:
+- `record payments` permite cobrar en mostrador; **anular** un pago exige `manage payments` (solo Administrador). Quien ya tenía `manage payments` conserva también el registro sin necesidad de volver a ejecutar el seeder.
 - «Administrador» recibe todos los permisos de la empresa.
 - Con `MFA_ENFORCE=true`, administradores de empresa y de plataforma deben activar MFA TOTP (`docs/mfa.md`).
 - Para cambiar la matriz, edita el seeder y ejecuta `php artisan db:seed --class=RolePermissionSeeder` (idempotente, no toca usuarios).

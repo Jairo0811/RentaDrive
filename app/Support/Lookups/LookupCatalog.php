@@ -35,7 +35,7 @@ final class LookupCatalog
         return match ($type) {
             'customers', 'vehicles' => [PermissionName::MANAGE_RESERVATIONS->value, PermissionName::MANAGE_RENTALS->value],
             'rentals' => [PermissionName::MANAGE_INSPECTIONS->value],
-            'invoices' => [PermissionName::MANAGE_PAYMENTS->value],
+            'invoices' => [PermissionName::RECORD_PAYMENTS->value, PermissionName::MANAGE_PAYMENTS->value],
             default => [],
         };
     }

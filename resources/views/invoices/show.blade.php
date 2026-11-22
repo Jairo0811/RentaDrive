@@ -49,7 +49,7 @@
         </div>
 
         <aside class="space-y-6">
-            @can('manage payments')
+            @canany(['record payments', 'manage payments'])
                 @if ((float) $invoice->balance > 0)
                     <section class="panel p-5 sm:p-6">
                         <h2 class="font-black text-slate-950 dark:text-white">Aplicar pago</h2>
@@ -64,7 +64,7 @@
                         </form>
                     </section>
                 @endif
-            @endcan
+            @endcanany
             @can('manage invoices')
                 <section class="panel p-5 sm:p-6">
                     <h2 class="font-black text-slate-950 dark:text-white">Ajustes de factura</h2>

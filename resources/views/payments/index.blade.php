@@ -3,7 +3,7 @@
 
     <x-page-header title="Pagos" subtitle="Registra cobros y consulta el historial de recibos." />
 
-    @can('manage payments')
+    @canany(['record payments', 'manage payments'])
         <section class="panel mb-6 p-5 sm:p-6" x-data="{ open: false }">
             @if ($openInvoiceCount === 0)
                 <div><p class="font-black text-slate-950 dark:text-white">Registrar pago</p><p class="mt-1 text-sm text-slate-400">No hay facturas con balance pendiente. Cuando existan, podrás registrar el cobro aquí.</p></div>
@@ -21,7 +21,7 @@
             </form>
             @endif
         </section>
-    @endcan
+    @endcanany
 
     <form method="GET" class="panel mb-5 flex flex-col gap-3 p-4 sm:flex-row"><label class="sr-only" for="payment-method-filter">Método de pago</label><select id="payment-method-filter" name="method" class="form-input sm:max-w-56"><option value="">Todos los métodos</option>@foreach (['cash' => 'Efectivo', 'card' => 'Tarjeta', 'transfer' => 'Transferencia', 'other' => 'Otro'] as $value => $label)<option value="{{ $value }}" @selected(request('method') === $value)>{{ $label }}</option>@endforeach</select><button class="btn-secondary">Filtrar</button></form>
     <div class="table-shell">

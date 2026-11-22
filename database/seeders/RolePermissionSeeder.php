@@ -48,6 +48,7 @@ final class RolePermissionSeeder extends Seeder
             PermissionName::MANAGE_RETURNS,
             PermissionName::VIEW_INVOICES,
             PermissionName::VIEW_PAYMENTS,
+            PermissionName::RECORD_PAYMENTS,
         ]);
         $this->syncRole(RoleName::INSPECTOR, [
             PermissionName::VIEW_DASHBOARD,
