@@ -22,7 +22,7 @@
 
 # RentaDrive
 
-> **Candidata 1.0.0-rc.1** (sin etiqueta publicada): consulta el [paquete RC1](docs/rc1/README.md), la [matriz de permisos](docs/permission-matrix.md) y el [CHANGELOG](CHANGELOG.md).
+> **Candidata 1.0.0-rc.1** (commit `94254f9`; etiqueta autorizada, pendiente de crear por el operador): consulta el [paquete RC1](docs/rc1/README.md), la [matriz de permisos](docs/permission-matrix.md) y el [CHANGELOG](CHANGELOG.md).
 
 **RentaDrive** es una plataforma web multiempresa para la gestión integral de rent-a-car. Centraliza clientes, sucursales, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría, e incorpora un **Booking Engine público por empresa**.
 
