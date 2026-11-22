@@ -4,16 +4,33 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Security\ContentSecurityPolicy;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 
 final class SecurityHeaders
 {
     public function handle(Request $request, Closure $next): Response
     {
+        $csp = ContentSecurityPolicy::mode() !== ContentSecurityPolicy::MODE_OFF;
+        $nonce = $csp ? ContentSecurityPolicy::generateNonce() : null;
+
+        if ($nonce !== null) {
+            // El nonce debe existir antes de renderizar las vistas: @vite y los <script> en línea lo usan.
+            Vite::useCspNonce($nonce);
+        }
+
         /** @var Response $response */
         $response = $next($request);
+
+        if ($nonce !== null && ! $response->headers->has(ContentSecurityPolicy::headerName())) {
+            $response->headers->set(
+                ContentSecurityPolicy::headerName(),
+                app(ContentSecurityPolicy::class)->build($nonce, $request->isSecure()),
+            );
+        }
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');

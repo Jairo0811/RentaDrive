@@ -52,6 +52,14 @@ return [
     'security' => [
         // Proxies de confianza (IPs/CIDR separados por coma). Nunca '*': ver ProductionReadiness.
         'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+        // Content-Security-Policy (ver docs/csp.md). mode: enforce | report-only | off.
+        'csp' => [
+            'mode' => env('CSP_MODE', 'enforce'),
+            // Orígenes adicionales (https://host, separados por coma) para imágenes y conexiones fetch/XHR.
+            'img' => env('CSP_IMG_SRC', ''),
+            'connect' => env('CSP_CONNECT_SRC', ''),
+        ],
     ],
 
     // Datos ficticios de staging (ver App\Support\Operations\StagingGuard).

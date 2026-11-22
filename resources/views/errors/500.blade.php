@@ -18,8 +18,9 @@
             </p>
             <div class="mt-8 flex flex-wrap justify-center gap-3">
                 <a href="{{ route('home') }}" class="btn-primary">Volver al dashboard</a>
-                <button type="button" class="btn-secondary" onclick="location.reload()">Reintentar</button>
+                <button type="button" class="btn-secondary" id="retry-button">Reintentar</button>
             </div>
         </main>
+        <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">document.getElementById('retry-button')?.addEventListener('click', () => location.reload());</script>
     </body>
 </html>

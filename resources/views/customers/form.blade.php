@@ -115,7 +115,7 @@
     </form>
 
     @push('scripts')
-        <script>
+        <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
             document.addEventListener('DOMContentLoaded', () => {
                 const typeField = document.querySelector('#document_type');
                 const numberField = document.querySelector('#document_number');
