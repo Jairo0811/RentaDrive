@@ -149,6 +149,9 @@ Route::middleware(['auth', 'tenant'])->group(function (): void {
     Route::get('/rentals/{rental}/contract', [RentalController::class, 'contract'])
         ->middleware('permission:'.PermissionName::MANAGE_CONTRACTS->value)
         ->name('rentals.contract');
+    Route::get('/rentals/{rental}/contract/download', [RentalController::class, 'contractPdf'])
+        ->middleware('permission:'.PermissionName::MANAGE_CONTRACTS->value)
+        ->name('rentals.contract.download');
     Route::patch('/rentals/{rental}/close', [RentalController::class, 'close'])
         ->middleware('permission:'.PermissionName::MANAGE_RETURNS->value)
         ->name('rentals.close');

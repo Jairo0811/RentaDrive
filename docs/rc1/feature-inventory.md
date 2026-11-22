@@ -13,7 +13,7 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Reservas (internas y portal público) | A | Disponibilidad, tokens públicos por empresa, depósitos |
 | Alquileres (apertura/cierre) | A | Transacciones con bloqueo, cálculo en centavos (`Money`) |
 | Contratos y acuse interno | A | Huella versionada con instantánea, detección de cambios posteriores. **No es firma digital certificada** |
-| Historial completo de versiones del contrato / descarga PDF firmada | D | Hoy: instantánea al acuse + vista imprimible del contrato |
+| Historial de versiones del contrato y descarga PDF | A | Versiones inmutables (apertura/cierre) con huella y diferencias; PDF con evidencia de integridad; solo `manage contracts`, aislado por empresa |
 | Inspecciones (con fotos) | A | Descarga autorizada por empresa |
 | Mantenimientos | A | CRUD y estados |
 | Facturación interna | A | Facturas internas, saldo, borrador fiscal separado |
@@ -36,5 +36,5 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 
 ## Elementos D pendientes (no dependen de terceros)
 1. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
-2. Historial de versiones editable del contrato y descarga PDF con huella.
+2. Firma electrónica certificada del cliente (depende de un proveedor externo, clase C).
 3. Lectura restringida por sucursal dentro de una empresa — **requiere decisión de negocio**.

@@ -8,9 +8,11 @@ use App\Domain\Operations\Services\RentalWorkflowService;
 use App\Http\Requests\RentalRequest;
 use App\Models\Rental;
 use App\Models\Reservation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 final class RentalController extends Controller
 {
@@ -68,6 +70,7 @@ final class RentalController extends Controller
             'reservation',
             'inspections.inspector',
             'acceptances',
+            'contractVersions.author',
             'invoice.payments',
             'opener',
             'closer',
@@ -90,6 +93,15 @@ final class RentalController extends Controller
         $workflow->close($rental, $validated);
 
         return redirect()->route('rentals.show', $rental)->with('status', 'Alquiler cerrado y factura recalculada.');
+    }
+
+    public function contractPdf(Rental $rental): Response
+    {
+        $rental->load(['customer', 'vehicle.model.brand', 'vehicle.category', 'opener', 'acceptances', 'contractVersions']);
+
+        return Pdf::loadView('documents.contract-pdf', compact('rental'))
+            ->setPaper('letter')
+            ->download('contrato-'.$rental->code.'.pdf');
     }
 
     public function contract(Rental $rental): View

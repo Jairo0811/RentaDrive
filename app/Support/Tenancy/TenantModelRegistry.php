@@ -17,6 +17,7 @@ use App\Models\PaymentEvent;
 use App\Models\PaymentIntent;
 use App\Models\Rental;
 use App\Models\RentalAcceptance;
+use App\Models\RentalContractVersion;
 use App\Models\Reservation;
 use App\Models\ReservationBookingOption;
 use App\Models\Setting;
@@ -53,6 +54,7 @@ final class TenantModelRegistry
             FiscalProfile::class,
             FiscalDraft::class,
             RentalAcceptance::class,
+            RentalContractVersion::class,
             AutomationDelivery::class,
             Setting::class,
             AuditLog::class,

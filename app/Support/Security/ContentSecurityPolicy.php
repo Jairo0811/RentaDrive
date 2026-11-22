@@ -51,7 +51,8 @@ final class ContentSecurityPolicy
         $dev = $this->developmentOrigins();
 
         $scriptSrc = ["'self'", "'nonce-{$nonce}'", ...$dev['http']];
-        $styleElem = ["'self'", self::FONT_AWESOME_HOST, ...$dev['http'], ...($dev['http'] !== [] ? ["'unsafe-inline'"] : [])];
+        // El nonce de estilos solo en producción/pruebas: en desarrollo Vite inyecta <style> sin nonce y 'unsafe-inline' se anularía si hubiera nonce.
+        $styleElem = ["'self'", self::FONT_AWESOME_HOST, ...$dev['http'], ...($dev['http'] !== [] ? ["'unsafe-inline'"] : ["'nonce-{$nonce}'"])];
         $connectSrc = ["'self'", ...$dev['http'], ...$dev['ws'], ...$this->configuredList('connect')];
         $imgSrc = ["'self'", 'data:', 'blob:', ...$this->photoOrigins(), ...$this->configuredList('img')];
         $fontSrc = ["'self'", 'data:', self::FONT_AWESOME_HOST, ...$dev['http']];
