@@ -7,7 +7,7 @@ pero cualquier usuario puede activarla desde *Perfil → Verificación en dos pa
 ## Qué incluye
 
 - **Activación**: se genera un secreto de 160 bits, se muestra como clave manual (y URI `otpauth://`) y solo queda activo tras
-  confirmar un código válido. No se genera código QR (evita una dependencia nueva); toda aplicación autenticadora permite escribir la clave.
+  confirmar un código válido. Se muestra un código QR (SVG generado en el servidor con `bacon/bacon-qr-code`; el secreto no sale a ningún servicio externo) y, como alternativa, la clave escrita.
 - **Login**: con credenciales correctas y MFA activo **no se crea sesión** hasta superar el desafío (`/two-factor-challenge`, válido 5 min).
 - **Códigos de recuperación**: 8 códigos de un solo uso. Se muestran una vez (en la respuesta, no en la sesión) y se guardan como HMAC-SHA256.
 - **Regeneración**: exige un código TOTP válido; invalida todos los anteriores.
@@ -35,6 +35,6 @@ Verifica antes la identidad de la persona por un canal independiente. La acción
 
 ## Limitaciones conocidas
 
-- Sin QR ni WebAuthn/passkeys. Sin SMS (por diseño: es un canal más débil).
+- Sin WebAuthn/passkeys. Sin SMS (por diseño: es un canal más débil).
 - El reinicio de MFA de otro usuario es una operación de consola; no existe aún un flujo web con doble aprobación.
 - La eficacia depende de que el reloj del servidor esté sincronizado (NTP); se tolera ±30 s.

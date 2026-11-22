@@ -5,7 +5,7 @@
 - **Acuse de contrato interno**: no es firma digital certificada del cliente ni sustituye asesoría legal.
 - **Sucursales**: `branch_id` se asigna al crear; todos los usuarios de una empresa ven los registros de todas sus sucursales (decisión de negocio pendiente).
 - **CSP**: `'unsafe-eval'` necesario por Alpine estándar; `style-src-attr 'unsafe-inline'`.
-- **MFA** sin QR; restablecimiento solo por consola (`rentadrive:mfa-reset`).
+- **MFA**: restablecimiento solo por consola (`rentadrive:mfa-reset`); sin WebAuthn.
 - **Pruebas**: solo Chromium en Playwright; sin iOS/Android reales, sin lectores de pantalla, sin zoom real.
 - **Rendimiento**: medido con ~250 filas por entidad en CI, no con carga concurrente ni volumen de producción.
 - **Restauración** ensayada en runner descartable; falta el ensayo en el staging real.
