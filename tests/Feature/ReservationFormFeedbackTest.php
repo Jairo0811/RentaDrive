@@ -46,7 +46,7 @@ final class ReservationFormFeedbackTest extends TestCase
             'end_at' => ['La devolución debe ser posterior al retiro.'],
         ]));
 
-        View::composer('reservations.form', static function ($view) use ($errors): void {
+        View::composer(['reservations.form', 'components.lookup-select'], static function ($view) use ($errors): void {
             $view->with('errors', $errors);
         });
 
