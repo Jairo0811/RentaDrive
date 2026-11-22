@@ -18,8 +18,9 @@
             </p>
             <div class="mt-8 flex flex-wrap justify-center gap-3">
                 <a href="{{ route('home') }}" class="btn-primary">Volver al dashboard</a>
-                <button type="button" class="btn-secondary" onclick="history.back()">Regresar</button>
+                <button type="button" class="btn-secondary" id="back-button">Regresar</button>
             </div>
         </main>
+        <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">document.getElementById('back-button')?.addEventListener('click', () => history.back());</script>
     </body>
 </html>

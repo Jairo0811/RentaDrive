@@ -93,7 +93,7 @@
         </aside>
     </form>
 
-    <script>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         (() => {
             const base = {{ json_encode((float) $quote['subtotal']) }};
             const options = Array.from(document.querySelectorAll('[data-booking-option]'));

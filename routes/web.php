@@ -3,6 +3,7 @@
 use App\Domain\Security\Enums\PermissionName;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BookingOptionController;
+use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
@@ -28,9 +29,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleMaintenanceController;
 use App\Support\Lookups\LookupCatalog;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+// Violaciones de CSP enviadas por el navegador: sin sesión, sin CSRF (no hay cookies en el envío), con límite de tasa.
+Route::post('/csp-report', CspReportController::class)
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->middleware('throttle:30,1')
+    ->name('csp.report');
 
 Route::prefix('book/{company:slug}')
     ->name('public-booking.')
