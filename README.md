@@ -22,6 +22,8 @@
 
 # RentaDrive
 
+> **Candidata 1.0.0-rc.1** (sin etiqueta publicada): consulta el [paquete RC1](docs/rc1/README.md), la [matriz de permisos](docs/permission-matrix.md) y el [CHANGELOG](CHANGELOG.md).
+
 **RentaDrive** es una plataforma web multiempresa para la gestión integral de rent-a-car. Centraliza clientes, sucursales, flota, reservas, alquileres, contratos, inspecciones, mantenimiento, facturación, pagos, reportes, usuarios, configuración y auditoría, e incorpora un **Booking Engine público por empresa**.
 
 El proyecto nació como trabajo final de **Análisis y Diseño de Sistemas (SOF-007)** del Instituto Tecnológico de Las Américas (ITLA) y fue modernizado en 2026. Actualmente evoluciona de proyecto académico/profesional a producto SaaS comercial orientado inicialmente al mercado dominicano.
