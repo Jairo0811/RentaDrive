@@ -6,6 +6,10 @@ namespace App\Support\Security\Mfa;
 
 use App\Models\AuditLog;
 use App\Models\User;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -47,6 +51,23 @@ final class TwoFactorAuthentication
             $user->email,
             (string) config('rentadrive.security.mfa.issuer', config('app.name', 'RentaDrive')),
         );
+    }
+
+    /**
+     * Código QR (SVG en línea, generado en el servidor: el secreto no sale a ningún servicio externo).
+     */
+    public function qrCodeSvg(User $user): ?string
+    {
+        $uri = $this->provisioningUri($user);
+
+        if ($uri === null) {
+            return null;
+        }
+
+        $svg = (new Writer(new ImageRenderer(new RendererStyle(200, 2), new SvgImageBackEnd)))->writeString($uri);
+
+        // Quita la declaración XML para poder incrustarlo en HTML.
+        return trim((string) preg_replace('/^<\?xml[^>]*\?>\s*/', '', $svg));
     }
 
     /**

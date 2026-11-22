@@ -5,7 +5,7 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Módulo | Clase | Evidencia / observaciones |
 |---|:-:|---|
 | Acceso, recuperación de contraseña, sesiones | A | PHPUnit + Playwright (escritorio y móvil). Contraseñas 12+ en producción/staging |
-| MFA TOTP (admin de empresa y plataforma), códigos de recuperación, `rentadrive:mfa-reset` | A | `TwoFactorAuthenticationTest`, `TotpTest`. Sin QR: se ingresa la clave manualmente (D menor) |
+| MFA TOTP (admin de empresa y plataforma), códigos de recuperación, `rentadrive:mfa-reset` | A | `TwoFactorAuthenticationTest`, `TotpTest`. Con código QR generado en el servidor y clave manual alternativa |
 | Aislamiento multiempresa | A | `CrossTenantAuthorizationMatrixTest` (matriz negativa + guarda estructural `company_id`) |
 | Roles y permisos | A | [Matriz](../permission-matrix.md) |
 | Clientes | A | CRUD, validación de cédula dominicana, selectores inteligentes |
@@ -36,7 +36,7 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 
 ## Elementos D pendientes (no dependen de terceros)
 1. Build CSP de Alpine para retirar `'unsafe-eval'` (`docs/csp.md`).
-2. MFA: código QR, WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
+2. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
 3. Historial de versiones editable del contrato y descarga PDF con huella.
 4. Cabecera CSP en respuestas 404 por binding de modelo.
 5. Lectura restringida por sucursal dentro de una empresa — **requiere decisión de negocio**.

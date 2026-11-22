@@ -208,6 +208,27 @@ final class TwoFactorAuthenticationTest extends TestCase
         $this->assertFalse($user->hasTwoFactorEnabled());
     }
 
+    public function test_pending_setup_shows_a_server_rendered_qr_code_with_the_provisioning_uri(): void
+    {
+        $user = User::factory()->create();
+        $mfa = app(TwoFactorAuthentication::class);
+        $mfa->beginSetup($user);
+
+        $svg = $mfa->qrCodeSvg($user->refresh());
+        $this->assertNotNull($svg);
+        $this->assertStringStartsWith('<svg', $svg);
+        $this->assertStringNotContainsString('<?xml', $svg);
+
+        $html = $this->actingAs($user)->get(route('profile.edit'))->assertOk()->getContent();
+        $this->assertStringContainsString('<svg', $html);
+        $this->assertStringContainsString('Escanea el código QR', $html);
+    }
+
+    public function test_no_qr_code_without_a_pending_secret(): void
+    {
+        $this->assertNull(app(TwoFactorAuthentication::class)->qrCodeSvg(User::factory()->create()));
+    }
+
     public function test_user_confirms_setup_and_sees_recovery_codes_once(): void
     {
         $user = User::factory()->create();

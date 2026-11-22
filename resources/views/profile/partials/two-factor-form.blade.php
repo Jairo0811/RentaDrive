@@ -43,8 +43,9 @@
                 <x-danger-button type="submit">Desactivar verificación en dos pasos</x-danger-button>
             </form>
         @elseif ($pending)
+            <div class="inline-block rounded-lg bg-white p-3" role="img" aria-label="Código QR para configurar la aplicación autenticadora">{!! $mfa->qrCodeSvg($user) !!}</div>
             <ol class="list-decimal space-y-2 pl-5 text-sm text-gray-700 dark:text-gray-300">
-                <li>En tu aplicación autenticadora elige «Ingresar clave de configuración» (cuenta: {{ $user->email }}, tipo: basado en tiempo).</li>
+                <li>Escanea el código QR con tu aplicación autenticadora, o elige «Ingresar clave de configuración» (cuenta: {{ $user->email }}, tipo: basado en tiempo).</li>
                 <li>Escribe esta clave: <code class="select-all break-all rounded bg-slate-100 px-2 py-1 font-mono text-slate-900 dark:bg-slate-800 dark:text-slate-100">{{ trim(chunk_split($user->two_factor_secret, 4, ' ')) }}</code></li>
                 <li>Ingresa el código de 6 dígitos que genera para confirmar.</li>
             </ol>
