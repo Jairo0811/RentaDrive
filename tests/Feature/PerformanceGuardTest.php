@@ -96,20 +96,26 @@ final class PerformanceGuardTest extends TestCase
         }
     }
 
-    /** @return array<string, array{queries: int, ms: float}> */
+    /** @return array<string, array{queries: int, ms: float, sql: array<int, string>}> */
     private function measure(): array
     {
         $this->actingAs($this->admin);
         $result = [];
 
         foreach (self::ROUTES as $route) {
-            $queries = 0;
-            DB::listen(static function () use (&$queries): void {
-                $queries++;
-            });
+            // Primera petición: calienta cachés de configuración/permisos para no medir ruido de arranque.
+            $this->get(route($route))->assertOk();
+
+            $log = [];
+            DB::flushQueryLog();
+            DB::enableQueryLog();
             $start = hrtime(true);
             $this->get(route($route))->assertOk();
-            $result[$route] = ['queries' => $queries, 'ms' => (hrtime(true) - $start) / 1e6];
+            $ms = (hrtime(true) - $start) / 1e6;
+            $log = array_column(DB::getQueryLog(), 'query');
+            DB::disableQueryLog();
+
+            $result[$route] = ['queries' => count($log), 'ms' => $ms, 'sql' => $log];
         }
 
         return $result;
@@ -130,6 +136,12 @@ final class PerformanceGuardTest extends TestCase
         fwrite(STDERR, "\n[rendimiento] ".(self::SCALE + 2)." filas por entidad\n".implode("\n", $lines)."\n");
 
         foreach (self::ROUTES as $route) {
+            if ($large[$route]['queries'] > $small[$route]['queries'] + 3) {
+                $extra = array_count_values(array_map(static fn (string $q): string => substr($q, 0, 110), $large[$route]['sql']));
+                arsort($extra);
+                fwrite(STDERR, "\n[N+1?] {$route}: ".json_encode(array_slice($extra, 0, 5), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n");
+            }
+
             $this->assertLessThanOrEqual(
                 $small[$route]['queries'] + 3,
                 $large[$route]['queries'],
