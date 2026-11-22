@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -62,6 +63,16 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
+        // Logging estructurado: una línea JSON por evento (incluye request_id del Context). Usar LOG_STACK=json.
+        'json' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/rentadrive.json.log'),
+            'level' => env('LOG_LEVEL', 'warning'),
+            'max_files' => env('LOG_DAILY_DAYS', 14),
+            'formatter' => JsonFormatter::class,
             'replace_placeholders' => true,
         ],
 

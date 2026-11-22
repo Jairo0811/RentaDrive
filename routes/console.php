@@ -3,6 +3,7 @@
 use App\Domain\Automation\Services\AutomationDispatcher;
 use App\Models\User;
 use App\Support\Commercial\CompanyLifecycle;
+use App\Support\Operations\HealthReport;
 use App\Support\Operations\ProductionReadiness;
 use App\Support\Operations\StagingGuard;
 use App\Support\Security\DemoCredentials;
@@ -10,6 +11,9 @@ use App\Support\Security\Mfa\TwoFactorAuthentication;
 use Database\Seeders\StagingFictionalSeeder;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -71,6 +75,46 @@ Artisan::command('rentadrive:mfa-reset {email}', function (string $email, TwoFac
 
     return Command::SUCCESS;
 })->purpose('Desactiva MFA de un usuario que perdió su dispositivo y sus códigos de recuperación.');
+
+// Latido del scheduler: lo lee HealthReport para detectar que el planificador dejó de ejecutarse.
+Schedule::call(static fn () => Cache::put(HealthReport::HEARTBEAT_KEY, time(), 3600))
+    ->name('rentadrive:heartbeat')
+    ->everyMinute();
+
+Artisan::command('rentadrive:monitor', function (HealthReport $health): int {
+    $report = $health->details();
+
+    if ($report['status'] === 'ok') {
+        $this->info('Operación saludable (base de datos, cola y scheduler).');
+
+        return Command::SUCCESS;
+    }
+
+    foreach ($report['problems'] as $problem) {
+        $this->error($problem);
+    }
+
+    Log::critical('operations.degraded', ['problems' => $report['problems']]);
+
+    $recipient = config('rentadrive.operations.alert_email');
+
+    // Solo se envía si hay destinatario configurado; máximo un aviso por hora para no saturar.
+    if (is_string($recipient) && filter_var($recipient, FILTER_VALIDATE_EMAIL) && Cache::add('rentadrive:alert:sent', 1, 3600)) {
+        try {
+            Mail::raw(
+                'RentaDrive detectó un problema operativo: '.implode(', ', $report['problems']).'. Revisa /api/health/details y los logs.',
+                static fn ($message) => $message->to($recipient)->subject('RentaDrive · alerta operativa'),
+            );
+        } catch (Throwable $exception) {
+            Log::error('No se pudo enviar la alerta operativa', ['exception' => $exception::class]);
+        }
+    }
+
+    return Command::FAILURE;
+})->purpose('Evalúa base de datos, cola y scheduler; registra y avisa (si hay destinatario) cuando hay degradación.');
+
+Schedule::command('rentadrive:monitor')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('queue:prune-failed --hours=720')->daily()->withoutOverlapping();
 
 Artisan::command('rentadrive:automations', function (AutomationDispatcher $dispatcher): int {
     $count = $dispatcher->run();

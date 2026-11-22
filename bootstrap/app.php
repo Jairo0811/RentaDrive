@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnforceMfaEnrollment;
 use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\ResolvePublicCompany;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(AssignRequestId::class);
         $middleware->web(append: [EnforceMfaEnrollment::class, SecurityHeaders::class]);
         $middleware->alias([
             'permission' => PermissionMiddleware::class,

@@ -68,6 +68,19 @@ return [
         ],
     ],
 
+    // Observabilidad y alertas (ver docs/operations-resilience.md).
+    'operations' => [
+        // Token Bearer para /api/health/details (≥ 32 caracteres; vacío = endpoint inexistente).
+        'health_token' => env('HEALTH_TOKEN'),
+        'max_queue_age_seconds' => (int) env('HEALTH_MAX_QUEUE_AGE', 900),
+        'max_failed_jobs' => (int) env('HEALTH_MAX_FAILED_JOBS', 5),
+        'max_scheduler_age_seconds' => (int) env('HEALTH_MAX_SCHEDULER_AGE', 180),
+        // En producción el scheduler es obligatorio; en local/testing no.
+        'require_scheduler' => (bool) env('HEALTH_REQUIRE_SCHEDULER', env('APP_ENV') === 'production'),
+        // Alertas por correo solo si se configura un destinatario (y un proveedor de correo real).
+        'alert_email' => env('RENTADRIVE_ALERT_EMAIL'),
+    ],
+
     // Datos ficticios de staging (ver App\Support\Operations\StagingGuard).
     'staging' => [
         'allow_seed' => (bool) env('RENTADRIVE_ALLOW_STAGING_SEED', false),
