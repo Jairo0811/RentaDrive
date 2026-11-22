@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Domain\Security\Enums\RoleName;
+use App\Models\User;
 use App\Support\Security\ContentSecurityPolicy;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Vite;
@@ -74,6 +77,29 @@ final class ContentSecurityPolicyTest extends TestCase
             $this->assertStringContainsString('nonce="nonce-de-prueba"', $html);
             $this->assertStringNotContainsString('onclick=', $html);
         }
+    }
+
+    public function test_unmatched_routes_and_model_binding_404s_also_get_csp_with_matching_nonce(): void
+    {
+        foreach (['/ruta-que-no-existe', '/customers/999999'] as $uri) {
+            $response = $this->get($uri);
+
+            $this->assertContains($response->getStatusCode(), [302, 404], $uri);
+            if ($response->getStatusCode() === 404) {
+                $header = (string) $response->headers->get('Content-Security-Policy');
+                $this->assertNotSame('', $header, "Sin CSP en {$uri}");
+                preg_match("/'nonce-([^']+)'/", $header, $nonce);
+                $this->assertStringContainsString('nonce="'.$nonce[1].'"', (string) $response->getContent());
+            }
+        }
+
+        $this->seed(RolePermissionSeeder::class);
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleName::ADMINISTRATOR->value);
+
+        $bound = $this->actingAs($admin)->get('/customers/999999');
+        $bound->assertNotFound();
+        $this->assertNotNull($bound->headers->get('Content-Security-Policy'));
     }
 
     public function test_report_only_mode_uses_the_report_only_header(): void

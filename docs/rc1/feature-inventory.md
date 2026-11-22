@@ -38,5 +38,5 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 1. Build CSP de Alpine para retirar `'unsafe-eval'` (`docs/csp.md`).
 2. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
 3. Historial de versiones editable del contrato y descarga PDF con huella.
-4. Cabecera CSP en respuestas 404 por binding de modelo.
+
 5. Lectura restringida por sucursal dentro de una empresa — **requiere decisión de negocio**.
