@@ -167,4 +167,17 @@ final class BranchVisibilityTest extends TestCase
         $this->assertSame(2, Rental::query()->count());
         $this->assertSame(1, Rental::query()->visibleToBranch()->count());
     }
+
+    public function test_dashboard_lists_and_counters_follow_the_branch_for_restricted_roles(): void
+    {
+        Rental::query()->withoutGlobalScopes()->update(['expected_return_at' => now()->subDay()]);
+
+        $agentHtml = $this->actingAs($this->userIn($this->north, RoleName::RENTAL_AGENT))->get(route('dashboard'))->assertOk()->getContent();
+        $this->assertStringContainsString('ALQ-NORTH', $agentHtml);
+        $this->assertStringNotContainsString('ALQ-SOUTH', $agentHtml);
+
+        $adminHtml = $this->actingAs($this->userIn($this->north, RoleName::ADMINISTRATOR))->get(route('dashboard'))->assertOk()->getContent();
+        $this->assertStringContainsString('ALQ-NORTH', $adminHtml);
+        $this->assertStringContainsString('ALQ-SOUTH', $adminHtml);
+    }
 }

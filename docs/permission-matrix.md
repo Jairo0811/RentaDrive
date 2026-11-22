@@ -35,6 +35,6 @@ Notas:
 
 ## Visibilidad por sucursal
 - **Administrador y Gerente**: ven todas las sucursales de su empresa.
-- **Agente de alquiler e Inspector** (con sucursal asignada): solo ven y abren registros de su sucursal — vehículos, reservas, alquileres (y su contrato), facturas, pagos e inspecciones. Un registro de otra sucursal responde 404 por URL directa y no aparece en listados ni selectores.
+- **Agente de alquiler e Inspector** (con sucursal asignada): solo ven y abren registros de su sucursal — vehículos, reservas, alquileres (y su contrato), facturas, pagos e inspecciones, además de los contadores y listas de su dashboard. Un registro de otra sucursal responde 404 por URL directa y no aparece en listados ni selectores.
 - Los **clientes** son de toda la empresa. La **disponibilidad** y los cierres consideran todas las sucursales (no es un filtro global).
 - Un usuario sin sucursal asignada no queda restringido.
