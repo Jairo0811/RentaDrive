@@ -7,7 +7,7 @@
 ARG PHP_IMAGE=php:8.4-fpm-bookworm
 
 # ---------- assets (Vite) ----------
-FROM node:24-bookworm-slim AS assets
+FROM node:26-bookworm-slim AS assets
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
