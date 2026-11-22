@@ -134,6 +134,14 @@ final class ProductionReadiness
             $advisories[] = 'MFA_ENFORCE=true obliga a SuperAdmin y Administradores a usar verificación en dos pasos.';
         }
 
+        if (strlen((string) config('rentadrive.operations.health_token')) < 32) {
+            $advisories[] = 'HEALTH_TOKEN (≥ 32 caracteres) habilita /api/health/details para monitoreo externo.';
+        }
+
+        if (! filter_var((string) config('rentadrive.operations.alert_email'), FILTER_VALIDATE_EMAIL)) {
+            $advisories[] = 'RENTADRIVE_ALERT_EMAIL no está configurado: las degradaciones solo quedan en el log (operations.degraded).';
+        }
+
         return $advisories;
     }
 
