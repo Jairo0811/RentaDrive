@@ -39,6 +39,12 @@
                     @if($rental->acceptances->isNotEmpty())
                         @foreach($rental->acceptances as $acceptance)
                             <p class="mt-3 text-sm text-emerald-300">{{ $acceptance->signer_name }} · {{ $acceptance->accepted_at->format('d/m/Y H:i') }} · Hash SHA-256: {{ $acceptance->document_hash }}</p>
+                            @php($integrity = \App\Support\Commercial\ContractIntegrity::status($acceptance))
+                            <p class="mt-1 text-xs {{ $integrity === 'modified' ? 'text-amber-300' : 'text-slate-400' }}">
+                                @if($integrity === 'valid') Integridad verificada: los términos coinciden con los del acuse.
+                                @elseif($integrity === 'modified') Atención: los términos del alquiler cambiaron después del acuse.
+                                @else Acuse de versión anterior: huella parcial, sin verificación completa. @endif
+                            </p>
                         @endforeach
                     @elseif($rental->status === 'open')
                         <form method="POST" action="{{ route('rentals.acceptance', $rental) }}" class="mt-4 space-y-3">
