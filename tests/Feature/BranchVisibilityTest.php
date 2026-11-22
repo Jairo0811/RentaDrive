@@ -144,13 +144,13 @@ final class BranchVisibilityTest extends TestCase
     public function test_lookup_selectors_respect_the_branch_for_restricted_roles_only(): void
     {
         $agent = $this->userIn($this->north, RoleName::RENTAL_AGENT);
-        $content = $this->actingAs($agent)->getJson(route('lookups.search', ['type' => 'vehicles', 'q' => 'V-']))->getContent();
-        $this->assertStringContainsString('V-NORTH', (string) $content);
-        $this->assertStringNotContainsString('V-SOUTH', (string) $content);
+        $content = $this->actingAs($agent)->getJson(route('lookups.search', ['type' => 'vehicles', 'q' => 'PL']))->getContent();
+        $this->assertStringContainsString('PLNORTH', (string) $content);
+        $this->assertStringNotContainsString('PLSOUTH', (string) $content);
 
         $admin = $this->userIn($this->north, RoleName::ADMINISTRATOR);
-        $content = $this->actingAs($admin)->getJson(route('lookups.search', ['type' => 'vehicles', 'q' => 'V-']))->getContent();
-        $this->assertStringContainsString('V-SOUTH', (string) $content);
+        $content = $this->actingAs($admin)->getJson(route('lookups.search', ['type' => 'vehicles', 'q' => 'PL']))->getContent();
+        $this->assertStringContainsString('PLSOUTH', (string) $content);
     }
 
     public function test_users_without_a_branch_are_not_restricted(): void
