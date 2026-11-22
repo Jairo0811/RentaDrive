@@ -1,6 +1,7 @@
 # RentaDrive — Paquete de candidato a versión 1.0.0-rc.1
 
-> Estado: **candidato, sin etiqueta publicada**. La etiqueta `v1.0.0-rc.1` solo se propone tras la aprobación del responsable; este paquete no la crea.
+> Estado: **candidata RC1 para staging** (no para producción). Commit candidato `94254f9`; etiqueta `v1.0.0-rc.1` autorizada por el responsable el 22/11/2026 y pendiente de crear por el operador:
+> `git tag -a v1.0.0-rc.1 94254f921f47fa5d433710f1f6c1d5292205afab -m "RentaDrive 1.0.0-rc.1 (candidata)" && git push origin v1.0.0-rc.1` (o un pre-release en GitHub apuntando a ese commit).
 
 | Documento | Contenido |
 |---|---|

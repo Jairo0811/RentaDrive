@@ -10,4 +10,4 @@
 - [ ] Validación manual: zoom 200/400 %, iOS/Android, VoiceOver/TalkBack/NVDA, Safari y Firefox.
 - [ ] Decidir la regla de visibilidad por sucursal.
 - [ ] Decidir sobre la PR #46 del tráiler (voz real, términos de uso de clips).
-- [ ] Autorizar (o no) la etiqueta `v1.0.0-rc.1`.
+- [x] Etiqueta `v1.0.0-rc.1` autorizada (22/11/2026). - [ ] Crearla en `94254f9` (ver `docs/rc1/README.md`).
