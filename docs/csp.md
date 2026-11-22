@@ -9,7 +9,7 @@ La aplicación envía una CSP con **nonce por petición** desde `App\Http\Middle
 | --- | --- | --- |
 | `default-src` | `'self'` | Todo lo no listado queda restringido al propio origen. |
 | `script-src` | `'self'` `'nonce-…'` | Sin scripts en línea sin nonce, sin orígenes externos y **sin `'unsafe-eval'`** (Alpine usa su build CSP). |
-| `style-src-elem` | `'self'` `https://cdnjs.cloudflare.com` | Hojas propias y Font Awesome; sin `<style>` en línea. |
+| `style-src-elem` | `'self'` `'nonce-…'` `https://cdnjs.cloudflare.com` | Hojas propias y Font Awesome; un `<style>` en línea solo con nonce (p. ej. el contrato imprimible). |
 | `style-src-attr` | `'unsafe-inline'` | Atributos `style=""` existentes (anchos de barras, visibilidad de componentes). |
 | `font-src` | `'self'` `data:` `https://cdnjs.cloudflare.com` | Iconos Font Awesome. |
 | `img-src` | `'self'` `data:` `blob:` + origen del disco de fotos si es externo | Fotos de flota en S3/CDN se autorizan automáticamente. |

@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\Rental;
 use App\Models\Reservation;
 use App\Models\Vehicle;
+use App\Support\Commercial\ContractVersions;
 use App\Support\Commercial\Money;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -59,6 +60,8 @@ final class RentalWorkflowService
                 'status' => 'open',
                 'opened_by' => auth()->id(),
             ]);
+
+            ContractVersions::record($rental, 'apertura');
 
             $vehicle->update(['status' => 'rented']);
             $reservation?->update(['status' => 'converted']);
@@ -119,6 +122,8 @@ final class RentalWorkflowService
                 'status' => 'closed',
                 'closed_by' => auth()->id(),
             ]);
+
+            ContractVersions::record($rental->refresh(), 'cierre');
 
             $rental->vehicle()->update([
                 'status' => $vehicleStatus,

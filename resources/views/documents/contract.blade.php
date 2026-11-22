@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Contrato {{ $rental->code }} | RentaDrive</title>
-    <style>
+    <style nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         * { box-sizing: border-box; }
         body { background:#e2e8f0; color:#0f172a; font-family:Arial,sans-serif; margin:0; padding:32px; }
         .document { background:white; box-shadow:0 20px 50px rgba(15,23,42,.18); margin:auto; max-width:900px; min-height:1100px; padding:54px; }
@@ -25,7 +25,8 @@
     </style>
 </head>
 <body>
-    <div class="actions"><button onclick="window.print()">Imprimir contrato</button></div>
+    <div class="actions"><button type="button" id="print-contract">Imprimir contrato</button></div>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">document.getElementById('print-contract')?.addEventListener('click', () => window.print());</script>
     <main class="document">
         <header class="header">
             <img src="{{ asset('images/rentadrive-logo-transparent.png') }}" alt="RentaDrive" class="logo">

@@ -22,6 +22,12 @@ final class ContractIntegrity
 
     public const LEGACY = 'legacy';
 
+    /** Alquiler cerrado: las condiciones pactadas siguen intactas; los totales finales pueden diferir del estimado. */
+    public const CLOSED = 'closed';
+
+    /** Condiciones pactadas al abrir (los importes pueden cambiar legítimamente al cerrar por días extra o cargos). */
+    private const AGREED_TERMS = ['code', 'customer_id', 'vehicle_id', 'start_at', 'expected_return_at', 'daily_rate', 'deposit_amount'];
+
     /** @return array<string, string|int|null> */
     public static function snapshot(Rental $rental): array
     {
@@ -56,6 +62,23 @@ final class ContractIntegrity
             return self::LEGACY;
         }
 
-        return hash_equals($acceptance->document_hash, self::hash(self::snapshot($rental))) ? self::VALID : self::MODIFIED;
+        if (hash_equals($acceptance->document_hash, self::hash(self::snapshot($rental)))) {
+            return self::VALID;
+        }
+
+        if ($rental->status === 'closed' && $acceptance->document_snapshot !== null) {
+            $accepted = json_decode($acceptance->document_snapshot, true, 512, JSON_THROW_ON_ERROR);
+            $current = self::snapshot($rental);
+
+            foreach (self::AGREED_TERMS as $field) {
+                if (($accepted[$field] ?? null) !== ($current[$field] ?? null)) {
+                    return self::MODIFIED;
+                }
+            }
+
+            return self::CLOSED;
+        }
+
+        return self::MODIFIED;
     }
 }

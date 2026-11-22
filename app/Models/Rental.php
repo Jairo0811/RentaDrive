@@ -86,6 +86,11 @@ class Rental extends Model
         return $this->hasMany(Inspection::class);
     }
 
+    public function contractVersions(): HasMany
+    {
+        return $this->hasMany(RentalContractVersion::class)->orderBy('version');
+    }
+
     public function acceptances(): HasMany
     {
         return $this->hasMany(RentalAcceptance::class);

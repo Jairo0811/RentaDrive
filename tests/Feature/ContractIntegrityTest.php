@@ -16,6 +16,7 @@ use App\Models\VehicleBrand;
 use App\Models\VehicleCategory;
 use App\Models\VehicleModel;
 use App\Support\Commercial\ContractIntegrity;
+use App\Support\Commercial\ContractVersions;
 use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -103,5 +104,67 @@ final class ContractIntegrityTest extends TestCase
 
         $this->rental->forceFill(['total' => 9999])->save();
         $this->actingAs($this->operator)->get(route('rentals.show', $this->rental))->assertSee('cambiaron después del acuse');
+    }
+
+    public function test_closed_rental_keeps_agreed_terms_valid_but_flags_changed_agreed_terms(): void
+    {
+        $this->accept();
+
+        // Cierre legítimo: cambian importes finales, no las condiciones pactadas.
+        $this->rental->forceFill(['status' => 'closed', 'total' => 1500, 'taxes' => 270, 'fees' => 100])->save();
+        $this->assertSame(ContractIntegrity::CLOSED, ContractIntegrity::status(RentalAcceptance::query()->firstOrFail()->refresh()));
+
+        $this->rental->forceFill(['daily_rate' => 5])->save();
+        $this->assertSame(ContractIntegrity::MODIFIED, ContractIntegrity::status(RentalAcceptance::query()->firstOrFail()->refresh()));
+    }
+
+    public function test_versions_are_recorded_only_on_change_with_a_diff_and_are_immutable(): void
+    {
+        $first = ContractVersions::record($this->rental, 'apertura');
+        $this->assertSame(1, $first->version);
+        $this->assertNull(ContractVersions::record($this->rental, 'cierre'), 'Sin cambios no se crea versión.');
+
+        $this->rental->forceFill(['fees' => 200, 'total' => 1400])->save();
+        $second = ContractVersions::record($this->rental->refresh(), 'cierre');
+
+        $this->assertSame(2, $second->version);
+        $this->assertSame(['fees', 'total'], array_keys(ContractVersions::diff($first, $second)));
+
+        $this->expectException(\LogicException::class);
+        $second->update(['reason' => 'manipulado']);
+    }
+
+    public function test_versions_cannot_be_deleted(): void
+    {
+        $version = ContractVersions::record($this->rental, 'apertura');
+
+        $this->expectException(\LogicException::class);
+        $version->delete();
+    }
+
+    public function test_contract_pdf_downloads_with_integrity_evidence_and_history_is_listed(): void
+    {
+        $this->accept();
+        ContractVersions::record($this->rental, 'apertura');
+
+        $response = $this->actingAs($this->operator)->get(route('rentals.contract.download', $this->rental));
+        $response->assertOk();
+        $this->assertStringContainsString('application/pdf', (string) $response->headers->get('content-type'));
+        $this->assertStringStartsWith('%PDF', $response->getContent());
+
+        $this->actingAs($this->operator)->get(route('rentals.show', $this->rental))
+            ->assertOk()->assertSee('Historial del contrato')->assertSee('Descargar PDF');
+    }
+
+    public function test_printable_contract_page_works_under_csp_with_nonce_style_and_no_inline_handler(): void
+    {
+        $response = $this->actingAs($this->operator)->get(route('rentals.contract', $this->rental))->assertOk();
+        $html = $response->getContent();
+        $header = (string) $response->headers->get('Content-Security-Policy');
+
+        preg_match("/style-src-elem [^;]*'nonce-([^']+)'/", $header, $nonce);
+        $this->assertNotEmpty($nonce, 'style-src-elem debe llevar nonce.');
+        $this->assertStringContainsString('<style nonce="'.$nonce[1].'">', $html);
+        $this->assertStringNotContainsString('onclick=', $html);
     }
 }

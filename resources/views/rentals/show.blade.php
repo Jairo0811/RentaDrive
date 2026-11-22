@@ -3,7 +3,7 @@
 
     <x-page-header :title="'Alquiler '.$rental->code" :subtitle="$rental->customer->full_name">
         <x-slot name="actions">
-            @can('manage contracts')<a href="{{ route('rentals.contract', $rental) }}" target="_blank" class="btn-secondary">Contrato imprimible</a>@endcan
+            @can('manage contracts')<a href="{{ route('rentals.contract', $rental) }}" target="_blank" class="btn-secondary">Contrato imprimible</a> <a href="{{ route('rentals.contract.download', $rental) }}" class="btn-secondary">Descargar PDF</a>@endcan
             @if ($rental->invoice)<a href="{{ route('invoices.show', $rental->invoice) }}" class="btn-secondary">Ver factura</a>@endif
             @if ($rental->status === 'open')
                 @can('manage inspections')<a href="{{ route('inspections.create', ['rental' => $rental->id]) }}" class="btn-primary">Nueva inspección</a>@endcan
@@ -42,6 +42,7 @@
                             @php($integrity = \App\Support\Commercial\ContractIntegrity::status($acceptance))
                             <p class="mt-1 text-xs {{ $integrity === 'modified' ? 'text-amber-300' : 'text-slate-400' }}">
                                 @if($integrity === 'valid') Integridad verificada: los términos coinciden con los del acuse.
+                                @elseif($integrity === 'closed') Alquiler cerrado: las condiciones pactadas siguen intactas; los totales finales pueden diferir del estimado del acuse (ver historial).
                                 @elseif($integrity === 'modified') Atención: los términos del alquiler cambiaron después del acuse.
                                 @else Acuse de versión anterior: huella parcial, sin verificación completa. @endif
                             </p>
@@ -56,6 +57,25 @@
                         </form>
                     @endif
                 </section>
+
+                @if($rental->contractVersions->isNotEmpty())
+                    <section class="panel p-5 sm:p-6">
+                        <h2 class="font-bold text-white">Historial del contrato</h2>
+                        <p class="mt-2 text-sm text-slate-400">Versiones inmutables de los términos (huella SHA-256). Solo se crea una versión nueva cuando algo cambia.</p>
+                        <ol class="mt-4 space-y-3 text-sm">
+                            @foreach($rental->contractVersions as $version)
+                                @php($changes = \App\Support\Commercial\ContractVersions::diff($rental->contractVersions->firstWhere('version', $version->version - 1), $version))
+                                <li class="rounded-xl bg-slate-950/50 p-4">
+                                    <p class="font-bold text-slate-100">v{{ $version->version }} · {{ ucfirst($version->reason) }} <span class="font-normal text-slate-400">· {{ $version->created_at->format('d/m/Y H:i') }}@if($version->author) · {{ $version->author->name }}@endif</span></p>
+                                    <p class="mt-1 break-all font-mono text-xs text-slate-400">{{ $version->document_hash }}</p>
+                                    @foreach($changes as $field => $change)
+                                        <p class="mt-1 text-xs text-amber-300">{{ $field }}: {{ $change['antes'] }} → {{ $change['despues'] }}</p>
+                                    @endforeach
+                                </li>
+                            @endforeach
+                        </ol>
+                    </section>
+                @endif
             @endcan
             <section class="table-shell">
                 <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800"><h2 class="font-black text-slate-950 dark:text-white">Inspecciones</h2>@if ($rental->status === 'open')<span class="text-xs text-slate-400">Entrega y devolución</span>@endif</div>

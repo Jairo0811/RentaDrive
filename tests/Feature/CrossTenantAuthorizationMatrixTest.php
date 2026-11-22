@@ -175,6 +175,7 @@ final class CrossTenantAuthorizationMatrixTest extends TestCase
             ['DELETE', 'reservations.destroy', ['reservation' => 'reservation']],
             ['GET', 'rentals.show', ['rental' => 'rental']],
             ['GET', 'rentals.contract', ['rental' => 'rental']],
+            ['GET', 'rentals.contract.download', ['rental' => 'rental']],
             ['POST', 'rentals.acceptance', ['rental' => 'rental']],
             ['PATCH', 'rentals.close', ['rental' => 'rental']],
             ['GET', 'inspections.show', ['inspection' => 'inspection']],
