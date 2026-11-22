@@ -51,6 +51,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
     }
 
+    /**
+     * Sucursal a la que queda limitada la visibilidad del usuario, o null si ve toda la empresa
+     * (Administrador, Gerente, administrador de plataforma o usuario sin sucursal).
+     */
+    public function branchRestriction(): ?int
+    {
+        if ($this->branch_id === null || $this->isPlatformAdmin()) {
+            return null;
+        }
+
+        if ($this->hasAnyRole([RoleName::ADMINISTRATOR->value, RoleName::MANAGER->value])) {
+            return null;
+        }
+
+        return $this->hasAnyRole([RoleName::RENTAL_AGENT->value, RoleName::INSPECTOR->value]) ? (int) $this->branch_id : null;
+    }
+
     /** Cuentas que deben proteger su acceso con MFA: SuperAdmin de plataforma y administradores de empresa. */
     public function isPrivileged(): bool
     {

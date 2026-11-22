@@ -19,6 +19,7 @@ final class InspectionController extends Controller
     public function index(Request $request): View
     {
         $inspections = Inspection::query()
+            ->visibleToBranch()
             ->with(['rental.customer', 'vehicle.model.brand', 'inspector'])
             ->when($request->filled('type'), fn ($query) => $query->where('type', $request->string('type')))
             ->latest('inspected_at')

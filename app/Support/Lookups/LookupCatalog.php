@@ -82,12 +82,13 @@ final class LookupCatalog
         return match ($type) {
             'customers' => Customer::query()->where('status', 'active')->orderBy('first_name')->orderBy('last_name')->orderBy('id'),
             'vehicles' => Vehicle::query()
+                ->visibleToBranch()
                 ->with(['model.brand', 'category'])
                 ->whereNotIn('status', $scope === 'rental' ? ['rented', 'maintenance', 'inactive'] : ['maintenance', 'inactive'])
                 ->orderBy('code')
                 ->orderBy('id'),
-            'rentals' => Rental::query()->with(['customer', 'vehicle.model.brand'])->latest('id'),
-            'invoices' => Invoice::query()->with('customer')->where('balance', '>', 0)->orderBy('due_at')->orderBy('id'),
+            'rentals' => Rental::query()->visibleToBranch()->with(['customer', 'vehicle.model.brand'])->latest('id'),
+            'invoices' => Invoice::query()->visibleToBranch()->with('customer')->where('balance', '>', 0)->orderBy('due_at')->orderBy('id'),
             default => abort(404),
         };
     }

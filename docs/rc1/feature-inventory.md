@@ -7,7 +7,7 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 | Acceso, recuperación de contraseña, sesiones | A | PHPUnit + Playwright (escritorio y móvil). Contraseñas 12+ en producción/staging |
 | MFA TOTP (admin de empresa y plataforma), códigos de recuperación, `rentadrive:mfa-reset` | A | `TwoFactorAuthenticationTest`, `TotpTest`. Con código QR generado en el servidor y clave manual alternativa |
 | Aislamiento multiempresa | A | `CrossTenantAuthorizationMatrixTest` (matriz negativa + guarda estructural `company_id`) |
-| Roles y permisos | A | [Matriz](../permission-matrix.md) |
+| Roles y permisos | A | [Matriz](../permission-matrix.md). Agente e Inspector limitados a su sucursal (listados, apertura por URL y selectores); Administrador y Gerente ven toda la empresa |
 | Clientes | A | CRUD, validación de cédula dominicana, selectores inteligentes |
 | Flota (vehículos, marcas, modelos, categorías) | A | CRUD, estados, fotos |
 | Reservas (internas y portal público) | A | Disponibilidad, tokens públicos por empresa, depósitos |
@@ -37,4 +37,4 @@ Clasificación: **A** completo y probado automáticamente · **B** completo, pen
 ## Elementos D pendientes (no dependen de terceros)
 1. MFA: WebAuthn y flujo web de restablecimiento (hoy solo comando de consola).
 2. Firma electrónica certificada del cliente (depende de un proveedor externo, clase C).
-3. Lectura restringida por sucursal dentro de una empresa — **requiere decisión de negocio**.
+3. Dashboard y reportes siguen mostrando totales de toda la empresa a quien los ve (Administrador/Gerente; el Agente ve el dashboard con contadores de empresa).

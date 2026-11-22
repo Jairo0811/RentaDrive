@@ -19,6 +19,7 @@ final class PaymentController extends Controller
     public function index(Request $request): View
     {
         $payments = Payment::query()
+            ->visibleToBranch()
             ->with(['invoice.customer', 'receiver'])
             ->when($request->filled('method'), fn ($query) => $query->where('method', $request->string('method')))
             ->latest('paid_at')
@@ -27,7 +28,7 @@ final class PaymentController extends Controller
 
         return view('payments.index', [
             'payments' => $payments,
-            'openInvoiceCount' => Invoice::query()->where('balance', '>', 0)->count(),
+            'openInvoiceCount' => Invoice::query()->visibleToBranch()->where('balance', '>', 0)->count(),
         ]);
     }
 
