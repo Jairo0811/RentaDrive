@@ -33,6 +33,7 @@ final class VehicleController extends Controller
         };
 
         $vehicles = Vehicle::query()
+            ->visibleToBranch()
             ->with(['model.brand', 'category'])
             ->withCount(['rentals', 'maintenances'])
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {

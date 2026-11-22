@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,5 +50,20 @@ class Payment extends Model
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    /** Visible solo si la factura asociada lo es (ver Invoice::scopeVisibleToBranch). */
+    public function scopeVisibleToBranch(Builder $query, ?User $user = null): void
+    {
+        $user ??= auth()->user();
+
+        if ($user?->branchRestriction() !== null) {
+            $query->whereHas('invoice', fn (Builder $invoice) => $invoice->visibleToBranch($user));
+        }
+    }
+
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        return $this->newQuery()->visibleToBranch()->where($field ?? $this->getRouteKeyName(), $value)->first();
     }
 }

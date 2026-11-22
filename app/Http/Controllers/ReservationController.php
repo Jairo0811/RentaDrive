@@ -23,6 +23,7 @@ final class ReservationController extends Controller
     public function index(Request $request): View
     {
         $reservations = Reservation::query()
+            ->visibleToBranch()
             ->with(['customer', 'category', 'vehicle.model.brand'])
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
                 $search = '%'.$request->string('q')->value().'%';

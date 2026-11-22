@@ -18,6 +18,7 @@ final class InvoiceController extends Controller
     public function index(Request $request): View
     {
         $invoices = Invoice::query()
+            ->visibleToBranch()
             ->with(['customer', 'rental.vehicle'])
             ->when($request->string('q')->isNotEmpty(), function ($query) use ($request): void {
                 $search = '%'.$request->string('q')->value().'%';

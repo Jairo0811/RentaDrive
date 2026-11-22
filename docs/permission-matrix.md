@@ -32,3 +32,9 @@ Notas:
 - «Administrador» recibe todos los permisos de la empresa.
 - Con `MFA_ENFORCE=true`, administradores de empresa y de plataforma deben activar MFA TOTP (`docs/mfa.md`).
 - Para cambiar la matriz, edita el seeder y ejecuta `php artisan db:seed --class=RolePermissionSeeder` (idempotente, no toca usuarios).
+
+## Visibilidad por sucursal
+- **Administrador y Gerente**: ven todas las sucursales de su empresa.
+- **Agente de alquiler e Inspector** (con sucursal asignada): solo ven y abren registros de su sucursal — vehículos, reservas, alquileres (y su contrato), facturas, pagos e inspecciones. Un registro de otra sucursal responde 404 por URL directa y no aparece en listados ni selectores.
+- Los **clientes** son de toda la empresa. La **disponibilidad** y los cierres consideran todas las sucursales (no es un filtro global).
+- Un usuario sin sucursal asignada no queda restringido.

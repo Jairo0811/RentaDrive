@@ -3,7 +3,7 @@
 - **No hay certificación fiscal**: no se emiten NCF ni e-CF; la facturación es interna.
 - **No hay cobros reales**: pagos manuales; no se guardan datos de tarjeta.
 - **Acuse de contrato interno**: no es firma digital certificada del cliente ni sustituye asesoría legal.
-- **Sucursales**: `branch_id` se asigna al crear; todos los usuarios de una empresa ven los registros de todas sus sucursales (decisión de negocio pendiente).
+- **Sucursales**: Agente e Inspector ven solo los registros de su sucursal (vehículos, reservas, alquileres, facturas, pagos, inspecciones y selectores). Los clientes son de toda la empresa, la disponibilidad cuenta toda la empresa (por diseño, para no sobrevender) y el dashboard del Agente muestra contadores de toda la empresa.
 - **CSP**: sin `'unsafe-eval'` (Alpine build CSP); persiste `style-src-attr 'unsafe-inline'` y la dependencia de cdnjs (Font Awesome).
 - **MFA**: restablecimiento solo por consola (`rentadrive:mfa-reset`); sin WebAuthn.
 - **Pruebas**: solo Chromium en Playwright; sin iOS/Android reales, sin lectores de pantalla, sin zoom real.
