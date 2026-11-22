@@ -27,7 +27,10 @@ actívalo cuando los administradores ya tengan MFA. `rentadrive:production-check
 
 ## Pérdida del dispositivo y de los códigos
 
-Un administrador sin acceso no puede recuperarlo desde la web (a propósito). El operador, con acceso al servidor, ejecuta:
+Un administrador de empresa sin acceso no puede recuperarlo por sí mismo. Hay dos vías:
+
+1. **SuperAdmin de plataforma (web)**: en *Plataforma → Empresas → editar*, sección de administradores, botón «Restablecer MFA». Exige confirmar la contraseña del SuperAdmin (≤5 min), solo aplica a administradores de esa empresa (no a cuentas de plataforma) y queda auditado como `mfa_reset_by_platform` con el actor.
+2. **Operador con acceso al servidor**:
 
     php artisan rentadrive:mfa-reset usuario@empresa.com
 
@@ -36,5 +39,5 @@ Verifica antes la identidad de la persona por un canal independiente. La acción
 ## Limitaciones conocidas
 
 - Sin WebAuthn/passkeys. Sin SMS (por diseño: es un canal más débil).
-- El reinicio de MFA de otro usuario es una operación de consola; no existe aún un flujo web con doble aprobación.
+- El restablecimiento web lo hace un SuperAdmin sin segunda aprobación (queda auditado); el MFA de las cuentas de plataforma solo se restablece por consola.
 - La eficacia depende de que el reloj del servidor esté sincronizado (NTP); se tolera ±30 s.

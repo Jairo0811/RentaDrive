@@ -113,7 +113,13 @@ final class PlatformCompanyController extends Controller
     {
         $events = $company->lifecycleEvents()->with('actor')->latest('id')->limit(20)->get();
 
-        return view('platform.companies.form', compact('company', 'events'));
+        $administrators = User::query()
+            ->where('company_id', $company->getKey())
+            ->role(RoleName::ADMINISTRATOR->value)
+            ->orderBy('name')
+            ->get();
+
+        return view('platform.companies.form', compact('company', 'events', 'administrators'));
     }
 
     public function update(CompanyUpdateRequest $request, Company $company): RedirectResponse

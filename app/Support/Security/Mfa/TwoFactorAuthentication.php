@@ -200,12 +200,12 @@ final class TwoFactorAuthentication
     }
 
     /** Registra un evento de seguridad (auditoría + log estructurado) sin datos secretos. */
-    public function record(User $user, string $event, array $context = []): void
+    public function record(User $user, string $event, array $context = [], ?User $actor = null): void
     {
-        AuditLog::withoutEvents(function () use ($user, $event): void {
+        AuditLog::withoutEvents(function () use ($user, $event, $actor): void {
             AuditLog::query()->create([
                 'company_id' => $user->company_id,
-                'user_id' => $user->getKey(),
+                'user_id' => ($actor ?? $user)->getKey(),
                 'event' => $event,
                 'auditable_type' => User::class,
                 'auditable_id' => $user->getKey(),
@@ -217,6 +217,7 @@ final class TwoFactorAuthentication
         Log::info('security.mfa', [
             'event' => $event,
             'user_id' => $user->getKey(),
+            ...($actor !== null ? ['actor_id' => $actor->getKey()] : []),
             'ip' => request()?->ip(),
             ...array_intersect_key($context, ['remaining' => true]),
         ]);
