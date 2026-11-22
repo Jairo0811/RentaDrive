@@ -121,6 +121,22 @@ final class ProductionReadiness
         return $problems;
     }
 
+    /**
+     * Recomendaciones que no bloquean el despliegue (se muestran como advertencia).
+     *
+     * @return list<string>
+     */
+    public function advisories(): array
+    {
+        $advisories = [];
+
+        if (config('rentadrive.security.mfa.enforce') !== true) {
+            $advisories[] = 'MFA_ENFORCE=true obliga a SuperAdmin y Administradores a usar verificación en dos pasos.';
+        }
+
+        return $advisories;
+    }
+
     /** @return list<string> */
     public function infrastructureProblems(): array
     {

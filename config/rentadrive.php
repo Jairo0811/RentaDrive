@@ -60,6 +60,12 @@ return [
             'img' => env('CSP_IMG_SRC', ''),
             'connect' => env('CSP_CONNECT_SRC', ''),
         ],
+
+        // MFA TOTP para SuperAdmin y Administradores. enforce=true obliga a activarlo antes de usar el panel.
+        'mfa' => [
+            'enforce' => (bool) env('MFA_ENFORCE', false),
+            'issuer' => env('MFA_ISSUER', 'RentaDrive'),
+        ],
     ],
 
     // Datos ficticios de staging (ver App\Support\Operations\StagingGuard).

@@ -18,10 +18,22 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        $user = $request->authenticate();
+
+        if ($user->hasTwoFactorEnabled()) {
+            // Las credenciales son correctas, pero todavía no hay sesión: solo un "pase" temporal hacia el desafío MFA.
+            $request->session()->regenerate();
+            $request->session()->put(TwoFactorChallengeController::PENDING_USER, $user->getKey());
+            $request->session()->put(TwoFactorChallengeController::PENDING_REMEMBER, $request->boolean('remember'));
+            $request->session()->put(TwoFactorChallengeController::PENDING_EXPIRES, now()->addMinutes(TwoFactorChallengeController::TTL_MINUTES)->getTimestamp());
+
+            return redirect()->route('two-factor.challenge');
+        }
+
+        Auth::guard('web')->login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
-        if ($request->user()?->isPlatformAdmin()) {
+        if ($user->isPlatformAdmin()) {
             return redirect()->route('platform.dashboard');
         }
 

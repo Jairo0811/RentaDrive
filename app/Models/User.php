@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Domain\Security\Enums\RoleName;
 use App\Models\Concerns\Auditable;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -16,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['company_id', 'branch_id', 'name', 'email', 'password', 'is_active', 'is_platform_admin'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_last_used_step'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
@@ -34,12 +35,26 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_active' => 'boolean',
             'is_platform_admin' => 'boolean',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 
     public function isPlatformAdmin(): bool
     {
         return $this->is_platform_admin === true;
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
+    }
+
+    /** Cuentas que deben proteger su acceso con MFA: SuperAdmin de plataforma y administradores de empresa. */
+    public function isPrivileged(): bool
+    {
+        return $this->isPlatformAdmin() || $this->hasRole(RoleName::ADMINISTRATOR->value);
     }
 
     public function company(): BelongsTo
