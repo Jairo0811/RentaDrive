@@ -6,6 +6,7 @@ use App\Support\Commercial\CompanyLifecycle;
 use App\Support\Operations\ProductionReadiness;
 use App\Support\Operations\StagingGuard;
 use App\Support\Security\DemoCredentials;
+use App\Support\Security\Mfa\TwoFactorAuthentication;
 use Database\Seeders\StagingFictionalSeeder;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -34,10 +35,42 @@ Artisan::command('rentadrive:production-check', function (ProductionReadiness $r
         return Command::FAILURE;
     }
 
+    foreach ($readiness->advisories() as $advisory) {
+        $this->warn('Recomendación: '.$advisory);
+    }
+
     $this->info('Configuración básica y conexión SQL Server verificadas. No sustituye auditoría ni prueba de restauración.');
 
     return Command::SUCCESS;
 })->purpose('Valida configuración crítica y conectividad antes de un despliegue.');
+
+Artisan::command('rentadrive:mfa-reset {email}', function (string $email, TwoFactorAuthentication $mfa): int {
+    // Recuperación operativa: solo desde consola del servidor, nunca desde la web.
+    $user = User::query()->where('email', $email)->first();
+
+    if ($user === null) {
+        $this->error('No existe un usuario con ese correo.');
+
+        return Command::FAILURE;
+    }
+
+    if (! $user->hasTwoFactorEnabled() && $user->two_factor_secret === null) {
+        $this->info('El usuario no tiene MFA configurado.');
+
+        return Command::SUCCESS;
+    }
+
+    if (! $this->confirm('¿Desactivar MFA de '.$user->email.'? El usuario deberá volver a activarlo.', false)) {
+        $this->warn('Operación cancelada.');
+
+        return Command::FAILURE;
+    }
+
+    $mfa->disable($user);
+    $this->info('MFA desactivado. Verifica la identidad del usuario por un canal independiente antes de entregarle el acceso.');
+
+    return Command::SUCCESS;
+})->purpose('Desactiva MFA de un usuario que perdió su dispositivo y sus códigos de recuperación.');
 
 Artisan::command('rentadrive:automations', function (AutomationDispatcher $dispatcher): int {
     $count = $dispatcher->run();

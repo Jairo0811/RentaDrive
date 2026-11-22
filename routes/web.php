@@ -23,6 +23,7 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TwoFactorSettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleMaintenanceController;
@@ -54,6 +55,14 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // MFA: confirmar la contraseña (máx. 10 min) antes de iniciar, regenerar o desactivar el segundo factor.
+    Route::middleware('password.confirm:password.confirm,600')->group(function (): void {
+        Route::post('/profile/two-factor', [TwoFactorSettingsController::class, 'store'])->name('two-factor.enable');
+        Route::post('/profile/two-factor/confirm', [TwoFactorSettingsController::class, 'confirm'])->name('two-factor.confirm');
+        Route::post('/profile/two-factor/recovery-codes', [TwoFactorSettingsController::class, 'regenerate'])->name('two-factor.recovery-codes');
+        Route::delete('/profile/two-factor', [TwoFactorSettingsController::class, 'destroy'])->name('two-factor.disable');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'platform_admin'])

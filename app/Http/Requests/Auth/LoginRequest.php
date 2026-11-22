@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -38,9 +39,11 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * Valida las credenciales SIN iniciar sesión: el controlador decide si hace falta un segundo factor.
+     *
      * @throws ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(): User
     {
         $this->ensureIsNotRateLimited();
 
@@ -49,7 +52,10 @@ class LoginRequest extends FormRequest
             'is_active' => true,
         ];
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        $provider = Auth::guard('web')->getProvider();
+        $user = $provider->retrieveByCredentials($credentials);
+
+        if (! $user instanceof User || ! $provider->validateCredentials($user, $credentials)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -58,6 +64,8 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        return $user;
     }
 
     /**
