@@ -23,7 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);
-        $middleware->web(append: [EnforceMfaEnrollment::class, SecurityHeaders::class]);
+        $middleware->web(append: [EnforceMfaEnrollment::class]);
+        // Global: también cubre 404 sin ruta y fallos de binding de modelo, que no pasan por el grupo web.
+        $middleware->append(SecurityHeaders::class);
         $middleware->alias([
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,

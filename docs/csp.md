@@ -37,6 +37,8 @@ Los scripts de `@vite` reciben el nonce mediante `Vite::useCspNonce()`.
 Cualquier `<script>` en línea debe llevar `nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}"`. No se admiten manejadores
 `onclick=` en las vistas (se migraron los de las páginas 404/500).
 
+Las respuestas 404 (ruta inexistente o modelo no encontrado en una ruta con binding) también llevan CSP: `SecurityHeaders` es middleware global, no solo del grupo `web`.
+
 ## Limitación conocida: `'unsafe-eval'`
 
 Alpine.js estándar evalúa las expresiones de `x-data`, `@click`, `x-show`… con `new Function`. Quitar `'unsafe-eval'` exige migrar a la
